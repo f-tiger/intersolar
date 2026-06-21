@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b1120">
+<title>Intersolar 2026 展位调研 · 归档助手</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<style>
+  :root{
+    --bg:#0b1120; --panel:#131c31; --panel2:#1b2740; --line:#26324f;
+    --txt:#e8edf7; --mut:#93a0bd; --acc:#3b82f6; --acc2:#22c55e;
+    --warn:#f59e0b; --bad:#ef4444; --chipA:#6366f1; --chipB:#0ea5e9; --chipG:#64748b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.5}
+  a{color:var(--acc);text-decoration:none}
+  .wrap{max-width:760px;margin:0 auto;padding:0 14px 96px}
+  header{position:sticky;top:0;z-index:30;background:rgba(11,17,32,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 0 0}
+  .hbar{max-width:760px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px}
+  .hbar h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px}
+  .hbar .sub{font-size:11px;color:var(--mut);font-weight:500}
+  .logo{width:30px;height:30px;flex:0 0 auto}
+  .nav{display:flex;gap:6px;max-width:760px;margin:0 auto;padding:0 10px 10px;overflow-x:auto}
+  .nav button{flex:0 0 auto;background:var(--panel);color:var(--mut);border:1px solid var(--line);
+    padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600}
+  .nav button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+  /* progress bar */
+  .prog{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:4px 0}
+  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+  /* summary card */
+  .summary{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;margin:14px 0}
+  .statrow{display:flex;gap:10px;text-align:center;margin-top:10px}
+  .statrow .s{flex:1;background:var(--panel2);border-radius:10px;padding:8px 4px}
+  .statrow .s b{display:block;font-size:20px}
+  .statrow .s span{font-size:11px;color:var(--mut)}
+  /* filters */
+  .filters{display:flex;gap:6px;margin:6px 0 12px;flex-wrap:wrap}
+  .filters button{background:var(--panel);color:var(--mut);border:1px solid var(--line);
+    padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
+  .filters button.on{color:#fff}
+  .filters button[data-l="A"].on{background:var(--chipA);border-color:var(--chipA)}
+  .filters button[data-l="B"].on{background:var(--chipB);border-color:var(--chipB)}
+  .filters button[data-l="G"].on{background:var(--chipG);border-color:var(--chipG)}
+  .filters button[data-l="all"].on{background:var(--acc);border-color:var(--acc)}
+  .search{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--txt);
+    padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:12px}
+  /* booth card */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px;margin-bottom:11px;display:block;width:100%;text-align:left;color:inherit}
+  .card:active{background:var(--panel2)}
+  .card .top{display:flex;align-items:flex-start;gap:8px}
+  .card .nm{font-weight:700;font-size:15.5px;flex:1}
+  .chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .chip.A{background:rgba(99,102,241,.18);color:#a5b4fc}
+  .chip.B{background:rgba(14,165,233,.18);color:#7dd3fc}
+  .chip.G{background:rgba(100,116,139,.2);color:#cbd5e1}
+  .chip.pri{background:rgba(245,158,11,.18);color:#fcd34d}
+  .card .focus{color:var(--mut);font-size:12.5px;margin:6px 0 8px}
+  .card .meta{display:flex;gap:14px;font-size:11.5px;color:var(--mut);align-items:center}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+  .st-todo{background:#64748b}.st-doing{background:var(--warn)}.st-done{background:var(--acc2)}
+  /* detail */
+  .back{background:none;border:none;color:var(--acc);font-size:14px;padding:12px 0;font-weight:600}
+  .sec{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;margin-bottom:12px}
+  .sec h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:7px}
+  .sec h3 .n{font-size:11px;color:var(--mut);font-weight:600}
+  label.fld{display:block;font-size:12px;color:var(--mut);margin:8px 0 4px}
+  input[type=text],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);padding:9px 11px;border-radius:9px;font-size:14px;font-family:inherit}
+  textarea{min-height:70px;resize:vertical}
+  .q{border-top:1px solid var(--line);padding:11px 0}
+  .q:first-of-type{border-top:none}
+  .q .qh{display:flex;gap:9px;align-items:flex-start;cursor:pointer}
+  .q .qh input{margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--acc2)}
+  .q .qt{font-size:13.5px;flex:1}
+  .q.checked .qt{color:var(--mut);text-decoration:line-through}
+  .q textarea{margin-top:7px;min-height:46px}
+  /* photos */
+  .photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+  .ph{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:var(--panel2)}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph .del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.6);color:#fff;border:none;
+    width:24px;height:24px;border-radius:50%;font-size:14px;line-height:1}
+  .ph .cap{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);font-size:9px;
+    padding:2px 4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .btnrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .btn{background:var(--acc);color:#fff;border:none;padding:11px 14px;border-radius:10px;
+    font-size:14px;font-weight:600;flex:1;text-align:center;min-width:120px}
+  .btn.sec2{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .btn.green{background:var(--acc2)}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--mut)}
+  .seg{display:flex;gap:6px;margin-top:6px}
+  .seg button{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--mut);
+    padding:8px;border-radius:8px;font-size:12px;font-weight:600}
+  .seg button.support{background:rgba(34,197,94,.18);color:#86efac;border-color:#22c55e}
+  .seg button.neutral{background:rgba(245,158,11,.16);color:#fcd34d;border-color:#f59e0b}
+  .seg button.refute{background:rgba(239,68,68,.16);color:#fca5a5;border-color:#ef4444}
+  .hypbox{border-top:1px solid var(--line);padding:11px 0}
+  .hypbox:first-of-type{border-top:none}
+  .hypbox .ht{font-size:12.5px;margin-bottom:3px}
+  .hypbox .hid{font-size:10px;color:var(--mut);font-weight:700}
+  /* dashboard */
+  .hcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+  .hcard .lbl{font-size:11px;font-weight:700;color:var(--mut)}
+  .hcard .desc{font-size:13.5px;margin:4px 0 10px}
+  .bars{display:flex;height:26px;border-radius:7px;overflow:hidden;background:var(--panel2);font-size:11px;font-weight:700}
+  .bars>div{display:flex;align-items:center;justify-content:center;min-width:0;color:#06210f}
+  .bs{background:#22c55e}.bn{background:#f59e0b}.br{background:#ef4444;color:#fff}
+  .bars .empty{flex:1;color:var(--mut);background:transparent}
+  .verdict{margin-top:9px;font-size:12px;padding:8px 10px;border-radius:8px;background:var(--panel2);color:var(--mut)}
+  .muted{color:var(--mut);font-size:12.5px}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#fff;color:#0b1120;
+    padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:99;opacity:0;
+    transition:opacity .25s;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+  .toast.show{opacity:1}
+  .hidden{display:none!important}
+  .tip{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
+    border-radius:10px;padding:10px;margin-bottom:12px}
+  .addbtn{width:100%;background:none;border:1px dashed var(--line);color:var(--mut);
+    padding:13px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:24px}
+  footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <svg class="logo" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="11" fill="#1b2740"/><circle cx="24" cy="20" r="7" fill="#f59e0b"/><g stroke="#f59e0b" stroke-width="2.4" stroke-linecap="round"><path d="M24 6v3M24 31v3M38 20h-3M13 20h-3M33.9 9.9l-2.1 2.1M16.2 27.8l-2.1 2.1M33.9 30.1l-2.1-2.1M16.2 12.2l-2.1-2.1"/></g><rect x="15" y="36" width="18" height="7" rx="2" fill="#22c55e"/></svg>
+    <div style="flex:1">
+      <h1>Intersolar 2026 展位调研</h1>
+      <div class="sub">慕尼黑 · 6/23–25 · 拍照归档 + MVP 验证</div>
+    </div>
+  </div>
+  <nav class="nav" id="nav">
+    <button data-v="list" class="on">展位</button>
+    <button data-v="dash">验证看板</button>
+    <button data-v="data">数据/归档</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <!-- LIST VIEW -->
+  <section id="view-list">
+    <div class="summary">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <strong style="font-size:14px">整体进度</strong>
+        <span class="muted" id="progtxt">0 / 0</span>
+      </div>
+      <div class="prog"><i id="progbar" style="width:0%"></i></div>
+      <div class="statrow">
+        <div class="s"><b id="st-done">0</b><span>已完成</span></div>
+        <div class="s"><b id="st-doing">0</b><span>进行中</span></div>
+        <div class="s"><b id="st-photos">0</b><span>照片</span></div>
+        <div class="s"><b id="st-ans">0</b><span>已答问题</span></div>
+      </div>
+    </div>
+    <input class="search" id="search" placeholder="搜索展位名 / 关键词…">
+    <div class="filters" id="filters">
+      <button data-l="all" class="on">全部</button>
+      <button data-l="A">A 户储线</button>
+      <button data-l="B">B 工商储线</button>
+      <button data-l="G">通用/论坛</button>
+      <button data-l="pri">⭐ 优先</button>
+      <button data-l="todo">未完成</button>
+    </div>
+    <div id="boothlist"></div>
+    <button class="addbtn" id="addbooth">＋ 临时新增一个展位</button>
+  </section>
+
+  <!-- DETAIL VIEW -->
+  <section id="view-detail" class="hidden"></section>
+
+  <!-- DASHBOARD VIEW -->
+  <section id="view-dash" class="hidden">
+    <div class="tip">把每个展位调研后给相关假设打上 <b>支持 / 中立 / 反驳</b>，这里会实时汇总。达到 PRD 的"判定标准"即可决定立项。</div>
+    <div id="dashbody"></div>
+  </section>
+
+  <!-- DATA VIEW -->
+  <section id="view-data" class="hidden">
+    <div class="sec">
+      <h3>📦 归档导出</h3>
+      <p class="muted">数据保存在本机浏览器（localStorage + IndexedDB）。导出后可永久归档、跨设备迁移。建议每天结束导出一次。</p>
+      <div class="btnrow">
+        <button class="btn green" id="exp-html">导出归档报告 (HTML，含照片)</button>
+      </div>
+      <div class="btnrow">
+        <button class="btn sec2" id="exp-json">导出数据备份 (JSON)</button>
+        <button class="btn sec2" id="imp-json">导入 JSON 恢复</button>
+      </div>
+      <input type="file" id="impfile" accept="application/json" class="hidden">
+    </div>
+    <div class="sec">
+      <h3>ℹ️ 使用说明</h3>
+      <ul class="muted" style="padding-left:18px;margin:0;line-height:1.9">
+        <li>手机打开本页 → "添加到主屏幕"可离线使用（首次需联网加载一次）。</li>
+        <li>每个展位：拍照 / 上传图片、逐条勾选并回答调研问题、记笔记、给假设打标。</li>
+        <li>照片会自动压缩（长边≤1600px）以节省空间。</li>
+        <li>"验证看板"汇总 A/B 两条线的假设证据，辅助判断 MVP 是否立项。</li>
+        <li>本工具本身也是一个可被验证的"现场数据采集"MVP — 用顺手与否就是反馈。</li>
+      </ul>
+    </div>
+    <div class="sec">
+      <h3>⚠️ 危险操作</h3>
+      <button class="btn ghost" id="wipe" style="border-color:#ef4444;color:#fca5a5">清空所有本地数据</button>
+    </div>
+  </section>
+
+  <footer>Intersolar Europe 2026 · The smarter E · 离线可用 · 数据仅存本机</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================ 数据：展位与问题种子 ============================ */
+const HYP = {
+  'A-H1':{line:'A',title:'跨品牌存量 retrofit 优化是空白（在位者只服务自家硬件）'},
+  'A-H2':{line:'A',title:'安装商/零售商愿为"跨品牌中立层 + 订阅 + 合规"付费'},
+  'A-H3':{line:'A',title:'消费级品牌 API 开放度足以做第三方调度/聚合'},
+  'B-H1':{line:'B',title:'SMB C&I 缺"跨品牌 + 多收益叠加 + 透明结算"标准化软件'},
+  'B-H2':{line:'B',title:'集成商/ESaaS 愿为白标调度 + 收益分成付费'},
+  'B-H3':{line:'B',title:'收益归因/结算透明度是真痛点'}
+};
+const QA = [ // A线通用问题
+  '优化只服务自家硬件还是跨品牌？跨哪些？什么协议（EEBUS/Modbus/云API）？',
+  '给安装商/零售商白标吗？怎么定价（per-device/分成）？',
+  '存量系统（无EMS）怎么 retrofit 接入？',
+  '§14a EEBUS 控制盒/CLS 现在真跑通了吗？装机里跑通多少？',
+  '你们最大的获客瓶颈是什么？'
+];
+const QB = [ // B线通用问题
+  'value stacking 支持哪几个市场协同（削峰/套利/aFRR/FCR）？',
+  '收益结算/归因做到什么颗粒度？客户怎么对账？',
+  '给集成商/ESaaS 白标吗？per-kW/分成怎么定？',
+  '跨品牌 PCS/电池接入哪些？SunSpec 覆盖如何？',
+  'SMB(<1MWh) 这块谁在认真做？最大获客瓶颈？'
+];
+const SEED = [
+  // ===== A 线：户储 retrofit =====
+  {id:'1komma5',name:'1KOMMA5° (Heartbeat)',line:'A',pri:1,hall:'',focus:'Heartbeat 已向存量开放、VPP 达1GW。验证"跨品牌"边界',hyp:['A-H1','A-H2'],q:QA},
+  {id:'sonnen',name:'sonnen',line:'A',pri:1,hall:'',focus:'已接 EPEX 日内、FCR 预鉴定。是否只服务自家电池',hyp:['A-H1'],q:QA},
+  {id:'gridx',name:'gridX (XENON)',line:'A',pri:1,hall:'',focus:'平台型在位者，已向安装商开放。接入广度/白标定价/合作边界',hyp:['A-H1','A-H2'],q:QA},
+  {id:'kiwigrid',name:'kiwigrid',line:'A',pri:0,hall:'',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2'],q:QA},
+  {id:'marstek',name:'Marstek',line:'A',pri:1,hall:'',focus:'低价即插即用储能，有官方Local/Open API。验证开放度',hyp:['A-H3'],q:QA},
+  {id:'ecoflow',name:'EcoFlow (OASIS)',line:'A',pri:1,hall:'',focus:'AI HEMS最成体系、对接500+电价、开发者API。是否在内化整合价值',hyp:['A-H3','A-H1'],q:QA},
+  {id:'anker',name:'Anker SOLIX',line:'A',pri:0,hall:'',focus:'Solarbank系列，偏云锁定、无官方本地API。验证封闭程度',hyp:['A-H3'],q:QA},
+  {id:'zendure',name:'Zendure',line:'A',pri:0,hall:'',focus:'SolarFlow + 动态电价TOU自动化。开放度',hyp:['A-H3'],q:QA},
+  {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA},
+  // ===== B 线：工商储 SaaS =====
+  {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3'],q:QB},
+  {id:'lumera',name:'Lumera Energy (Lumera OS)',line:'B',pri:1,hall:'',focus:'C&I储能规划/仿真/运营OS，入围。结算/归因怎么做',hyp:['B-H1','B-H3'],q:QB},
+  {id:'simpl',name:'Simpl.energy (Zympler)',line:'B',pri:1,hall:'',focus:'PV/电池/EV/工业负荷统一EMS，入围。SMB定价、跨品牌',hyp:['B-H1','B-H2'],q:QB},
+  {id:'entrix',name:'Entrix',line:'B',pri:0,hall:'',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2'],q:QB},
+  {id:'suena',name:'Suena',line:'B',pri:0,hall:'',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2'],q:QB},
+  {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:0,hall:'',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB},
+  {id:'gridbeyond',name:'GridBeyond',line:'B',pri:0,hall:'',focus:'AI优化+CapEx-free电池。ESaaS模式/收益分成',hyp:['B-H2','B-H3'],q:QB},
+  {id:'sigenergy',name:'Sigenergy (AI in All)',line:'B',pri:1,hall:'',focus:'SigenStor Neo五合一、AI叙事、ees入围。EMS开放度',hyp:['B-H1'],q:QB},
+  {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:0,hall:'',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB},
+  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:0,hall:'',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB},
+  {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？',hyp:['B-H1','B-H2'],q:QB},
+  {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3'],q:QB},
+  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:0,hall:'',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3'],q:QB},
+  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:0,hall:'',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB},
+  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:0,hall:'',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1'],q:QB},
+  // ===== 通用 / 论坛 =====
+  {id:'award',name:'⭐ The smarter E AWARD 颁奖',line:'G',pri:1,hall:'ICM · 6/22 17:00',focus:'一晚锁定软件/VPP风向与获奖名单。重点听 Smart Integrated Energy 类目',hyp:[],q:[
+    '哪些项目获奖（区别于入围）？评审强调了什么价值点？',
+    '获奖项目里有无"跨品牌中立层 / 透明结算"叙事？',
+    '与我的A/B假设最相关的是哪几个？记下展位号去拜访。']},
+  {id:'emforum',name:'EM-Power Forum 场次',line:'G',pri:1,hall:'EM-Power · 凭展票免费',focus:'需求响应数据互操作性、拥塞/容量管理、DSO数字化',hyp:[],q:[
+    '需求响应数据互操作性现状与缺口？',
+    '拥塞/容量管理给软件留了什么机会？',
+    'DSO数字化的痛点与采购意愿？']},
+  {id:'seforum',name:'The smarter E Forum',line:'G',pri:0,hall:'凭展票免费',focus:'prosuming / smart grid 大主题、实战分享',hyp:[],q:[
+    'prosuming/灵活性变现的最新实战案例？',
+    '有无可借鉴的商业模式/分成结构？']}
+];
+
+/* ============================ 存储层 ============================ */
+const LS_KEY='intersolar_state_v2';
+let STATE = load();
+function load(){ try{return JSON.parse(localStorage.getItem(LS_KEY))||{booths:{},custom:[]}}catch(e){return{booths:{},custom:[]}} }
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(STATE)); }
+function allBooths(){ return [...SEED, ...(STATE.custom||[])]; }
+function bState(id){ if(!STATE.booths[id]) STATE.booths[id]={status:'todo',hall:'',notes:'',answers:{},hyp:{}}; return STATE.booths[id]; }
+
+/* IndexedDB for photos */
+let DB;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('intersolar_photos',1);
+  r.onupgradeneeded=e=>{const db=e.target.result; if(!db.objectStoreNames.contains('photos')){
+    const s=db.createObjectStore('photos',{keyPath:'id',autoIncrement:true}); s.createIndex('booth','boothId');}};
+  r.onsuccess=e=>{DB=e.target.result;res(DB)}; r.onerror=e=>rej(e);});}
+function txStore(mode){return DB.transaction('photos',mode).objectStore('photos');}
+function addPhoto(p){return new Promise((res,rej)=>{const r=txStore('readwrite').add(p);r.onsuccess=()=>res(r.result);r.onerror=rej;});}
+function delPhoto(id){return new Promise((res,rej)=>{const r=txStore('readwrite').delete(id);r.onsuccess=res;r.onerror=rej;});}
+function photosOf(boothId){return new Promise((res,rej)=>{const out=[];const idx=txStore('readonly').index('booth');
+  const r=idx.openCursor(IDBKeyRange.only(boothId));r.onsuccess=e=>{const c=e.target.result;if(c){out.push(c.value);c.continue()}else res(out)};r.onerror=rej;});}
+function allPhotos(){return new Promise((res,rej)=>{const out=[];const r=txStore('readonly').openCursor();
+  r.onsuccess=e=>{const c=e.target.result;if(c){out.push(c.value);c.continue()}else res(out)};r.onerror=rej;});}
+function countPhotos(){return new Promise((res)=>{const r=txStore('readonly').count();r.onsuccess=()=>res(r.result);});}
+function clearPhotos(){return new Promise((res,rej)=>{const r=txStore('readwrite').clear();r.onsuccess=res;r.onerror=rej;});}
+
+/* 图片压缩 */
+function compress(file){return new Promise(res=>{const img=new Image();const url=URL.createObjectURL(file);
+  img.onload=()=>{const max=1600;let{width:w,height:h}=img;if(w>h&&w>max){h=h*max/w;w=max}else if(h>max){w=w*max/h;h=max}
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);c.toBlob(b=>res(b),'image/jpeg',0.82);};
+  img.onerror=()=>{URL.revokeObjectURL(url);res(file)};img.src=url;});}
+
+/* ============================ 渲染 ============================ */
+let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='';
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+
+function go(v){CUR=v;['list','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
+  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  if(v==='list')renderList(); if(v==='dash')renderDash(); window.scrollTo(0,0);}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
+
+function statusOf(id){const s=bState(id);const b=allBooths().find(x=>x.id===id);
+  const ans=Object.values(s.answers||{}).filter(a=>a&&(a.checked||a.text)).length;
+  if(s.status==='done')return'done'; if(s.status==='doing'||ans>0||s.notes)return'doing'; return'todo';}
+
+async function renderList(){
+  const list=allBooths();
+  // summary
+  let done=0,doing=0,ans=0;
+  list.forEach(b=>{const st=statusOf(b.id);if(st==='done')done++;else if(st==='doing')doing++;
+    const s=bState(b.id);ans+=Object.values(s.answers||{}).filter(a=>a&&(a.checked||a.text)).length;});
+  const ph=await countPhotos();
+  $('#st-done').textContent=done;$('#st-doing').textContent=doing;$('#st-photos').textContent=ph;$('#st-ans').textContent=ans;
+  $('#progtxt').textContent=done+' / '+list.length;
+  $('#progbar').style.width=(list.length?Math.round(done/list.length*100):0)+'%';
+  // filter
+  let fl=list.filter(b=>{
+    if(FILTER==='A'||FILTER==='B'||FILTER==='G')return b.line===FILTER;
+    if(FILTER==='pri')return b.pri===1;
+    if(FILTER==='todo')return statusOf(b.id)!=='done';
+    return true;});
+  if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+b.focus).toLowerCase().includes(q));}
+  const pc=await Promise.all(fl.map(b=>countPhotos2(b.id)));
+  const html=fl.map((b,i)=>{const st=statusOf(b.id);const s=bState(b.id);
+    const a=Object.values(s.answers||{}).filter(x=>x&&(x.checked||x.text)).length;
+    const stTxt={todo:'未开始',doing:'进行中',done:'已完成'}[st];
+    return `<button class="card" onclick="openBooth('${b.id}')">
+      <div class="top"><div class="nm">${esc(b.name)}</div>
+        ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
+        <span class="chip ${b.line}">${b.line==='A'?'户储':b.line==='B'?'工商储':'通用'}</span></div>
+      <div class="focus">${esc(b.focus)}</div>
+      <div class="meta">
+        <span><i class="dot st-${st}"></i>${stTxt}</span>
+        <span>📷 ${pc[i]}</span><span>✓ ${a}/${b.q.length}</span>
+        ${(s.hall||b.hall)?'<span>📍 '+esc(s.hall||b.hall)+'</span>':''}
+      </div></button>`;}).join('');
+  $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
+}
+function countPhotos2(id){return photosOf(id).then(a=>a.length);}
+
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  FILTER=b.dataset.l;$$('#filters button').forEach(x=>x.classList.toggle('on',x===b));renderList();});
+$('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
+
+async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);const s=bState(id);
+  go('detail');const v=$('#view-detail');
+  const photos=await photosOf(id);
+  v.innerHTML=`
+   <button class="back" onclick="go('list')">‹ 返回展位列表</button>
+   <div class="sec">
+     <h3>${esc(b.name)} <span class="chip ${b.line}" style="margin-left:auto">${b.line==='A'?'户储线':b.line==='B'?'工商储线':'通用'}</span></h3>
+     <p class="muted" style="margin:0 0 6px">${esc(b.focus)}</p>
+     <label class="fld">展位号 / 位置（现场填）</label>
+     <input type="text" id="f-hall" value="${esc(s.hall||b.hall||'')}" placeholder="如 B2.350">
+     <label class="fld">状态</label>
+     <select id="f-status">
+       <option value="todo"${s.status==='todo'?' selected':''}>未开始</option>
+       <option value="doing"${s.status==='doing'?' selected':''}>进行中</option>
+       <option value="done"${s.status==='done'?' selected':''}>已完成</option>
+     </select>
+   </div>
+
+   <div class="sec">
+     <h3>📷 现场照片 <span class="n">${photos.length} 张</span></h3>
+     <div class="photogrid" id="pgrid"></div>
+     <div class="btnrow">
+       <label class="btn" style="cursor:pointer">📸 拍照<input type="file" accept="image/*" capture="environment" id="cap" class="hidden" multiple></label>
+       <label class="btn sec2" style="cursor:pointer">🖼 从相册<input type="file" accept="image/*" id="pick" class="hidden" multiple></label>
+     </div>
+   </div>
+
+   <div class="sec">
+     <h3>📋 调研问题清单 <span class="n">点标题勾选完成</span></h3>
+     <div id="qlist"></div>
+   </div>
+
+   <div class="sec">
+     <h3>📝 自由笔记</h3>
+     <textarea id="f-notes" placeholder="报价、产品细节、联系人、名片、后续动作…">${esc(s.notes||'')}</textarea>
+   </div>
+
+   ${b.hyp.length?`<div class="sec">
+     <h3>🎯 假设证据（关键）</h3>
+     <p class="muted" style="margin:-4px 0 4px;font-size:11.5px">基于本展位见闻，给相关假设打标，会汇总到验证看板</p>
+     ${b.hyp.map(h=>`<div class="hypbox">
+        <div class="hid">${h}</div><div class="ht">${esc(HYP[h].title)}</div>
+        <div class="seg" data-h="${h}">
+          <button data-val="support"${s.hyp[h]==='support'?' class="support"':''}>支持</button>
+          <button data-val="neutral"${s.hyp[h]==='neutral'?' class="neutral"':''}>中立</button>
+          <button data-val="refute"${s.hyp[h]==='refute'?' class="refute"':''}>反驳</button>
+        </div></div>`).join('')}
+   </div>`:''}
+
+   <div class="btnrow" style="margin-bottom:30px">
+     <button class="btn green" onclick="markDone()">✓ 标记完成并返回</button>
+   </div>`;
+
+  renderPhotos(photos);
+  renderQ(b,s);
+  // bindings
+  $('#f-hall').addEventListener('input',e=>{bState(id).hall=e.target.value;save();});
+  $('#f-status').addEventListener('change',e=>{bState(id).status=e.target.value;save();});
+  $('#f-notes').addEventListener('input',e=>{bState(id).notes=e.target.value;save();});
+  $('#cap').addEventListener('change',e=>handleFiles(e.target.files,id));
+  $('#pick').addEventListener('change',e=>handleFiles(e.target.files,id));
+  v.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;
+    const h=seg.dataset.h,val=btn.dataset.val;const cur=bState(id).hyp[h];
+    bState(id).hyp[h]=(cur===val)?'':val;save();
+    seg.querySelectorAll('button').forEach(x=>{x.className='';if(x.dataset.val===bState(id).hyp[h])x.className=x.dataset.val;});}));
+}
+
+function renderQ(b,s){$('#qlist').innerHTML=b.q.map((q,i)=>{const a=s.answers[i]||{};
+  return `<div class="q ${a.checked?'checked':''}" data-i="${i}">
+    <div class="qh"><input type="checkbox" ${a.checked?'checked':''}>
+      <div class="qt">${esc(q)}</div></div>
+    <textarea placeholder="记录回答…">${esc(a.text||'')}</textarea></div>`;}).join('');
+  $$('#qlist .q').forEach(el=>{const i=el.dataset.i;
+    el.querySelector('input').addEventListener('change',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
+      s2.answers[i].checked=e.target.checked;save();el.classList.toggle('checked',e.target.checked);});
+    el.querySelector('textarea').addEventListener('input',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
+      s2.answers[i].text=e.target.value;save();});});}
+
+function renderPhotos(photos){const g=$('#pgrid');if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片，点下方拍照或上传</p>';return;}
+  g.innerHTML='';photos.forEach(p=>{const url=URL.createObjectURL(p.blob);const d=document.createElement('div');d.className='ph';
+    d.innerHTML=`<img src="${url}" onclick="window.open('${url}')"><button class="del">×</button>${p.cap?'<div class="cap">'+esc(p.cap)+'</div>':''}`;
+    d.querySelector('.del').addEventListener('click',async()=>{if(confirm('删除这张照片？')){await delPhoto(p.id);openBooth(CURBOOTH);}});
+    g.appendChild(d);});}
+
+async function handleFiles(files,id){if(!files.length)return;toast('处理中…');
+  for(const f of files){const blob=await compress(f);await addPhoto({boothId:id,blob,cap:'',ts:Date.now()});}
+  toast('已保存 '+files.length+' 张');openBooth(id);}
+
+function markDone(){bState(CURBOOTH).status='done';save();toast('已标记完成');go('list');}
+
+/* ============================ 验证看板 ============================ */
+function renderDash(){
+  const tally={};Object.keys(HYP).forEach(h=>tally[h]={support:0,neutral:0,refute:0,booths:[]});
+  allBooths().forEach(b=>{const s=bState(b.id);Object.entries(s.hyp||{}).forEach(([h,v])=>{
+    if(v&&tally[h]){tally[h][v]++;tally[h].booths.push(b.name);}});});
+  const lines={A:'A 线 · 户储 retrofit 层',B:'B 线 · 工商储 value-stacking SaaS'};
+  let html='';
+  ['A','B'].forEach(L=>{
+    html+=`<h2 style="font-size:15px;margin:6px 0 10px;color:${L==='A'?'#a5b4fc':'#7dd3fc'}">${lines[L]}</h2>`;
+    Object.entries(HYP).filter(([h,o])=>o.line===L).forEach(([h,o])=>{
+      const t=tally[h];const tot=t.support+t.neutral+t.refute;
+      const verdict = tot===0?'尚无证据，去现场调研对应展位':
+        (t.support>=3&&t.support>t.refute)?'✅ 证据偏向成立（支持≥3 且多于反驳）':
+        (t.refute>t.support)?'❌ 证据偏向反驳，需重新评估':'🟡 证据不足/分歧，继续收集';
+      html+=`<div class="hcard"><div class="lbl">${h}</div><div class="desc">${esc(o.title)}</div>
+        <div class="bars">${tot?`
+          ${t.support?`<div class="bs" style="flex:${t.support}">${t.support}</div>`:''}
+          ${t.neutral?`<div class="bn" style="flex:${t.neutral}">${t.neutral}</div>`:''}
+          ${t.refute?`<div class="br" style="flex:${t.refute}">${t.refute}</div>`:''}`:'<div class="empty">暂无证据</div>'}</div>
+        <div class="verdict">${verdict}${t.booths.length?' · '+esc(t.booths.join('、')):''}</div></div>`;
+    });
+  });
+  html+=`<div class="hcard"><div class="lbl">判定标准（来自 PRD）</div>
+    <div class="muted" style="margin-top:6px;line-height:1.8">
+    <b>A 立项</b>：3+ 在位者确认"只服务自家生态"(A-H1 支持≥3) 且 2+ 渠道方要中立层(A-H2)。<br>
+    <b>B 立项</b>：现有产品普遍"绑硬件/偏大资产/结算薄弱"(B-H1) 且 2+ 集成商/ESaaS 愿白标付费(B-H2/H3)。</div></div>`;
+  $('#dashbody').innerHTML=html;
+}
+
+/* ============================ 导出 / 归档 ============================ */
+function blobToDataURL(b){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b);});}
+
+$('#exp-json').addEventListener('click',async()=>{toast('生成中…');
+  const photos=await allPhotos();const ph=[];for(const p of photos){ph.push({boothId:p.boothId,cap:p.cap,ts:p.ts,data:await blobToDataURL(p.blob)});}
+  const out={app:'intersolar-booth-scout',v:2,exportedAt:new Date().toISOString(),state:STATE,photos:ph};
+  download('intersolar-backup-'+stamp()+'.json',JSON.stringify(out),'application/json');});
+
+$('#imp-json').addEventListener('click',()=>$('#impfile').click());
+$('#impfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
+  try{const j=JSON.parse(await f.text());if(j.state){STATE=j.state;save();}
+    if(j.photos){await clearPhotos();for(const p of j.photos){const blob=await(await fetch(p.data)).blob();
+      await addPhoto({boothId:p.boothId,blob,cap:p.cap||'',ts:p.ts||Date.now()});}}
+    toast('已恢复');go('list');}catch(err){alert('导入失败：'+err.message);}});
+
+$('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…');
+  const photos=await allPhotos();const byB={};for(const p of photos){(byB[p.boothId]=byB[p.boothId]||[]).push(p);}
+  const datas={};for(const p of photos){datas[p.id]=await blobToDataURL(p.blob);}
+  let body='';
+  for(const b of allBooths()){const s=bState(b.id);const ps=byB[b.id]||[];
+    const ans=b.q.map((q,i)=>{const a=s.answers[i]||{};return (a.checked||a.text)?`<li><b>${a.checked?'✓ ':''}</b>${esc(q)}${a.text?'<br><span style="color:#475569">→ '+esc(a.text)+'</span>':''}</li>`:'';}).filter(Boolean).join('');
+    const hyp=Object.entries(s.hyp||{}).filter(([,v])=>v).map(([h,v])=>`${h}: ${({support:'支持',neutral:'中立',refute:'反驳'})[v]}`).join(' · ');
+    if(s.status==='todo'&&!ps.length&&!ans&&!s.notes&&!hyp)continue;
+    body+=`<div class="r"><h2>${esc(b.name)} <span class="tag">${b.line==='A'?'户储':b.line==='B'?'工商储':'通用'}</span></h2>
+      <p class="m">${esc(b.focus)}${(s.hall||b.hall)?' · 📍'+esc(s.hall||b.hall):''} · 状态：${({todo:'未开始',doing:'进行中',done:'已完成'})[s.status]}</p>
+      ${ans?'<ul>'+ans+'</ul>':''}
+      ${s.notes?'<p class="nt"><b>笔记：</b>'+esc(s.notes).replace(/\n/g,'<br>')+'</p>':''}
+      ${hyp?'<p class="hy">🎯 '+esc(hyp)+'</p>':''}
+      ${ps.length?'<div class="g">'+ps.map(p=>`<img src="${datas[p.id]}">`).join('')+'</div>':''}
+    </div>`;}
+  const doc=`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Intersolar 2026 调研归档 ${stamp()}</title><style>
+    body{font-family:-apple-system,system-ui,"PingFang SC",sans-serif;max-width:820px;margin:0 auto;padding:20px;color:#0f172a;background:#f8fafc}
+    h1{font-size:22px}.sum{color:#475569;font-size:13px;margin-bottom:20px}
+    .r{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:14px}
+    .r h2{font-size:17px;margin:0 0 4px}.tag{font-size:11px;background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:99px;vertical-align:middle}
+    .m{color:#64748b;font-size:12.5px;margin:0 0 8px}ul{margin:8px 0;padding-left:20px;font-size:13.5px;line-height:1.7}
+    .nt{font-size:13px;background:#f1f5f9;padding:8px 10px;border-radius:8px}.hy{font-size:12.5px;color:#0369a1}
+    .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.g img{width:100%;border-radius:8px}
+    </style></head><body><h1>Intersolar Europe 2026 · 展位调研归档</h1>
+    <p class="sum">导出时间：${new Date().toLocaleString('zh-CN')} · 共 ${photos.length} 张照片</p>${body||'<p>暂无已填写内容</p>'}</body></html>`;
+  download('intersolar-归档-'+stamp()+'.html',doc,'text/html');});
+
+$('#wipe').addEventListener('click',async()=>{if(confirm('确定清空所有本地数据（含照片）？此操作不可恢复。')){
+  localStorage.removeItem(LS_KEY);STATE={booths:{},custom:[]};await clearPhotos();toast('已清空');go('list');}});
+
+$('#addbooth').addEventListener('click',()=>{const name=prompt('展位名称：');if(!name)return;
+  const line=prompt('归类 A=户储 / B=工商储 / G=通用：','G').toUpperCase();const L=['A','B','G'].includes(line)?line:'G';
+  const id='custom_'+Date.now();STATE.custom=STATE.custom||[];
+  STATE.custom.push({id,name,line:L,pri:0,hall:'',focus:'(临时新增)',hyp:[],q:L==='A'?QA:L==='B'?QB:['现场要点1','现场要点2','现场要点3']});
+  save();openBooth(id);});
+
+/* ============================ 工具 ============================ */
+function esc(s){return(s==null?'':String(s)).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function download(name,content,type){const b=new Blob([content],{type});const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);}
+function stamp(){const d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes());}
+function pad(n){return String(n).padStart(2,'0');}
+let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
+window.openBooth=openBooth;window.go=go;window.markDone=markDone;
+
+/* 启动 */
+openDB().then(()=>renderList()).catch(()=>renderList());
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>

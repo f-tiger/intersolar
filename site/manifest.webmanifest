@@ -1,0 +1,15 @@
+{
+  "name": "Intersolar 2026 展位调研",
+  "short_name": "展位调研",
+  "description": "Intersolar Europe 2026 现场展位调研、拍照归档与 MVP 验证助手",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
