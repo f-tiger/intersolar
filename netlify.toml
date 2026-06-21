@@ -1,0 +1,20 @@
+# Netlify config — serve the static booth-scouting PWA from /site
+[build]
+  publish = "site"
+  command = ""
+
+# SPA-ish fallback so refresh/offline routing always resolves to the app shell
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Ensure the service worker and manifest are served fresh
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
