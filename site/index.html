@@ -168,6 +168,7 @@
         <div class="s"><b id="st-ans">0</b><span>已答问题</span></div>
       </div>
     </div>
+    <div class="tip">📍 展位号已尽量预填自公开资料：<b>无后缀</b>=公司官方页确认；<b>带 ?</b>=公开资料推断、请现场核对；<b>"号待查"/空白</b>=官方未公布，到场用 <b>The smarter E App</b> 或入口大屏查。<br>提示：ees 储能多在 B 区、EM-Power 在 B5、Power2Drive 在 B6、Intersolar 在 A 区+C1。</div>
     <input class="search" id="search" placeholder="搜索展位名 / 关键词…">
     <div class="filters" id="filters">
       <button data-l="all" class="on">全部</button>
@@ -266,26 +267,26 @@ const SEED = [
   {id:'gridx',name:'gridX (XENON)',line:'A',pri:1,hall:'',focus:'平台型在位者，已向安装商开放。接入广度/白标定价/合作边界',hyp:['A-H1','A-H2'],q:QA},
   {id:'kiwigrid',name:'kiwigrid',line:'A',pri:0,hall:'',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2'],q:QA},
   {id:'marstek',name:'Marstek',line:'A',pri:1,hall:'',focus:'低价即插即用储能，有官方Local/Open API。验证开放度',hyp:['A-H3'],q:QA},
-  {id:'ecoflow',name:'EcoFlow (OASIS)',line:'A',pri:1,hall:'',focus:'AI HEMS最成体系、对接500+电价、开发者API。是否在内化整合价值',hyp:['A-H3','A-H1'],q:QA},
+  {id:'ecoflow',name:'EcoFlow (OASIS)',line:'A',pri:1,hall:'B1.170?',focus:'AI HEMS最成体系、对接500+电价、开发者API。是否在内化整合价值',hyp:['A-H3','A-H1'],q:QA},
   {id:'anker',name:'Anker SOLIX',line:'A',pri:0,hall:'',focus:'Solarbank系列，偏云锁定、无官方本地API。验证封闭程度',hyp:['A-H3'],q:QA},
   {id:'zendure',name:'Zendure',line:'A',pri:0,hall:'',focus:'SolarFlow + 动态电价TOU自动化。开放度',hyp:['A-H3'],q:QA},
-  {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA},
+  {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'B3.130(Kostal展台)?',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA},
   // ===== B 线：工商储 SaaS =====
-  {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3'],q:QB},
+  {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'B0厅·号待查',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3'],q:QB},
   {id:'lumera',name:'Lumera Energy (Lumera OS)',line:'B',pri:1,hall:'',focus:'C&I储能规划/仿真/运营OS，入围。结算/归因怎么做',hyp:['B-H1','B-H3'],q:QB},
   {id:'simpl',name:'Simpl.energy (Zympler)',line:'B',pri:1,hall:'',focus:'PV/电池/EV/工业负荷统一EMS，入围。SMB定价、跨品牌',hyp:['B-H1','B-H2'],q:QB},
-  {id:'entrix',name:'Entrix',line:'B',pri:0,hall:'',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2'],q:QB},
-  {id:'suena',name:'Suena',line:'B',pri:0,hall:'',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2'],q:QB},
+  {id:'entrix',name:'Entrix',line:'B',pri:0,hall:'B5.471',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2'],q:QB},
+  {id:'suena',name:'Suena',line:'B',pri:0,hall:'B5.374?',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2'],q:QB},
   {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:0,hall:'',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB},
   {id:'gridbeyond',name:'GridBeyond',line:'B',pri:0,hall:'',focus:'AI优化+CapEx-free电池。ESaaS模式/收益分成',hyp:['B-H2','B-H3'],q:QB},
   {id:'sigenergy',name:'Sigenergy (AI in All)',line:'B',pri:1,hall:'',focus:'SigenStor Neo五合一、AI叙事、ees入围。EMS开放度',hyp:['B-H1'],q:QB},
   {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:0,hall:'',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB},
-  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:0,hall:'',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB},
-  {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？',hyp:['B-H1','B-H2'],q:QB},
-  {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3'],q:QB},
-  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:0,hall:'',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3'],q:QB},
-  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:0,hall:'',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB},
-  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:0,hall:'',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1'],q:QB},
+  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:0,hall:'C1厅·号待查',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB},
+  {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'B1.410',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？',hyp:['B-H1','B-H2'],q:QB},
+  {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'B2.470',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3'],q:QB},
+  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:0,hall:'TWAICE B0.336 · ACCURE B2.380',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3'],q:QB},
+  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:0,hall:'C5创业区·号待查',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB},
+  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:0,hall:'B6.510?',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1'],q:QB},
   // ===== 通用 / 论坛 =====
   {id:'award',name:'⭐ The smarter E AWARD 颁奖',line:'G',pri:1,hall:'ICM · 6/22 17:00',focus:'一晚锁定软件/VPP风向与获奖名单。重点听 Smart Integrated Energy 类目',hyp:[],q:[
     '哪些项目获奖（区别于入围）？评审强调了什么价值点？',
