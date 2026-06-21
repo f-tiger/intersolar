@@ -83,6 +83,13 @@
   .q .qt{font-size:13.5px;flex:1}
   .q.checked .qt{color:var(--mut);text-decoration:line-through}
   .q textarea{margin-top:7px;min-height:46px}
+  .q .qt2{font-size:13.5px;font-weight:500}
+  .q.answered .qt2{color:#86efac}
+  .opts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
+  .opt{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
+    padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:600}
+  .opt.sel{background:var(--acc);border-color:var(--acc);color:#fff}
+  .q .note{margin-top:8px;min-height:36px;font-size:13px}
   /* photos */
   .photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
   .ph{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:var(--panel2)}
@@ -227,19 +234,30 @@ const HYP = {
   'B-H2':{line:'B',title:'集成商/ESaaS 愿为白标调度 + 收益分成付费'},
   'B-H3':{line:'B',title:'收益归因/结算透明度是真痛点'}
 };
+// 问题改为"点选项"为主、补充文字为辅。{q:问题, o:选项, multi:可多选}
 const QA = [ // A线通用问题
-  '优化只服务自家硬件还是跨品牌？跨哪些？什么协议（EEBUS/Modbus/云API）？',
-  '给安装商/零售商白标吗？怎么定价（per-device/分成）？',
-  '存量系统（无EMS）怎么 retrofit 接入？',
-  '§14a EEBUS 控制盒/CLS 现在真跑通了吗？装机里跑通多少？',
-  '你们最大的获客瓶颈是什么？'
+  {q:'优化只服务自家硬件，还是跨品牌？走什么协议？', multi:true,
+    o:['仅自家硬件','跨品牌·部分','跨品牌·广泛','EEBUS','Modbus','云API','不确定']},
+  {q:'给安装商/零售商白标吗？怎么定价？', multi:false,
+    o:['不白标','白标·按设备','白标·分成','白标·订阅','待定']},
+  {q:'存量系统（无EMS）怎么 retrofit 接入？', multi:false,
+    o:['不支持存量','加装控制盒','纯云对接','换网关/EMS','不确定']},
+  {q:'§14a EEBUS 控制盒/CLS 真跑通了吗？', multi:false,
+    o:['已量产跑通','试点中','仅demo','未做','不确定']},
+  {q:'最大的获客瓶颈是什么？', multi:true,
+    o:['价格','渠道','合规/§14a','用户认知','安装能力','其他']}
 ];
 const QB = [ // B线通用问题
-  'value stacking 支持哪几个市场协同（削峰/套利/aFRR/FCR）？',
-  '收益结算/归因做到什么颗粒度？客户怎么对账？',
-  '给集成商/ESaaS 白标吗？per-kW/分成怎么定？',
-  '跨品牌 PCS/电池接入哪些？SunSpec 覆盖如何？',
-  'SMB(<1MWh) 这块谁在认真做？最大获客瓶颈？'
+  {q:'value stacking 支持哪些市场协同？', multi:true,
+    o:['削峰自用','套利','aFRR','FCR','日内/EPEX','仅单一市场','不确定']},
+  {q:'收益结算/归因做到什么颗粒度？', multi:false,
+    o:['实时·设备级','日级','月报','无透明结算','不确定']},
+  {q:'给集成商/ESaaS 白标吗？怎么定价？', multi:false,
+    o:['不白标','白标·按kW','白标·分成','白标·订阅','待定']},
+  {q:'跨品牌 PCS/电池接入哪些？SunSpec？', multi:true,
+    o:['仅自家','跨品牌·部分','跨品牌·广泛','SunSpec支持','不确定']},
+  {q:'SMB(<1MWh) 谁在认真做？瓶颈在哪？', multi:true,
+    o:['认真做SMB','只做大项目','瓶颈·价格','瓶颈·渠道','瓶颈·结算','不确定']}
 ];
 const SEED = [
   // ===== A 线：户储 retrofit =====
@@ -322,8 +340,10 @@ function go(v){CUR=v;['list','detail','dash','data'].forEach(x=>$('#view-'+x).cl
   if(v==='list')renderList(); if(v==='dash')renderDash(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
-function statusOf(id){const s=bState(id);const b=allBooths().find(x=>x.id===id);
-  const ans=Object.values(s.answers||{}).filter(a=>a&&(a.checked||a.text)).length;
+function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
+function ansCount(s){return Object.values(s.answers||{}).filter(isAns).length;}
+function statusOf(id){const s=bState(id);
+  const ans=ansCount(s);
   if(s.status==='done')return'done'; if(s.status==='doing'||ans>0||s.notes)return'doing'; return'todo';}
 
 async function renderList(){
@@ -331,7 +351,7 @@ async function renderList(){
   // summary
   let done=0,doing=0,ans=0;
   list.forEach(b=>{const st=statusOf(b.id);if(st==='done')done++;else if(st==='doing')doing++;
-    const s=bState(b.id);ans+=Object.values(s.answers||{}).filter(a=>a&&(a.checked||a.text)).length;});
+    ans+=ansCount(bState(b.id));});
   const ph=await countPhotos();
   $('#st-done').textContent=done;$('#st-doing').textContent=doing;$('#st-photos').textContent=ph;$('#st-ans').textContent=ans;
   $('#progtxt').textContent=done+' / '+list.length;
@@ -345,7 +365,7 @@ async function renderList(){
   if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+b.focus).toLowerCase().includes(q));}
   const pc=await Promise.all(fl.map(b=>countPhotos2(b.id)));
   const html=fl.map((b,i)=>{const st=statusOf(b.id);const s=bState(b.id);
-    const a=Object.values(s.answers||{}).filter(x=>x&&(x.checked||x.text)).length;
+    const a=ansCount(s);
     const stTxt={todo:'未开始',doing:'进行中',done:'已完成'}[st];
     return `<button class="card" onclick="openBooth('${b.id}')">
       <div class="top"><div class="nm">${esc(b.name)}</div>
@@ -432,16 +452,36 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
     seg.querySelectorAll('button').forEach(x=>{x.className='';if(x.dataset.val===bState(id).hyp[h])x.className=x.dataset.val;});}));
 }
 
+function qText(q){return typeof q==='object'?q.q:q;}
 function renderQ(b,s){$('#qlist').innerHTML=b.q.map((q,i)=>{const a=s.answers[i]||{};
-  return `<div class="q ${a.checked?'checked':''}" data-i="${i}">
-    <div class="qh"><input type="checkbox" ${a.checked?'checked':''}>
-      <div class="qt">${esc(q)}</div></div>
-    <textarea placeholder="记录回答…">${esc(a.text||'')}</textarea></div>`;}).join('');
+  if(typeof q!=='object'){ // 论坛/自定义：勾选 + 文字
+    return `<div class="q ${a.checked?'checked':''}" data-i="${i}" data-t="s">
+      <div class="qh"><input type="checkbox" ${a.checked?'checked':''}>
+        <div class="qt">${esc(q)}</div></div>
+      <textarea placeholder="记录回答…">${esc(a.text||'')}</textarea></div>`;}
+  // 结构化：点选项 + 可选补充
+  const opts=a.opts||[];const done=isAns(a);
+  const chips=q.o.map(o=>`<button type="button" class="opt${opts.includes(o)?' sel':''}" data-o="${esc(o)}">${esc(o)}</button>`).join('');
+  return `<div class="q ${done?'answered':''}" data-i="${i}" data-t="o" data-multi="${q.multi?1:0}">
+    <div class="qt2">${done?'✓ ':''}${esc(q.q)}${q.multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':''}</div>
+    <div class="opts">${chips}</div>
+    <textarea class="note" placeholder="补充细节(可选)…">${esc(a.text||'')}</textarea></div>`;}).join('');
   $$('#qlist .q').forEach(el=>{const i=el.dataset.i;
-    el.querySelector('input').addEventListener('change',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
-      s2.answers[i].checked=e.target.checked;save();el.classList.toggle('checked',e.target.checked);});
+    if(el.dataset.t==='s'){
+      el.querySelector('input').addEventListener('change',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
+        s2.answers[i].checked=e.target.checked;save();el.classList.toggle('checked',e.target.checked);});
+    }else{
+      const multi=el.dataset.multi==='1';
+      el.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>{
+        const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};let arr=s2.answers[i].opts||[];const o=btn.dataset.o;
+        if(arr.includes(o))arr=arr.filter(x=>x!==o); else if(multi)arr.push(o); else arr=[o];
+        s2.answers[i].opts=arr;save();
+        el.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',arr.includes(x.dataset.o)));
+        const done=isAns(s2.answers[i]);el.classList.toggle('answered',done);
+        el.querySelector('.qt2').innerHTML=(done?'✓ ':'')+esc(qText(b.q[i]))+(multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':'');}));
+    }
     el.querySelector('textarea').addEventListener('input',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
-      s2.answers[i].text=e.target.value;save();});});}
+      s2.answers[i].text=e.target.value;save();el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));});});}
 
 function renderPhotos(photos){const g=$('#pgrid');if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片，点下方拍照或上传</p>';return;}
   g.innerHTML='';photos.forEach(p=>{const url=URL.createObjectURL(p.blob);const d=document.createElement('div');d.className='ph';
@@ -504,7 +544,10 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
   const datas={};for(const p of photos){datas[p.id]=await blobToDataURL(p.blob);}
   let body='';
   for(const b of allBooths()){const s=bState(b.id);const ps=byB[b.id]||[];
-    const ans=b.q.map((q,i)=>{const a=s.answers[i]||{};return (a.checked||a.text)?`<li><b>${a.checked?'✓ ':''}</b>${esc(q)}${a.text?'<br><span style="color:#475569">→ '+esc(a.text)+'</span>':''}</li>`:'';}).filter(Boolean).join('');
+    const ans=b.q.map((q,i)=>{const a=s.answers[i]||{};if(!isAns(a))return'';
+      const sel=(a.opts&&a.opts.length)?'<br><span style="color:#0369a1">▸ '+esc(a.opts.join(' / '))+'</span>':'';
+      const chk=(typeof q!=='object'&&a.checked)?'✓ ':'';
+      return `<li><b>${chk}</b>${esc(qText(q))}${sel}${a.text?'<br><span style="color:#475569">→ '+esc(a.text)+'</span>':''}</li>`;}).filter(Boolean).join('');
     const hyp=Object.entries(s.hyp||{}).filter(([,v])=>v).map(([h,v])=>`${h}: ${({support:'支持',neutral:'中立',refute:'反驳'})[v]}`).join(' · ');
     if(s.status==='todo'&&!ps.length&&!ans&&!s.notes&&!hyp)continue;
     body+=`<div class="r"><h2>${esc(b.name)} <span class="tag">${b.line==='A'?'户储':b.line==='B'?'工商储':'通用'}</span></h2>
