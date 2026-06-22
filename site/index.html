@@ -207,6 +207,8 @@
         <button class="btn green" id="cloud-on">启用 / 连接实时协作</button>
         <button class="btn sec2" id="cloud-share">复制分享链接给同事</button>
       </div>
+      <button class="btn sec2" id="cloud-qr" style="margin-top:8px;width:100%">📱 生成二维码（同事扫码加入）</button>
+      <div id="qrbox"></div>
       <button class="btn ghost" id="cloud-off" style="margin-top:8px;width:100%">退出云模式（回本地，本地数据保留）</button>
       <p class="muted" style="font-size:11px;margin-top:8px">分享链接已含连接配置，同事点开即连同一份数据、各自填名字即可。⚠️ 现场 wifi 不稳时照片上传可能失败，可改用下方"导出/合并导入"兜底。临时新增的展位仅本机可见。</p>
     </div>
@@ -722,8 +724,21 @@ $('#cloud-on')&&$('#cloud-on').addEventListener('click',()=>{
   if(!url||!key||!ev){alert('请填 Supabase URL / anon key / 活动代号');return;}
   if(me){ME=me;localStorage.setItem('scout_me',ME);}
   setCfg(url,key,ev);toast('正在连接…');setTimeout(()=>location.reload(),300);});
-$('#cloud-share')&&$('#cloud-share').addEventListener('click',async()=>{const l=shareLink();if(!l){alert('请先填配置并启用');return;}
+function ensureCfg(){ let c=getCfg();
+  if(!c){ const url=($('#cf-url')&&$('#cf-url').value.trim()),key=($('#cf-key')&&$('#cf-key').value.trim()),ev=($('#cf-ev')&&$('#cf-ev').value.trim());
+    if(url&&key&&ev){ setCfg(url,key,ev); c=getCfg(); } }
+  return c; }
+$('#cloud-share')&&$('#cloud-share').addEventListener('click',async()=>{ if(!ensureCfg()){alert('请先填 URL / anon key / 活动代号');return;} const l=shareLink();
   try{await navigator.clipboard.writeText(l);toast('分享链接已复制');}catch(e){prompt('复制此链接发给同事：',l);}});
+$('#cloud-qr')&&$('#cloud-qr').addEventListener('click',async()=>{ const box=$('#qrbox'); if(!box)return;
+  if(!ensureCfg()){alert('请先填 URL / anon key / 活动代号');return;} const l=shareLink();
+  box.innerHTML='<p class="muted" style="text-align:center">生成中…</p>';
+  try{ const m=await import('https://esm.sh/qrcode@1'); const QR=m.default||m;
+    const url=await QR.toDataURL(l,{width:280,margin:1,color:{dark:'#0b1120',light:'#ffffff'}});
+    box.innerHTML='<img alt="QR" src="'+url+'" style="width:210px;height:210px;background:#fff;padding:8px;border-radius:12px;display:block;margin:10px auto 4px">'
+      +'<p class="muted" style="text-align:center;font-size:11px">同事用手机相机扫一扫即加入</p>'
+      +'<p class="muted" style="text-align:center;word-break:break-all;font-size:9px;opacity:.6">'+esc(l)+'</p>';
+  }catch(e){ console.warn(e); box.innerHTML='<p class="muted" style="text-align:center">二维码生成失败（需联网）。可改用上方"复制分享链接"。</p>'; } });
 $('#cloud-off')&&$('#cloud-off').addEventListener('click',()=>{if(confirm('退出云模式、回到本地？（本地数据保留）')){localStorage.removeItem('scout_cfg');location.hash='';location.reload();}});
 
 /* ============================ 工具 ============================ */
