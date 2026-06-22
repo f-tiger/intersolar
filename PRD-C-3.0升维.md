@@ -6,6 +6,24 @@
 
 ---
 
+## 0′. 现场怎么用：5 个软件未来方向 + 对着竞对调研（与 App「🧭 软件未来方向」一致）
+
+抽象的"轨道/OS"现场不好验证，落到 **5 个看得懂的方向**，每个直接对着竞对去调研，回来在 App 方向卡上判断"值不值得做"：
+
+| # | 软件未来方向 | 一句话 | 去看的竞对 |
+|---|---|---|---|
+| ① | **AI 自治交易/调度（Agentic）** | 从"给建议"→"自己决策 + 自动交易/对冲" | Suena、Entrix、enspired、GridBeyond、Kraken |
+| ② | **跨品牌中立接入层** | 不绑硬件、统一接入各品牌设备做调度（接入广度=壁垒） | gridX、kiwigrid、Marstek/EcoFlow(开放API)、Tibber |
+| ③ | **收益结算 / 可融资账本（bankability）** | 把运营业绩做成可被金融/保险接受的"可信账本" | volytica、TWAICE/ACCURE、coneva、Furo |
+| ④ | **能源平台/OS（被集成的底座）** | 做别人都来搭的平台与标准、收过路费 | gridX、FENECON(OpenEMS)、Next Kraftwerke |
+| ⑤ | **VPP/灵活性下沉中小客户** | 虚拟电厂/聚合做到 SMB/户用规模 | Next Kraftwerke、1KOMMA5°、GridBeyond、Tibber |
+
+**每个方向现场必答 5 问**（App 已内置）：①谁做得最好、成色如何？②真需求吗、有人付费？③壁垒/护城河在哪？④对比竞对我们的空位/差异点？⑤值得立项吗？
+
+> 下面 §0–§12 是这套方向背后的完整战略论证（"轨道/OS"升维终局）。现场先用上面 5 个方向 + 竞对清单跑，回来再对照下文判断主攻。
+
+---
+
 ## 0. 为什么要这份 PRD（一句话）
 
 A（户储 retrofit 优化层）和 B（C&I value-stacking SaaS）都是好生意，但都停在"**软件定义能源 2.0 = 优化/编排层**"：再做一个更中立的 optimizer。这一层正在变拥挤（gridX、kiwigrid 泛欧 VPP、1KOMMA5° Heartbeat 跨品牌化、Entrix/Suena/Kraken），且其售卖的"多榨 X% 收益"中的 **α 会随参与者增多而自我压缩**（FCR 已饱和、套利价差会收敛）。
