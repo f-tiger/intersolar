@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0b1120">
+<meta name="theme-color" content="#eef1f6">
 <title>Intersolar 2026 展位调研 · 归档助手</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
 <style>
   :root{
-    --bg:#0b1120; --panel:#131c31; --panel2:#1b2740; --line:#26324f;
-    --txt:#e8edf7; --mut:#93a0bd; --acc:#3b82f6; --acc2:#22c55e;
-    --warn:#f59e0b; --bad:#ef4444; --chipA:#6366f1; --chipB:#0ea5e9; --chipG:#64748b;
+    --bg:#eef1f6; --panel:#ffffff; --panel2:#f1f5f9; --line:#e2e8f0;
+    --txt:#0f172a; --mut:#64748b; --acc:#2563eb; --acc2:#16a34a;
+    --warn:#d97706; --bad:#dc2626; --chipA:#6366f1; --chipB:#0ea5e9; --chipG:#64748b;
     --radius:14px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -20,7 +20,7 @@
     font-size:15px;line-height:1.5}
   a{color:var(--acc);text-decoration:none}
   .wrap{max-width:760px;margin:0 auto;padding:0 14px 96px}
-  header{position:sticky;top:0;z-index:30;background:rgba(11,17,32,.92);
+  header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);
     backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 0 0}
   .hbar{max-width:760px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px}
   .hbar h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px}
@@ -59,17 +59,20 @@
   .card .top{display:flex;align-items:flex-start;gap:8px}
   .card .nm{font-weight:700;font-size:15.5px;flex:1}
   .chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
-  .chip.A{background:rgba(99,102,241,.18);color:#a5b4fc}
-  .chip.B{background:rgba(14,165,233,.18);color:#7dd3fc}
-  .chip.C{background:rgba(20,184,166,.18);color:#5eead4}
-  .chip.G{background:rgba(100,116,139,.2);color:#cbd5e1}
-  .chip.pri{background:rgba(245,158,11,.18);color:#fcd34d}
+  .chip.A{background:rgba(99,102,241,.14);color:#4338ca}
+  .chip.B{background:rgba(14,165,233,.14);color:#0369a1}
+  .chip.C{background:rgba(13,148,136,.14);color:#0f766e}
+  .chip.G{background:rgba(100,116,139,.16);color:#475569}
+  .chip.pri{background:rgba(217,119,6,.16);color:#b45309}
   .card .focus{color:var(--mut);font-size:12.5px;margin:6px 0 8px}
   .card .meta{display:flex;gap:14px;font-size:11.5px;color:var(--mut);align-items:center}
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
   .st-todo{background:#64748b}.st-doing{background:var(--warn)}.st-done{background:var(--acc2)}
   /* detail */
-  .back{background:none;border:none;color:var(--acc);font-size:14px;padding:12px 0;font-weight:600}
+  .back{display:inline-flex;align-items:center;gap:6px;background:var(--acc);border:none;color:#fff;
+    font-size:15px;padding:12px 20px;margin:10px 0 4px;font-weight:700;border-radius:999px;
+    box-shadow:0 2px 8px rgba(37,99,235,.3)}
+  .back:active{filter:brightness(.92)}
   .sec{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
     padding:14px;margin-bottom:12px}
   .sec h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:7px}
@@ -85,8 +88,10 @@
   .q .qt{font-size:13.5px;flex:1}
   .q.checked .qt{color:var(--mut);text-decoration:line-through}
   .q textarea{margin-top:7px;min-height:46px}
-  .q .qt2{font-size:13.5px;font-weight:500}
-  .q.answered .qt2{color:#86efac}
+  .q .qt2{font-size:14px;font-weight:600}
+  .q.answered .qt2{color:#15803d}
+  .qhint{font-size:11.5px;color:var(--mut);margin:3px 0 1px;line-height:1.5}
+  .qtag{display:inline-block;background:rgba(13,148,136,.14);color:#0f766e;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;vertical-align:middle}
   .opts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
   .opt{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
     padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:600}
@@ -109,9 +114,9 @@
   .seg{display:flex;gap:6px;margin-top:6px}
   .seg button{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--mut);
     padding:8px;border-radius:8px;font-size:12px;font-weight:600}
-  .seg button.support{background:rgba(34,197,94,.18);color:#86efac;border-color:#22c55e}
-  .seg button.neutral{background:rgba(245,158,11,.16);color:#fcd34d;border-color:#f59e0b}
-  .seg button.refute{background:rgba(239,68,68,.16);color:#fca5a5;border-color:#ef4444}
+  .seg button.support{background:rgba(22,163,74,.14);color:#15803d;border-color:#16a34a}
+  .seg button.neutral{background:rgba(217,119,6,.14);color:#b45309;border-color:#d97706}
+  .seg button.refute{background:rgba(220,38,38,.12);color:#b91c1c;border-color:#dc2626}
   .hypbox{border-top:1px solid var(--line);padding:11px 0}
   .hypbox:first-of-type{border-top:none}
   .hypbox .ht{font-size:12.5px;margin-bottom:3px}
@@ -126,9 +131,9 @@
   .bars .empty{flex:1;color:var(--mut);background:transparent}
   .verdict{margin-top:9px;font-size:12px;padding:8px 10px;border-radius:8px;background:var(--panel2);color:var(--mut)}
   .muted{color:var(--mut);font-size:12.5px}
-  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#fff;color:#0b1120;
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#0f172a;color:#fff;
     padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:99;opacity:0;
-    transition:opacity .25s;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+    transition:opacity .25s;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.25)}
   .toast.show{opacity:1}
   .hidden{display:none!important}
   .tip{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
@@ -259,69 +264,113 @@ const HYP = {
   'C-H3':{line:'C',title:'接入与结算这层尚未被某家锁定，存在中立标准/账本的卡位窗口'}
 };
 // 问题改为"点选项"为主、补充文字为辅。{q:问题, o:选项, multi:可多选}
-const QA = [ // A线通用问题
-  {q:'优化只服务自家硬件，还是跨品牌？走什么协议？', multi:true,
+const QA = [ // A线·户用储能 retrofit 通用问题（每家还有专属问题见 qx）
+  {q:'能管别家品牌吗？怎么连？', multi:true, h:'软件/App 只能管自家电池，还是也能接别的品牌；用什么方式连（EEBUS / Modbus / 厂商云）',
     o:['仅自家硬件','跨品牌·部分','跨品牌·广泛','EEBUS','Modbus','云API','不确定']},
-  {q:'给安装商/零售商白标吗？怎么定价？', multi:false,
+  {q:'给安装商/零售商贴牌吗？怎么收费？', multi:false, h:'能不能让安装商或电力零售商用自己的牌子卖；按设备 / 分成 / 订阅',
     o:['不白标','白标·按设备','白标·分成','白标·订阅','待定']},
-  {q:'存量系统（无EMS）怎么 retrofit 接入？', multi:false,
+  {q:'老系统（没装智能控制器）怎么接进来？', multi:false, h:'已装好、没有 EMS 的存量光储，怎么改造接入',
     o:['不支持存量','加装控制盒','纯云对接','换网关/EMS','不确定']},
-  {q:'§14a EEBUS 控制盒/CLS 真跑通了吗？', multi:false,
+  {q:'德国 §14a 控制盒现在真能用了吗？', multi:false, h:'电网"可控负荷"新规要用的 EEBUS 控制盒/CLS——装机里真正跑通了多少',
     o:['已量产跑通','试点中','仅demo','未做','不确定']},
-  {q:'最大的获客瓶颈是什么？', multi:true,
+  {q:'拓客户最难的是哪一环？', multi:true, h:'听真实获客瓶颈（价格 / 没渠道 / 合规 / 用户不懂 / 缺安装能力）',
     o:['价格','渠道','合规/§14a','用户认知','安装能力','其他']}
 ];
-const QB = [ // B线通用问题
-  {q:'value stacking 支持哪些市场协同？', multi:true,
+const QB = [ // B线·工商业储能 SaaS 通用问题（每家还有专属问题见 qx）
+  {q:'一套电池能同时做几种收益？', multi:true, h:'能不能多种赚钱方式协同（削峰省钱＋低买高卖＋电网调频…），还是只做一种',
     o:['削峰自用','套利','aFRR','FCR','日内/EPEX','仅单一市场','不确定']},
-  {q:'收益结算/归因做到什么颗粒度？', multi:false,
+  {q:'收益怎么算清、客户怎么对账？', multi:false, h:'每块钱赚在哪个收益流、能否出可对账报表（结算透明度，行业普遍痛点）',
     o:['实时·设备级','日级','月报','无透明结算','不确定']},
-  {q:'给集成商/ESaaS 白标吗？怎么定价？', multi:false,
+  {q:'给集成商/投资方贴牌吗？怎么收费？', multi:false, h:'能不能贴牌给做工商储的集成商 / ESaaS 投资方；按 kW / 分成 / 订阅',
     o:['不白标','白标·按kW','白标·分成','白标·订阅','待定']},
-  {q:'跨品牌 PCS/电池接入哪些？SunSpec？', multi:true,
+  {q:'能接哪些品牌的变流器/电池？', multi:true, h:'跨品牌接入广度；是否支持 SunSpec 这类通用标准',
     o:['仅自家','跨品牌·部分','跨品牌·广泛','SunSpec支持','不确定']},
-  {q:'SMB(<1MWh) 谁在认真做？瓶颈在哪？', multi:true,
+  {q:'中小工商业(<1MWh) 谁在认真做？', multi:true, h:'这块"夹心层"谁在做、最大难点在哪（多数玩家只做大项目）',
     o:['认真做SMB','只做大项目','瓶颈·价格','瓶颈·渠道','瓶颈·结算','不确定']}
 ];
-const QC = [ // C线：3.0 轨道/OS 验证（平台·标准·结算 bankability）
-  {q:'愿意被第三方平台集成/被 API 调用做底座吗？还是要全栈通吃？', multi:false,
+const QC = [ // C线·软件定义能源 3.0（平台·标准·结算）通用问题
+  {q:'愿意当"被别人调用"的底座吗？', multi:false, h:'愿不愿被第三方平台集成 / 被 API 调用做底层，而不是什么都自己全包',
     o:['愿做底座/被集成','只全栈自有','看条件/分成','不确定']},
-  {q:'对外开放的 API / 标准有哪些（调灵活性、读结算）？', multi:true,
+  {q:'有对外开放的接口/标准吗？', multi:true, h:'有没有开放 API、开源（如 OpenEMS）、或通用标准，让别人能接他们',
     o:['开放API','OpenEMS/开源','SunSpec/Modbus','EEBUS','仅私有','无','不确定']},
-  {q:'收益结算/归因能被金融机构或保险接受吗（bankability）？', multi:false,
+  {q:'收益报表能拿去融资/承保吗？', multi:false, h:'结算/收益归因够不够"可信账本"——能被银行或保险接受（bankability）',
     o:['已被金融/保险接受','可审计报表','仅内部报表','无透明结算','不确定']},
-  {q:'接入+结算这层，目前被某一家锁定了吗？', multi:false,
+  {q:'接入+结算这层被谁垄断了吗？', multi:false, h:'判断这层现在是群雄混战（有机会）还是已被某巨头锁定',
     o:['高度碎片·无人锁定','部分锁定','被巨头锁定','不确定']},
-  {q:'谁来当"中立账本/标准"最合适？会用第三方吗？', multi:true,
+  {q:'谁该当"中立标准/账本"？', multi:true, h:'问他们觉得谁来当中立标准最合适、愿不愿用第三方中立层',
     o:['愿用第三方中立层','想自己当标准','行业联盟','不需要','不确定']}
 ];
 const SEED = [
   // ===== A 线：户储 retrofit =====
-  {id:'1komma5',name:'1KOMMA5° (Heartbeat)',line:'A',pri:1,hall:'',focus:'Heartbeat 已向存量开放、VPP 达1GW。验证"跨品牌"边界',hyp:['A-H1','A-H2'],q:QA},
-  {id:'sonnen',name:'sonnen',line:'A',pri:1,hall:'B0.360',focus:'已接 EPEX 日内、FCR 预鉴定。是否只服务自家电池',hyp:['A-H1'],q:QA},
-  {id:'gridx',name:'gridX (XENON)',line:'A',pri:1,hall:'B5.671',focus:'平台型在位者，已向安装商开放。接入广度/白标定价/合作边界',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA},
-  {id:'kiwigrid',name:'kiwigrid',line:'A',pri:0,hall:'B5.575',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA},
-  {id:'marstek',name:'Marstek',line:'A',pri:1,hall:'C4.110',focus:'低价即插即用储能，有官方Local/Open API。验证开放度',hyp:['A-H3'],q:QA},
-  {id:'ecoflow',name:'EcoFlow (OASIS)',line:'A',pri:1,hall:'B1.170',focus:'AI HEMS最成体系、对接500+电价、开发者API。是否在内化整合价值',hyp:['A-H3','A-H1'],q:QA},
-  {id:'anker',name:'Anker SOLIX',line:'A',pri:0,hall:'B1.570',focus:'Solarbank系列，偏云锁定、无官方本地API。验证封闭程度',hyp:['A-H3'],q:QA},
-  {id:'zendure',name:'Zendure',line:'A',pri:0,hall:'C1.280',focus:'SolarFlow + 动态电价TOU自动化。开放度',hyp:['A-H3'],q:QA},
-  {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'B3.130(Kostal展台)',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA},
+  {id:'1komma5',name:'1KOMMA5° (Heartbeat)',line:'A',pri:1,hall:'',focus:'Heartbeat 已向存量开放、VPP 达1GW。验证"跨品牌"边界',hyp:['A-H1','A-H2'],q:QA,qx:[
+    {q:'Heartbeat 真能接他牌电池吗？',multi:false,h:'已宣布向存量开放——核实是否真接非 1K5 安装的他牌硬件',o:['仅自家装机','含他牌(有限)','广泛他牌','只是愿景','不确定']},
+    {q:'VPP 收益怎么分给业主？',multi:false,h:'1GW VPP——每户每年分多少、怎么结算',o:['固定补贴','按表现分成','并入电价','不透明','不确定']}]},
+  {id:'sonnen',name:'sonnen',line:'A',pri:1,hall:'B0.360',focus:'已接 EPEX 日内、FCR 预鉴定。是否只服务自家电池',hyp:['A-H1'],q:QA,qx:[
+    {q:'只服务自家电池吗？',multi:false,h:'核心：VPP/调度是否只接 sonnen 自家电池',o:['仅sonnen','含他牌','不确定']},
+    {q:'EPEX 日内 / FCR 实跑规模？',multi:false,h:'真在跑还是只宣传',o:['大规模在跑','试点','仅宣传','不确定']}]},
+  {id:'gridx',name:'gridX (XENON)',line:'A',pri:1,hall:'B5.671',focus:'平台型在位者，已向安装商开放。接入广度/白标定价/合作边界',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
+    {q:'愿被集成做我的接入底层，还是会竞争？',multi:false,h:'合作 or 竞争边界（C-H1）',o:['愿被集成/供底层','只做自有平台','看情况','不确定']},
+    {q:'XENON 接入设备广度？',multi:false,o:['极广(数百型号)','中等','有限','不确定']}]},
+  {id:'kiwigrid',name:'kiwigrid',line:'A',pri:0,hall:'B5.575',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
+    {q:'泛欧 VPP 平台对第三方开放吗？',multi:false,h:'新发平台能否被别家接入/集成',o:['开放API','仅合作方','封闭','不确定']},
+    {q:'pay-per-device 价位说清了吗？',multi:false,o:['给了具体价','区间模糊','不愿说','不确定']}]},
+  {id:'marstek',name:'Marstek',line:'A',pri:1,hall:'C4.110',focus:'低价即插即用储能，有官方Local/Open API。验证开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'本地/开放 API 真可用、文档全吗？',multi:false,h:'验证 H3：消费级品牌 API 开放度',o:['完整可用','有但简陋','仅云API','无','不确定']},
+    {q:'欢迎第三方做聚合/调度吗？',multi:false,o:['欢迎','中立','不鼓励','不确定']}]},
+  {id:'ecoflow',name:'EcoFlow (OASIS)',line:'A',pri:1,hall:'B1.170',focus:'AI HEMS最成体系、对接500+电价、开发者API。是否在内化整合价值',hyp:['A-H3','A-H1'],q:QA,qx:[
+    {q:'OASIS 在内化"跨品牌整合"价值吗？',multi:false,h:'会不会自己做成闭环、挤掉第三方',o:['正内化通吃','聚焦自家','愿开放','不确定']},
+    {q:'开发者 API 能调度他牌设备吗？',multi:false,o:['能','仅读数据','仅自家','不确定']}]},
+  {id:'anker',name:'Anker SOLIX',line:'A',pri:0,hall:'B1.570',focus:'Solarbank系列，偏云锁定、无官方本地API。验证封闭程度',hyp:['A-H3'],q:QA,qx:[
+    {q:'有本地/开放 API，还是纯云锁定？',multi:false,h:'验证封闭程度',o:['有本地API','仅云API','完全封闭','不确定']}]},
+  {id:'zendure',name:'Zendure',line:'A',pri:0,hall:'C1.280',focus:'SolarFlow + 动态电价TOU自动化。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'SolarFlow / TOU 对第三方开放吗？',multi:false,o:['开放','仅自家App','不确定']}]},
+  {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'B3.130(Kostal展台)',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA,qx:[
+    {q:'Smart Battery 接他牌电池到什么程度？',multi:false,h:'判断是潜在客户还是竞品',o:['广泛接他牌','少数型号','仅合作','不接','不确定']},
+    {q:'"中立接入层"愿买/合作还是自建？',multi:false,o:['愿买/合作','自建','不确定']}]},
   // ===== B 线：工商储 SaaS =====
-  {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'B0.345',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3','C-H2'],q:QB},
-  {id:'lumera',name:'Furo (原 Lumera Energy · Lumera OS)',line:'B',pri:1,hall:'C4.170A',focus:'C&I储能规划/仿真/运营OS，入围。结算/归因怎么做',hyp:['B-H1','B-H3'],q:QB},
-  {id:'simpl',name:'Simpl.energy (Zympler)',line:'B',pri:1,hall:'C4.660C',focus:'PV/电池/EV/工业负荷统一EMS，入围。SMB定价、跨品牌',hyp:['B-H1','B-H2'],q:QB},
-  {id:'entrix',name:'Entrix',line:'B',pri:0,hall:'B5.471',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2','C-H1'],q:QB},
-  {id:'suena',name:'Suena',line:'B',pri:0,hall:'B5.374',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2','C-H1'],q:QB},
-  {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:0,hall:'B5.290',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB},
-  {id:'gridbeyond',name:'GridBeyond',line:'B',pri:0,hall:'',focus:'AI优化+CapEx-free电池。ESaaS模式/收益分成',hyp:['B-H2','B-H3'],q:QB},
-  {id:'sigenergy',name:'Sigenergy (AI in All)',line:'B',pri:1,hall:'B1.330',focus:'SigenStor Neo五合一、AI叙事、ees入围。EMS开放度',hyp:['B-H1'],q:QB},
-  {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:0,hall:'B3.410 (另P2D B6.110)',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB},
-  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:0,hall:'C1.111',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB},
-  {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'B1.410',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？开源=潜在中立标准',hyp:['B-H1','B-H2','C-H3'],q:QB},
-  {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'B2.470',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3','C-H2'],q:QB},
-  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:0,hall:'TWAICE B0.336 · ACCURE B2.380',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3','C-H2'],q:QB},
-  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:0,hall:'C4.370A',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB},
-  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:0,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB},
+  {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'B0.345',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3','C-H2'],q:QB,qx:[
+    {q:'收益结算/归因做到多细？',multi:false,h:'直接对标 B-H3：是否设备级、可审计',o:['设备级可审计','日月报','较弱','不确定']},
+    {q:'面向 SMB(<1MWh) 吗？',multi:false,o:['是','偏大项目','不确定']}]},
+  {id:'lumera',name:'Furo (原 Lumera Energy · Lumera OS)',line:'B',pri:1,hall:'C4.170A',focus:'C&I储能规划/仿真/运营OS，入围。结算/归因怎么做',hyp:['B-H1','B-H3'],q:QB,qx:[
+    {q:'是规划仿真为主，还是含实时运营+结算？',multi:false,o:['全周期含结算','偏规划仿真','不确定']},
+    {q:'跨品牌接入广度？',multi:false,o:['广','有限','不确定']}]},
+  {id:'simpl',name:'Simpl.energy (Zympler)',line:'B',pri:1,hall:'C4.660C',focus:'PV/电池/EV/工业负荷统一EMS，入围。SMB定价、跨品牌',hyp:['B-H1','B-H2'],q:QB,qx:[
+    {q:'Zympler 真能跨 PV/电池/EV/负荷统一调度？',multi:false,o:['全打通','部分','不确定']},
+    {q:'SMB 定价清晰吗？',multi:false,o:['清晰','模糊','不确定']}]},
+  {id:'entrix',name:'Entrix',line:'B',pri:0,hall:'B5.471',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2','C-H1'],q:QB,qx:[
+    {q:'愿做"市场通道供给方"被我分成接入吗？',multi:false,h:'C-H1：被集成做底座',o:['愿意','只做自家客户','不确定']},
+    {q:'做不做 SMB(<1MWh)？',multi:false,o:['做','只大资产','不确定']}]},
+  {id:'suena',name:'Suena',line:'B',pri:0,hall:'B5.374',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2','C-H1'],q:QB,qx:[
+    {q:'Autopilot 自治到哪一步？人还做什么？',multi:false,h:'3.0 agentic 自治成色',o:['全自治交易','半自动','仅建议','不确定']},
+    {q:'能做我的上游市场通道(分成)吗？',multi:false,o:['能','不愿','不确定']}]},
+  {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:0,hall:'B5.290',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB,qx:[
+    {q:'能以"分成接入"做我的市场通道吗？',multi:false,h:'不自建牌照、接它的通道',o:['可以','需谈','不愿','不确定']}]},
+  {id:'gridbeyond',name:'GridBeyond',line:'B',pri:0,hall:'',focus:'AI优化+CapEx-free电池。ESaaS模式/收益分成',hyp:['B-H2','B-H3'],q:QB,qx:[
+    {q:'ESaaS/收益分成的分成结构？',multi:false,o:['已告知具体','模糊','不确定']},
+    {q:'做 SMB 吗？',multi:false,o:['做','只大客户','不确定']}]},
+  {id:'sigenergy',name:'Sigenergy (AI in All)',line:'B',pri:1,hall:'B1.330',focus:'SigenStor Neo五合一、AI叙事、ees入围。EMS开放度',hyp:['B-H1'],q:QB,qx:[
+    {q:'"AI in All" 有实质还是营销话术？',multi:false,o:['有实质','偏营销','不确定']},
+    {q:'EMS 对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']}]},
+  {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:0,hall:'B3.410 (另P2D B6.110)',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB,qx:[
+    {q:'iSolarEMS 只服务自家硬件吗？',multi:false,o:['仅自家','含他牌','不确定']},
+    {q:'有多市场价值堆叠能力吗？',multi:false,o:['有','仅削峰自用','无','不确定']}]},
+  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:0,hall:'C1.111',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB,qx:[
+    {q:'C&I 的价值堆叠到哪一步？',multi:false,o:['多市场','仅自用削峰','不确定']},
+    {q:'对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']}]},
+  {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'B1.410',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？开源=潜在中立标准',hyp:['B-H1','B-H2','C-H3'],q:QB,qx:[
+    {q:'OpenEMS 能作中立标准被我嫁接吗？',multi:false,h:'C-H3：开源=潜在中立标准',o:['可嫁接/欢迎','有限','不确定']},
+    {q:'社区版/商业版边界清晰吗？',multi:false,o:['清晰','模糊','不确定']}]},
+  {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'B2.470',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3','C-H2'],q:QB,qx:[
+    {q:'AvEn 能作我的资产层模块(买非自研)吗？',multi:false,o:['可授权/集成','仅整包','不确定']},
+    {q:'KPI 能被金融/保险接受吗？',multi:false,h:'bankability',o:['能(bankable)','内部用','不确定']}]},
+  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:0,hall:'TWAICE B0.336 · ACCURE B2.380',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3','C-H2'],q:QB,qx:[
+    {q:'分析结果可作可融资业绩证据吗？',multi:false,h:'bankability',o:['可(bankable)','参考用','不确定']},
+    {q:'印证"缺单一可信数据源"痛点吗？',multi:false,o:['强烈印证','一般','否','不确定']}]},
+  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:0,hall:'C4.370A',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB,qx:[
+    {q:'容量画像能作我的接入/选址数据源吗？',multi:false,o:['可API接入','仅出报告','不确定']}]},
+  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:0,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
+    {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
+    {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
   // ===== C 线：软件定义能源 3.0 —— 灵活性+结算"轨道" =====
   {id:'c30-synth',name:'🧭 3.0 轨道·横向综判',line:'C',pri:1,hall:'走完平台/结算各家后填',focus:'升维假设：别再做"更中立的optimizer"，而是做大家都要用的接入+灵活性+结算"轨道/OS"（拥有标准与账本=拥有规则）。逛完 gridX/kiwigrid/FENECON/Entrix/Suena/volytica/TWAICE/coneva 后在此综合判断',hyp:['C-H1','C-H2','C-H3'],q:QC},
   // ===== 通用 / 论坛 =====
@@ -492,7 +541,7 @@ async function renderList(){
       <div class="focus">${esc(b.focus)}</div>
       <div class="meta">
         <span><i class="dot st-${st}"></i>${stTxt}</span>
-        <span>📷 ${pc[i]}</span><span>✓ ${a}/${b.q.length}</span>
+        <span>📷 ${pc[i]}</span><span>✓ ${a}/${qsOf(b).length}</span>
         ${(s.hall||b.hall)?'<span>📍 '+esc(s.hall||b.hall)+'</span>':''}
       </div></button>`;}).join('');
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
@@ -571,7 +620,8 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
 }
 
 function qText(q){return typeof q==='object'?q.q:q;}
-function renderQ(b,s){$('#qlist').innerHTML=b.q.map((q,i)=>{const a=s.answers[i]||{};
+function qsOf(b){return (b.q||[]).concat(b.qx||[]);}
+function renderQ(b,s){const QS=qsOf(b);const BL=(b.q||[]).length;$('#qlist').innerHTML=QS.map((q,i)=>{const a=s.answers[i]||{};
   if(typeof q!=='object'){ // 论坛/自定义：勾选 + 文字
     return `<div class="q ${a.checked?'checked':''}" data-i="${i}" data-t="s">
       <div class="qh"><input type="checkbox" ${a.checked?'checked':''}>
@@ -581,7 +631,8 @@ function renderQ(b,s){$('#qlist').innerHTML=b.q.map((q,i)=>{const a=s.answers[i]
   const opts=a.opts||[];const done=isAns(a);
   const chips=q.o.map(o=>`<button type="button" class="opt${opts.includes(o)?' sel':''}" data-o="${esc(o)}">${esc(o)}</button>`).join('');
   return `<div class="q ${done?'answered':''}" data-i="${i}" data-t="o" data-multi="${q.multi?1:0}">
-    <div class="qt2">${done?'✓ ':''}${esc(q.q)}${q.multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':''}</div>
+    <div class="qt2">${done?'✓ ':''}${i>=BL?'<span class="qtag">专属</span> ':''}${esc(q.q)}${q.multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':''}</div>
+    ${q.h?'<div class="qhint">'+esc(q.h)+'</div>':''}
     <div class="opts">${chips}</div>
     <textarea class="note" placeholder="补充细节(可选)…">${esc(a.text||'')}</textarea></div>`;}).join('');
   $$('#qlist .q').forEach(el=>{const i=el.dataset.i;
@@ -596,7 +647,7 @@ function renderQ(b,s){$('#qlist').innerHTML=b.q.map((q,i)=>{const a=s.answers[i]
         s2.answers[i].opts=arr;touchBooth(CURBOOTH);
         el.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',arr.includes(x.dataset.o)));
         const done=isAns(s2.answers[i]);el.classList.toggle('answered',done);
-        el.querySelector('.qt2').innerHTML=(done?'✓ ':'')+esc(qText(b.q[i]))+(multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':'');}));
+        el.querySelector('.qt2').innerHTML=(done?'✓ ':'')+(i>=BL?'<span class="qtag">专属</span> ':'')+esc(qText(QS[i]))+(multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':'');}));
     }
     el.querySelector('textarea').addEventListener('input',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
       s2.answers[i].text=e.target.value;touchBooth(CURBOOTH);el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));});});}
@@ -620,7 +671,7 @@ function renderDash(){
   allBooths().forEach(b=>{const s=bState(b.id);Object.entries(s.hyp||{}).forEach(([h,v])=>{
     if(v&&tally[h]){tally[h][v]++;tally[h].booths.push(b.name);}});});
   const lines={A:'A 线 · 户储 retrofit 层',B:'B 线 · 工商储 value-stacking SaaS',C:'C 线 · 软件定义能源 3.0 · 灵活性+结算轨道'};
-  const lineColor={A:'#a5b4fc',B:'#7dd3fc',C:'#5eead4'};
+  const lineColor={A:'#4338ca',B:'#0369a1',C:'#0f766e'};
   let html='';
   ['A','B','C'].forEach(L=>{
     html+=`<h2 style="font-size:15px;margin:6px 0 10px;color:${lineColor[L]}">${lines[L]}</h2>`;
@@ -677,7 +728,7 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
   const datas={};for(const p of photos){datas[p.id]=await blobToDataURL(await photoBlob(p));}
   let body='';
   for(const b of allBooths()){const s=bState(b.id);const ps=byB[b.id]||[];
-    const ans=b.q.map((q,i)=>{const a=s.answers[i]||{};if(!isAns(a))return'';
+    const ans=qsOf(b).map((q,i)=>{const a=s.answers[i]||{};if(!isAns(a))return'';
       const sel=(a.opts&&a.opts.length)?'<br><span style="color:#0369a1">▸ '+esc(a.opts.join(' / '))+'</span>':'';
       const chk=(typeof q!=='object'&&a.checked)?'✓ ':'';
       return `<li><b>${chk}</b>${esc(qText(q))}${sel}${a.text?'<br><span style="color:#475569">→ '+esc(a.text)+'</span>':''}</li>`;}).filter(Boolean).join('');
