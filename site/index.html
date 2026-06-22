@@ -422,6 +422,7 @@ const SEED = [
   {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:1,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
     {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
     {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
+  {id:'eon',name:'E.ON',line:'B',pri:0,cat:'vpp',hall:'C5.630',focus:'德国能源巨头/零售商(持股 gridX)。潜在客户/被集成方：动态电价+VPP+白标',hyp:['B-H2','C-H1'],q:QB},
   // ===== C 线：软件未来方向（看方向 + 对着竞对调研） =====
   {id:'dir-agentic',name:'方向① AI 自治交易/调度',line:'C',pri:1,cat:'os30',hall:'',focus:'软件从"给建议"→"自己决策+自动交易/对冲"。去看竞对：Suena、Entrix、enspired、GridBeyond、Kraken',hyp:['C-H1'],q:QD},
   {id:'dir-neutral',name:'方向② 跨品牌中立接入层',line:'C',pri:1,cat:'os30',hall:'',focus:'不绑硬件、统一接入各品牌设备做调度（接入广度=壁垒）。去看竞对：gridX、kiwigrid、Marstek/EcoFlow(开放API)、Tibber',hyp:['C-H1','C-H3'],q:QD},
@@ -506,7 +507,7 @@ const CN_NAME={
   'Zitara':'美国·电池软件','Eatron':'英国·电池AI(BMS)','DNV':'挪威·认证/咨询',
   'Envelio':'德国·配网智能','Depsys':'瑞士·配网监测','Neara':'澳洲·电网三维建模','Heimdall Power':'挪威·电网传感',
   'Wallbox':'西班牙·充电+V2G','Voltfang':'德国·梯次储能','Ambibox':'德国·V2G/充电',
-  'Deye':'德业 · 宁波(混合/储能逆变)','SolaX Power':'浙江 · 混合储能逆变','SOFAR':'首航新能源','Solis (Ginlong)':'锦浪科技','Hoymiles':'禾迈 · 微逆/储能','AlphaESS':'安徽 · 户储系统','Dyness':'户储电池品牌','KSTAR':'科士达','SAJ':'三晶电气','Solplanet':'AISWEI · 上海'
+  'Deye':'德业 · 宁波(混合/储能逆变)','SolaX Power':'浙江 · 混合储能逆变','SOFAR':'首航新能源','Solis (Ginlong)':'锦浪科技','Hoymiles':'禾迈 · 微逆/储能','AlphaESS':'安徽 · 户储系统','Dyness':'户储电池品牌','KSTAR':'科士达','SAJ':'三晶电气','Solplanet':'AISWEI · 上海','E.ON':'德国 · 能源巨头/零售商'
 };
 function cnOf(b){ return CN_NAME[b.id]||CN_NAME[b.name]||''; }
 function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=ansCount(s);const cn=cnOf(b);const col=catColor(b);
