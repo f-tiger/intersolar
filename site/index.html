@@ -78,10 +78,10 @@
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
   .st-todo{background:#64748b}.st-doing{background:var(--warn)}.st-done{background:var(--acc2)}
   /* detail */
-  .back{display:inline-flex;align-items:center;gap:6px;background:var(--acc);border:none;color:#fff;
-    font-size:15px;padding:12px 20px;margin:10px 0 4px;font-weight:700;border-radius:999px;
-    box-shadow:0 2px 8px rgba(37,99,235,.3)}
-  .back:active{filter:brightness(.92)}
+  .back{position:fixed;left:14px;bottom:20px;z-index:60;display:inline-flex;align-items:center;gap:6px;
+    background:var(--acc);border:none;color:#fff;font-size:15px;padding:13px 20px;font-weight:800;border-radius:999px;
+    box-shadow:0 8px 22px rgba(37,99,235,.45)}
+  .back:active{filter:brightness(.92);transform:scale(.96)}
   .sec{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
     padding:15px;margin-bottom:12px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
   .sec h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:7px}
@@ -342,15 +342,12 @@ const SEED = [
   {id:'gridx',name:'gridX (XENON)',line:'A',pri:1,hall:'B5.671',focus:'平台型在位者，已向安装商开放。接入广度/白标定价/合作边界',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
     {q:'愿被集成做我的接入底层，还是会竞争？',multi:false,h:'合作 or 竞争边界（C-H1）',o:['愿被集成/供底层','只做自有平台','看情况','不确定']},
     {q:'XENON 接入设备广度？',multi:false,o:['极广(数百型号)','中等','有限','不确定']}]},
-  {id:'kiwigrid',name:'kiwigrid',line:'A',pri:0,hall:'B5.575',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
+  {id:'kiwigrid',name:'kiwigrid',line:'A',pri:1,hall:'B5.575',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
     {q:'泛欧 VPP 平台对第三方开放吗？',multi:false,h:'新发平台能否被别家接入/集成',o:['开放API','仅合作方','封闭','不确定']},
     {q:'pay-per-device 价位说清了吗？',multi:false,o:['给了具体价','区间模糊','不愿说','不确定']}]},
   {id:'marstek',name:'Marstek',line:'A',pri:1,hall:'C4.110',focus:'低价即插即用储能，有官方Local/Open API。验证开放度',hyp:['A-H3'],q:QA,qx:[
     {q:'本地/开放 API 真可用、文档全吗？',multi:false,h:'验证 H3：消费级品牌 API 开放度',o:['完整可用','有但简陋','仅云API','无','不确定']},
     {q:'欢迎第三方做聚合/调度吗？',multi:false,o:['欢迎','中立','不鼓励','不确定']}]},
-  {id:'ecoflow',name:'EcoFlow (OASIS)',line:'A',pri:1,hall:'B1.170',focus:'AI HEMS最成体系、对接500+电价、开发者API。是否在内化整合价值',hyp:['A-H3','A-H1'],q:QA,qx:[
-    {q:'OASIS 在内化"跨品牌整合"价值吗？',multi:false,h:'会不会自己做成闭环、挤掉第三方',o:['正内化通吃','聚焦自家','愿开放','不确定']},
-    {q:'开发者 API 能调度他牌设备吗？',multi:false,o:['能','仅读数据','仅自家','不确定']}]},
   {id:'anker',name:'Anker SOLIX',line:'A',pri:0,hall:'B1.570',focus:'Solarbank系列，偏云锁定、无官方本地API。验证封闭程度',hyp:['A-H3'],q:QA,qx:[
     {q:'有本地/开放 API，还是纯云锁定？',multi:false,h:'验证封闭程度',o:['有本地API','仅云API','完全封闭','不确定']}]},
   {id:'zendure',name:'Zendure',line:'A',pri:0,hall:'C1.280',focus:'SolarFlow + 动态电价TOU自动化。开放度',hyp:['A-H3'],q:QA,qx:[
@@ -368,13 +365,13 @@ const SEED = [
   {id:'simpl',name:'Simpl.energy (Zympler)',line:'B',pri:1,hall:'C4.660C',focus:'PV/电池/EV/工业负荷统一EMS，入围。SMB定价、跨品牌',hyp:['B-H1','B-H2'],q:QB,qx:[
     {q:'Zympler 真能跨 PV/电池/EV/负荷统一调度？',multi:false,o:['全打通','部分','不确定']},
     {q:'SMB 定价清晰吗？',multi:false,o:['清晰','模糊','不确定']}]},
-  {id:'entrix',name:'Entrix',line:'B',pri:0,hall:'B5.471',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2','C-H1'],q:QB,qx:[
+  {id:'entrix',name:'Entrix',line:'B',pri:1,hall:'B5.471',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2','C-H1'],q:QB,qx:[
     {q:'愿做"市场通道供给方"被我分成接入吗？',multi:false,h:'C-H1：被集成做底座',o:['愿意','只做自家客户','不确定']},
     {q:'做不做 SMB(<1MWh)？',multi:false,o:['做','只大资产','不确定']}]},
   {id:'suena',name:'Suena',line:'B',pri:0,hall:'B5.374',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2','C-H1'],q:QB,qx:[
     {q:'Autopilot 自治到哪一步？人还做什么？',multi:false,h:'3.0 agentic 自治成色',o:['全自治交易','半自动','仅建议','不确定']},
     {q:'能做我的上游市场通道(分成)吗？',multi:false,o:['能','不愿','不确定']}]},
-  {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:0,hall:'B5.290',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB,qx:[
+  {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:1,hall:'B5.290',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB,qx:[
     {q:'能以"分成接入"做我的市场通道吗？',multi:false,h:'不自建牌照、接它的通道',o:['可以','需谈','不愿','不确定']}]},
   {id:'gridbeyond',name:'GridBeyond',line:'B',pri:0,hall:'',focus:'AI优化+CapEx-free电池。ESaaS模式/收益分成',hyp:['B-H2','B-H3'],q:QB,qx:[
     {q:'ESaaS/收益分成的分成结构？',multi:false,o:['已告知具体','模糊','不确定']},
@@ -382,10 +379,10 @@ const SEED = [
   {id:'sigenergy',name:'Sigenergy (AI in All)',line:'B',pri:1,hall:'B1.330',focus:'SigenStor Neo五合一、AI叙事、ees入围。EMS开放度',hyp:['B-H1'],q:QB,qx:[
     {q:'"AI in All" 有实质还是营销话术？',multi:false,o:['有实质','偏营销','不确定']},
     {q:'EMS 对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']}]},
-  {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:0,hall:'B3.410 (另P2D B6.110)',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB,qx:[
+  {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:1,hall:'B3.410 (另P2D B6.110)',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB,qx:[
     {q:'iSolarEMS 只服务自家硬件吗？',multi:false,o:['仅自家','含他牌','不确定']},
     {q:'有多市场价值堆叠能力吗？',multi:false,o:['有','仅削峰自用','无','不确定']}]},
-  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:0,hall:'C1.111',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB,qx:[
+  {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:1,hall:'C1.111',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB,qx:[
     {q:'C&I 的价值堆叠到哪一步？',multi:false,o:['多市场','仅自用削峰','不确定']},
     {q:'对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']}]},
   {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'B1.410',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？开源=潜在中立标准',hyp:['B-H1','B-H2','C-H3'],q:QB,qx:[
@@ -394,12 +391,12 @@ const SEED = [
   {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'B2.470',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3','C-H2'],q:QB,qx:[
     {q:'AvEn 能作我的资产层模块(买非自研)吗？',multi:false,o:['可授权/集成','仅整包','不确定']},
     {q:'KPI 能被金融/保险接受吗？',multi:false,h:'bankability',o:['能(bankable)','内部用','不确定']}]},
-  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:0,hall:'TWAICE B0.336 · ACCURE B2.380',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3','C-H2'],q:QB,qx:[
+  {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:1,hall:'TWAICE B0.336 · ACCURE B2.380',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3','C-H2'],q:QB,qx:[
     {q:'分析结果可作可融资业绩证据吗？',multi:false,h:'bankability',o:['可(bankable)','参考用','不确定']},
     {q:'印证"缺单一可信数据源"痛点吗？',multi:false,o:['强烈印证','一般','否','不确定']}]},
-  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:0,hall:'C4.370A',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB,qx:[
+  {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:1,hall:'C4.370A',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB,qx:[
     {q:'容量画像能作我的接入/选址数据源吗？',multi:false,o:['可API接入','仅出报告','不确定']}]},
-  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:0,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
+  {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:1,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
     {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
     {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
   // ===== C 线：软件定义能源 3.0 —— 灵活性+结算"轨道" =====
