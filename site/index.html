@@ -100,6 +100,10 @@
   .cathead{font-size:19px;font-weight:800;margin:22px 0 6px;display:flex;align-items:center;gap:8px;
     color:var(--txt);border-left:5px solid var(--acc);padding-left:10px;line-height:1.25;cursor:pointer;user-select:none}
   .catchev{color:var(--mut);font-size:15px;font-weight:700;margin-left:2px}
+  .cattabs{display:flex;gap:7px;overflow-x:auto;margin:0 0 12px;padding-bottom:3px}
+  .cattabs button{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);color:var(--mut);
+    padding:9px 15px;border-radius:999px;font-size:14px;font-weight:700;white-space:nowrap}
+  .cattabs button.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 2px 6px rgba(37,99,235,.25)}
   .cathead .catn{font-size:12px;font-weight:700;color:var(--mut);background:var(--panel2);border-radius:999px;padding:2px 9px}
   .catref{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
     border-radius:9px;padding:7px 11px;margin:0 0 11px;line-height:1.65}
@@ -201,6 +205,7 @@
       <button data-l="pri">⭐ 优先</button>
       <button data-l="todo">未完成</button>
     </div>
+    <div class="cattabs" id="cattabs"></div>
     <div id="boothlist"></div>
     <button class="addbtn" id="addbooth">＋ 临时新增一个展位</button>
   </section>
@@ -573,12 +578,14 @@ function compress(file){return new Promise(res=>{const img=new Image();const url
   img.onerror=()=>{URL.revokeObjectURL(url);res(file)};img.src=url;});}
 
 /* ============================ 渲染 ============================ */
-let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={}, OPEN_CAT={};
+let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={}, OPEN_CAT={}, CATSEL='all';
+const CATTAB={all:'全部',storage:'🔋储能',hems:'🏠HEMS',ci:'⚡工商储',vpp:'📈VPP',analytics:'🔬分析',grid:'🕸电网',v2g:'🚗V2G',os30:'🧭3.0',misc:'➕其他'};
 try{const ui=JSON.parse(localStorage.getItem('scout_ui')||'{}'); OPEN_REF=ui.ref||{}; OPEN_CAT=ui.cat||{};}catch(e){}
 function saveUI(){ try{localStorage.setItem('scout_ui',JSON.stringify({ref:OPEN_REF,cat:OPEN_CAT}));}catch(e){} }
 function toggleRef(k){ OPEN_REF[k]=!OPEN_REF[k]; saveUI(); renderList(); }
 function toggleCat(k){ OPEN_CAT[k]=!OPEN_CAT[k]; saveUI(); renderList(); }
-window.toggleRef=toggleRef; window.toggleCat=toggleCat;
+function selCat(k){ CATSEL=k; renderList(); window.scrollTo(0,0); }
+window.toggleRef=toggleRef; window.toggleCat=toggleCat; window.selCat=selCat;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
 function go(v){CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
@@ -611,18 +618,27 @@ async function renderList(){
   if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+b.focus).toLowerCase().includes(q));}
   const pcArr=await Promise.all(fl.map(b=>countPhotos2(b.id)));
   const pcMap={}; fl.forEach((b,i)=>pcMap[b.id]=pcArr[i]);
-  // 按类型大分类分组渲染
+  // 分类横向 tab
+  const present=CATS.filter(c=>fl.some(b=>catOf(b)===c.k));
+  if(CATSEL!=='all' && !present.some(c=>c.k===CATSEL)) CATSEL='all';
+  let tabs='<button class="'+(CATSEL==='all'?'on':'')+'" onclick="selCat(\'all\')">全部</button>';
+  present.forEach(c=>{ const n=fl.filter(b=>catOf(b)===c.k && !b.ref).length;
+    tabs+='<button class="'+(CATSEL===c.k?'on':'')+'" onclick="selCat(\''+c.k+'\')">'+(CATTAB[c.k]||c.k)+'</button>'; });
+  $('#cattabs').innerHTML=tabs;
+  // 按选中分类渲染（全部=分组展示）
+  const single = CATSEL!=='all';
+  const shown = single?CATS.filter(c=>c.k===CATSEL):CATS;
   let html='';
-  CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
+  shown.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
     const conf=items.filter(b=>!b.ref).sort((a,b)=>(b.pri||0)-(a.pri||0));
     const refs=items.filter(b=>b.ref);
-    const folded = !!OPEN_CAT[c.k] && !SEARCH;
-    html+='<div class="cathead" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+conf.length+'</span><span class="catchev">'+(folded?'▸':'▾')+'</span></div>';
+    const folded = !single && !!OPEN_CAT[c.k] && !SEARCH;
+    html+='<div class="cathead" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+conf.length+'</span>'+(single?'':'<span class="catchev">'+(folded?'▸':'▾')+'</span>')+'</div>';
     if(folded) return;
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
     html+=conf.map(b=>cardHtml(b,pcMap[b.id])).join('');
     html+='<button class="addbtn" style="margin:2px 0 12px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
-    if(refs.length){ const open=OPEN_REF[c.k]||!!SEARCH;
+    if(refs.length){ const open=OPEN_REF[c.k]||!!SEARCH||single;
       html+='<button class="refToggle" onclick="toggleRef(\''+c.k+'\')">'+(open?'▾ 收起对标参照':'▸ 展开对标参照 '+refs.length+' 家')+'</button>';
       if(open) html+='<div style="margin-bottom:16px">'+refs.map(b=>cardHtml(b,pcMap[b.id])).join('')+'</div>';
     }
