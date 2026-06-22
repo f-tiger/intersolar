@@ -159,6 +159,7 @@
   </div>
   <nav class="nav" id="nav">
     <button data-v="list" class="on">展位</button>
+    <button data-v="conf">会议</button>
     <button data-v="dash">验证看板</button>
     <button data-v="data">数据/归档</button>
   </nav>
@@ -187,13 +188,15 @@
       <button data-l="A">A 户储线</button>
       <button data-l="B">B 工商储线</button>
       <button data-l="C">C 3.0轨道</button>
-      <button data-l="G">通用/论坛</button>
       <button data-l="pri">⭐ 优先</button>
       <button data-l="todo">未完成</button>
     </div>
     <div id="boothlist"></div>
     <button class="addbtn" id="addbooth">＋ 临时新增一个展位</button>
   </section>
+
+  <!-- CONF VIEW -->
+  <section id="view-conf" class="hidden"><div id="confbody"></div></section>
 
   <!-- DETAIL VIEW -->
   <section id="view-detail" class="hidden"></section>
@@ -507,9 +510,9 @@ function compress(file){return new Promise(res=>{const img=new Image();const url
 let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='';
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
-function go(v){CUR=v;['list','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
+function go(v){CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  if(v==='list')renderList(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
+  if(v==='list')renderList(); if(v==='conf')renderConf(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
 function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
@@ -519,7 +522,7 @@ function statusOf(id){const s=bState(id);
   if(s.status==='done')return'done'; if(s.status==='doing'||ans>0||s.notes)return'doing'; return'todo';}
 
 async function renderList(){
-  const list=allBooths();
+  const list=allBooths().filter(b=>b.line!=='G');
   // summary
   let done=0,doing=0,ans=0;
   list.forEach(b=>{const st=statusOf(b.id);if(st==='done')done++;else if(st==='doing')doing++;
@@ -557,12 +560,39 @@ $('#filters').addEventListener('click',e=>{const b=e.target.closest('button');if
   FILTER=b.dataset.l;$$('#filters button').forEach(x=>x.classList.toggle('on',x===b));renderList();});
 $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
+/* ============================ 会议 / 论坛排期 ============================ */
+const CONF=[
+  {day:'6/22 周一 · 开幕前夜（ICM）', items:[
+    {time:'17:00', name:'The smarter E AWARD 颁奖典礼', loc:'ICM 国际会议中心', key:'一晚锁定全行业软件/VPP 风向与获奖名单；重点听 Smart Integrated Energy 类目的获奖理由', boothId:'award'}
+  ]},
+  {day:'6/22–23 · 四大会议（ICM · 需会议票）', items:[
+    {time:'全天', name:'Intersolar / ees / EM-Power / Power2Drive Conference', loc:'ICM', key:'付费会议：政策与市场设计、灵活性、储能商业模式深度议题；按兴趣挑场次'}
+  ]},
+  {day:'6/23–25 · 展期论坛（展馆内 · 凭展票免费）', items:[
+    {time:'展期每日', name:'EM-Power Forum', loc:'EM-Power 馆', key:'需求响应数据互操作性、拥塞/容量管理、DSO 数字化——与 3.0 轨道最相关，优先去', boothId:'emforum'},
+    {time:'展期每日', name:'The smarter E Forum', loc:'展馆内', key:'prosuming / 智能电网 / 灵活性变现的实战案例与商业模式', boothId:'seforum'},
+    {time:'展期每日', name:'ees Forum', loc:'ees 馆', key:'电池与储能系统、BESS 运营与可用能量 / 可融资性(bankability) 话题'}
+  ]}
+];
+function renderConf(){
+  let h='<div class="tip">📅 核心排期 + 一句话重点如下。<b>具体每场时间/房间以官方 The smarter E App 议程为准</b>。带"📝记录"的可点进去现场记笔记。</div>';
+  CONF.forEach(g=>{ h+='<h2 style="font-size:14px;margin:16px 0 8px;color:var(--mut)">'+esc(g.day)+'</h2>';
+    g.items.forEach(it=>{ const rec=!!it.boothId; const a=rec?ansCount(bState(it.boothId)):0;
+      h+='<div class="card"'+(rec?' onclick="openBooth(\''+it.boothId+'\')"':'')+'>'
+        +'<div class="top"><div class="nm">'+esc(it.name)+'</div><span class="chip G">'+esc(it.time)+'</span></div>'
+        +'<div class="focus">'+esc(it.key)+'</div>'
+        +'<div class="meta"><span>📍 '+esc(it.loc)+'</span>'+(rec?'<span>📝 记录 '+a+'</span>':'<span>仅参考</span>')+'</div>'
+      +'</div>'; });
+  });
+  $('#confbody').innerHTML=h;
+}
+
 async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);const s=bState(id);
   go('detail');const v=$('#view-detail');
   const cc=concludeBooth(b,s);
   const photos=await photosOf(id);
   v.innerHTML=`
-   <button class="back" onclick="go('list')">‹ 返回展位列表</button>
+   <button class="back" onclick="go('${b.line==='G'?'conf':'list'}')">‹ 返回${b.line==='G'?'会议':'展位'}</button>
    <div class="sec">
      <h3>${esc(b.name)} <span class="chip ${b.line}" style="margin-left:auto">${b.line==='A'?'户储线':b.line==='B'?'工商储线':b.line==='C'?'3.0轨道':'通用'}</span></h3>
      <p class="muted" style="margin:0 0 6px">${esc(b.focus)}</p>
