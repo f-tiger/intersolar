@@ -26,10 +26,10 @@
   .hbar h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px}
   .hbar .sub{font-size:11px;color:var(--mut);font-weight:500}
   .logo{width:30px;height:30px;flex:0 0 auto}
-  .nav{display:flex;gap:6px;max-width:760px;margin:0 auto;padding:0 10px 10px;overflow-x:auto}
+  .nav{display:flex;gap:8px;max-width:760px;margin:0 auto;padding:0 12px 12px;overflow-x:auto}
   .nav button{flex:0 0 auto;background:var(--panel);color:var(--mut);border:1px solid var(--line);
-    padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600}
-  .nav button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+    padding:11px 20px;border-radius:999px;font-size:16px;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .nav button.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 2px 8px rgba(37,99,235,.28)}
   /* progress bar */
   .prog{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:4px 0}
   .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
@@ -103,6 +103,7 @@
   .catref{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
     border-radius:9px;padding:7px 11px;margin:0 0 11px;line-height:1.65}
   .catref b{color:var(--txt)}
+  .catzone{font-size:12px;color:var(--mut);margin:-2px 0 9px;padding-left:13px;font-weight:600}
   .refchip{display:inline-block;background:var(--panel);border:1px solid var(--line);color:var(--acc);
     font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;margin:4px 5px 0 0}
   .refchip:active{background:var(--panel2)}
@@ -190,7 +191,6 @@
         <div class="s"><b id="st-ans">0</b><span>已答问题</span></div>
       </div>
     </div>
-    <div class="tip">📍 展位号已尽量预填自公开资料：<b>无后缀</b>=公司官方页确认；<b>带 ?</b>=公开资料推断、请现场核对；<b>"号待查"/空白</b>=官方未公布，到场用 <b>The smarter E App</b> 或入口大屏查；<b>"(去年位置)"</b>=2026 号未公布、仅给去年展区供找方向。<br>提示：ees 储能多在 B 区、EM-Power 在 B5、Power2Drive 在 B6、Intersolar 在 A 区+C1。</div>
     <input class="search" id="search" placeholder="搜索展位名 / 关键词…">
     <div class="filters" id="filters">
       <button data-l="all" class="on">全部</button>
@@ -411,15 +411,15 @@ function bState(id){ if(!STATE.booths[id]) STATE.booths[id]={status:'todo',hall:
 
 /* ---------- 展位分类（按类型，含热门参照公司） ---------- */
 const CATS=[
-  {k:'storage', t:'🔋 储能硬件 · 即插即用 / 电池', refs:['Tesla Powerwall','BYD','SolarEdge','Enphase','Huawei LUNA','Growatt','GoodWe','Pylontech','Fox ESS']},
-  {k:'hems',    t:'🏠 户用软件 · HEMS / VPP',      refs:['Tesla VPP','Enphase IQ','SolarEdge ONE','SMA Sunny Home','Loxone','Solarwatt Manager','Voltware']},
-  {k:'ci',      t:'⚡ 工商储 · EMS / 调度软件',     refs:['SMA Commercial','Fluence','Stem','AMMP','Wattstor','Wattsight']},
-  {k:'vpp',     t:'📈 VPP · 聚合 · 能量交易 / 动态电价', refs:['Octopus Kraken','enspired','Habitat Energy','Sympower','Flower','Enpal','Voltus','Leap']},
-  {k:'analytics',t:'🔬 电池分析 · 资产层 KPI',      refs:['Zitara','DNV','TÜV','Eatron']},
-  {k:'grid',    t:'🕸 电网 · 容量 / 接入数据',       refs:['Envelio','Depsys','Neara','Heimdall Power']},
-  {k:'v2g',     t:'🚗 V2G · 车网互动',              refs:['Wallbox Quasar','Fermata Energy','Voltfang','Ambibox','We Drive Solar']},
-  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      refs:['Octopus Kraken']},
-  {k:'misc',    t:'➕ 临时新增 / 其他',              refs:[]}
+  {k:'storage', t:'🔋 储能硬件 · 即插即用 / 电池', zone:'多在 ees 馆 · B 区 / C 区', refs:['Tesla Powerwall','BYD','SolarEdge','Enphase','Huawei LUNA','Growatt','GoodWe','Pylontech','Fox ESS']},
+  {k:'hems',    t:'🏠 户用软件 · HEMS / VPP',      zone:'EM-Power B5 · ees B 区为主', refs:['Tesla VPP','Enphase IQ','SolarEdge ONE','SMA Sunny Home','Loxone','Solarwatt Manager','Voltware']},
+  {k:'ci',      t:'⚡ 工商储 · EMS / 调度软件',     zone:'Intersolar A 区+C1 · ees B 区', refs:['SMA Commercial','Fluence','Stem','AMMP','Wattstor','Wattsight']},
+  {k:'vpp',     t:'📈 VPP · 聚合 · 能量交易 / 动态电价', zone:'EM-Power 馆 · B5 为主', refs:['Octopus Kraken','enspired','Habitat Energy','Sympower','Flower','Enpal','Voltus','Leap']},
+  {k:'analytics',t:'🔬 电池分析 · 资产层 KPI',      zone:'ees 馆 · B0–B2', refs:['Zitara','DNV','TÜV','Eatron']},
+  {k:'grid',    t:'🕸 电网 · 容量 / 接入数据',       zone:'EM-Power · C 区', refs:['Envelio','Depsys','Neara','Heimdall Power']},
+  {k:'v2g',     t:'🚗 V2G · 车网互动',              zone:'Power2Drive · B6', refs:['Wallbox Quasar','Fermata Energy','Voltfang','Ambibox','We Drive Solar']},
+  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      zone:'综合判断 · 无固定展位', refs:['Octopus Kraken']},
+  {k:'misc',    t:'➕ 临时新增 / 其他',              zone:'', refs:[]}
 ];
 const CAT_OF={
   '1komma5':'hems','sonnen':'hems','gridx':'hems','kiwigrid':'hems',
@@ -586,6 +586,7 @@ async function renderList(){
     const showRefs = defView && c.refs && c.refs.length;
     if(!items.length && !showRefs) return;
     html+='<div class="cathead">'+c.t+'<span class="catn">'+items.length+'</span></div>';
+    if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
     if(showRefs) html+='<div class="catref"><b>热门参照</b>（点击 + 加入调研）：'
       +c.refs.map(n=>'<span class="refchip" onclick="addRef(\''+n.replace(/'/g,'')+'\',\''+c.k+'\')">+ '+esc(n)+'</span>').join('')+'</div>';
     html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
