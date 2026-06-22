@@ -405,12 +405,30 @@ const SEED = [
     '有无可借鉴的商业模式/分成结构？']}
 ];
 
+/* 对标/参照公司：自动预置为展位（无需手动添加；展位号到现场补） */
+const REF_MAP={
+  storage:['Tesla','BYD','SolarEdge','Enphase','Growatt','GoodWe','Pylontech','Fox ESS'],
+  hems:['SMA','Loxone','Solarwatt','Voltware'],
+  ci:['Fluence','AMMP','Wattstor'],
+  vpp:['enspired','Habitat Energy','Sympower','Flower','Enpal'],
+  analytics:['Zitara','Eatron','DNV'],
+  grid:['Envelio','Depsys','Neara','Heimdall Power'],
+  v2g:['Wallbox','Voltfang','Ambibox']
+};
+const LINE_OF_CAT={storage:'A',hems:'A',ci:'B',vpp:'B',analytics:'B',grid:'B',v2g:'B',os30:'C'};
+const HYP_OF_LINE={A:['A-H1','A-H2','A-H3'],B:['B-H1','B-H2','B-H3'],C:['C-H1','C-H2','C-H3']};
+const REF_SEED=[];
+Object.entries(REF_MAP).forEach(([cat,names])=>names.forEach(n=>{const L=LINE_OF_CAT[cat];
+  REF_SEED.push({id:'r_'+n.toLowerCase().replace(/[^a-z0-9]+/g,''),name:n,line:L,cat,pri:0,hall:'',ref:1,
+    focus:'对标 / 参照公司 · 展位号到现场或官方 App 查',hyp:HYP_OF_LINE[L],q:L==='A'?QA:L==='C'?QC:QB});
+}));
+
 /* ============================ 存储层 ============================ */
 const LS_KEY='intersolar_state_v2';
 let STATE = load();
 function load(){ try{return JSON.parse(localStorage.getItem(LS_KEY))||{booths:{},custom:[]}}catch(e){return{booths:{},custom:[]}} }
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(STATE)); }
-function allBooths(){ return [...SEED, ...(STATE.custom||[])]; }
+function allBooths(){ return [...SEED, ...REF_SEED, ...(STATE.custom||[])]; }
 function bState(id){ if(!STATE.booths[id]) STATE.booths[id]={status:'todo',hall:'',notes:'',answers:{},hyp:{}}; return STATE.booths[id]; }
 
 /* ---------- 展位分类（按类型，含热门参照公司） ---------- */
@@ -438,6 +456,7 @@ function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=an
   return `<button class="card" onclick="openBooth('${b.id}')">
       <div class="top"><div class="nm">${esc(b.name)}</div>
         ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
+        ${b.ref?'<span class="chip" style="background:var(--panel2);color:var(--mut)">对标</span>':''}
         <span class="chip ${b.line}">${b.line==='A'?'户储':b.line==='B'?'工商储':b.line==='C'?'3.0':'通用'}</span></div>
       <div class="focus">${esc(b.focus)}</div>
       <div class="meta">
@@ -584,15 +603,10 @@ async function renderList(){
   const pcArr=await Promise.all(fl.map(b=>countPhotos2(b.id)));
   const pcMap={}; fl.forEach((b,i)=>pcMap[b.id]=pcArr[i]);
   // 按类型大分类分组渲染
-  const defView = FILTER==='all' && !SEARCH;
   let html='';
-  CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k);
-    const showRefs = defView && c.refs && c.refs.length;
-    if(!items.length && !showRefs) return;
+  CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
     html+='<div class="cathead">'+c.t+'<span class="catn">'+items.length+'</span></div>';
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
-    if(showRefs) html+='<div class="catref"><b>热门参照</b>（点击 + 加入调研）：'
-      +c.refs.map(n=>'<span class="refchip" onclick="addRef(\''+n.replace(/'/g,'')+'\',\''+c.k+'\')">+ '+esc(n)+'</span>').join('')+'</div>';
     html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
   });
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
