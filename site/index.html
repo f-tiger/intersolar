@@ -98,7 +98,8 @@
   .lean.r{background:rgba(220,38,38,.12);color:#b91c1c}
   .concl{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .cathead{font-size:19px;font-weight:800;margin:22px 0 6px;display:flex;align-items:center;gap:8px;
-    color:var(--txt);border-left:5px solid var(--acc);padding-left:10px;line-height:1.25}
+    color:var(--txt);border-left:5px solid var(--acc);padding-left:10px;line-height:1.25;cursor:pointer;user-select:none}
+  .catchev{color:var(--mut);font-size:15px;font-weight:700;margin-left:2px}
   .cathead .catn{font-size:12px;font-weight:700;color:var(--mut);background:var(--panel2);border-radius:999px;padding:2px 9px}
   .catref{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
     border-radius:9px;padding:7px 11px;margin:0 0 11px;line-height:1.65}
@@ -572,9 +573,10 @@ function compress(file){return new Promise(res=>{const img=new Image();const url
   img.onerror=()=>{URL.revokeObjectURL(url);res(file)};img.src=url;});}
 
 /* ============================ 渲染 ============================ */
-let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={};
+let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={}, OPEN_CAT={};
 function toggleRef(k){ OPEN_REF[k]=!OPEN_REF[k]; renderList(); }
-window.toggleRef=toggleRef;
+function toggleCat(k){ OPEN_CAT[k]=!OPEN_CAT[k]; renderList(); }
+window.toggleRef=toggleRef; window.toggleCat=toggleCat;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
 function go(v){CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
@@ -612,7 +614,9 @@ async function renderList(){
   CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
     const conf=items.filter(b=>!b.ref).sort((a,b)=>(b.pri||0)-(a.pri||0));
     const refs=items.filter(b=>b.ref);
-    html+='<div class="cathead">'+c.t+'<span class="catn">'+conf.length+'</span></div>';
+    const folded = !!OPEN_CAT[c.k] && !SEARCH;
+    html+='<div class="cathead" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+conf.length+'</span><span class="catchev">'+(folded?'▸':'▾')+'</span></div>';
+    if(folded) return;
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
     html+=conf.map(b=>cardHtml(b,pcMap[b.id])).join('');
     html+='<button class="addbtn" style="margin:2px 0 12px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
