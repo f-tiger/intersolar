@@ -97,6 +97,12 @@
   .lean.n{background:rgba(100,116,139,.16);color:#475569}
   .lean.r{background:rgba(220,38,38,.12);color:#b91c1c}
   .concl{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .cathead{font-size:19px;font-weight:800;margin:22px 0 6px;display:flex;align-items:center;gap:8px;
+    color:var(--txt);border-left:5px solid var(--acc);padding-left:10px;line-height:1.25}
+  .cathead .catn{font-size:12px;font-weight:700;color:var(--mut);background:var(--panel2);border-radius:999px;padding:2px 9px}
+  .catref{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
+    border-radius:9px;padding:7px 11px;margin:0 0 11px;line-height:1.65}
+  .catref b{color:var(--txt)}
   .opts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
   .opt{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
     padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:600}
@@ -185,9 +191,6 @@
     <input class="search" id="search" placeholder="搜索展位名 / 关键词…">
     <div class="filters" id="filters">
       <button data-l="all" class="on">全部</button>
-      <button data-l="A">A 户储线</button>
-      <button data-l="B">B 工商储线</button>
-      <button data-l="C">C 3.0轨道</button>
       <button data-l="pri">⭐ 优先</button>
       <button data-l="todo">未完成</button>
     </div>
@@ -403,6 +406,39 @@ function save(){ localStorage.setItem(LS_KEY, JSON.stringify(STATE)); }
 function allBooths(){ return [...SEED, ...(STATE.custom||[])]; }
 function bState(id){ if(!STATE.booths[id]) STATE.booths[id]={status:'todo',hall:'',notes:'',answers:{},hyp:{}}; return STATE.booths[id]; }
 
+/* ---------- 展位分类（按类型，含热门参照公司） ---------- */
+const CATS=[
+  {k:'storage', t:'🔋 储能硬件 · 即插即用 / 电池', ref:'<b>热门参照：</b>Tesla Powerwall、BYD、SolarEdge、Enphase、Huawei LUNA、Growatt、GoodWe、Pylontech、Fox ESS'},
+  {k:'hems',    t:'🏠 户用软件 · HEMS / VPP',      ref:'<b>热门参照：</b>Tesla(VPP/Autobidder)、Enphase IQ、SolarEdge ONE、SMA Sunny Home、Loxone、Solarwatt Manager、Voltware'},
+  {k:'ci',      t:'⚡ 工商储 · EMS / 调度软件',     ref:'<b>热门参照：</b>SMA Commercial、Fluence、Stem、AMMP、Wattstor、Sungrow iSolarEMS、Huawei FusionSolar'},
+  {k:'vpp',     t:'📈 VPP · 聚合 · 能量交易 / 动态电价', ref:'<b>热门参照：</b>Octopus Kraken、enspired、Habitat Energy、Sympower、Flower、Enpal、Voltus、Leap'},
+  {k:'analytics',t:'🔬 电池分析 · 资产层 KPI',      ref:'<b>热门参照：</b>TWAICE、ACCURE、Zitara、DNV、TÜV'},
+  {k:'grid',    t:'🕸 电网 · 容量 / 接入数据',       ref:'<b>热门参照：</b>Envelio、Depsys、Neara、Heimdall Power、gridICT'},
+  {k:'v2g',     t:'🚗 V2G · 车网互动',              ref:'<b>热门参照：</b>Wallbox Quasar、Fermata Energy、Voltfang、Ambibox、We Drive Solar'},
+  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      ref:'尚无现成对标——这正是 3.0 的卡位空位（最接近：Octopus Kraken 的平台化）'},
+  {k:'misc',    t:'➕ 临时新增 / 其他',              ref:''}
+];
+const CAT_OF={
+  '1komma5':'hems','sonnen':'hems','gridx':'hems','kiwigrid':'hems',
+  'marstek':'storage','ecoflow':'storage','anker':'storage','zendure':'storage','sigenergy':'storage',
+  'coneva':'ci','lumera':'ci','simpl':'ci','sungrow':'ci','huawei':'ci','fenecon':'ci',
+  'entrix':'vpp','suena':'vpp','nextkraftwerke':'vpp','gridbeyond':'vpp','tibber':'vpp',
+  'volytica':'analytics','twaice':'analytics','blindleister':'grid','mobilityhouse':'v2g','c30-synth':'os30'
+};
+function catOf(b){ return b.cat || CAT_OF[b.id] || 'misc'; }
+function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=ansCount(s);
+  const stTxt={todo:'未开始',doing:'进行中',done:'已完成'}[st];
+  return `<button class="card" onclick="openBooth('${b.id}')">
+      <div class="top"><div class="nm">${esc(b.name)}</div>
+        ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
+        <span class="chip ${b.line}">${b.line==='A'?'户储':b.line==='B'?'工商储':b.line==='C'?'3.0':'通用'}</span></div>
+      <div class="focus">${esc(b.focus)}</div>
+      <div class="meta">
+        <span><i class="dot st-${st}"></i>${stTxt}</span>
+        <span>📷 ${pc||0}</span><span>✓ ${a}/${qsOf(b).length}</span>
+        ${(s.hall||b.hall)?'<span>📍 '+esc(s.hall||b.hall)+'</span>':''}
+      </div></button>`; }
+
 /* ---------- 云协作（Supabase 实时；未配置=纯本地） ---------- */
 let CLOUD=false, SB=null, EVENT='', ME=localStorage.getItem('scout_me')||'';
 let PHOTOS=[]; // 云模式照片缓存 {id,boothId,by,cap,ts,path,url}
@@ -538,20 +574,15 @@ async function renderList(){
     if(FILTER==='todo')return statusOf(b.id)!=='done';
     return true;});
   if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+b.focus).toLowerCase().includes(q));}
-  const pc=await Promise.all(fl.map(b=>countPhotos2(b.id)));
-  const html=fl.map((b,i)=>{const st=statusOf(b.id);const s=bState(b.id);
-    const a=ansCount(s);
-    const stTxt={todo:'未开始',doing:'进行中',done:'已完成'}[st];
-    return `<button class="card" onclick="openBooth('${b.id}')">
-      <div class="top"><div class="nm">${esc(b.name)}</div>
-        ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
-        <span class="chip ${b.line}">${b.line==='A'?'户储':b.line==='B'?'工商储':b.line==='C'?'3.0':'通用'}</span></div>
-      <div class="focus">${esc(b.focus)}</div>
-      <div class="meta">
-        <span><i class="dot st-${st}"></i>${stTxt}</span>
-        <span>📷 ${pc[i]}</span><span>✓ ${a}/${qsOf(b).length}</span>
-        ${(s.hall||b.hall)?'<span>📍 '+esc(s.hall||b.hall)+'</span>':''}
-      </div></button>`;}).join('');
+  const pcArr=await Promise.all(fl.map(b=>countPhotos2(b.id)));
+  const pcMap={}; fl.forEach((b,i)=>pcMap[b.id]=pcArr[i]);
+  // 按类型大分类分组渲染
+  let html='';
+  CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length)return;
+    html+='<div class="cathead">'+c.t+'<span class="catn">'+items.length+'</span></div>';
+    if(c.ref) html+='<div class="catref">'+c.ref+'</div>';
+    html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
+  });
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
 }
 function countPhotos2(id){return photosOf(id).then(a=>a.length);}
