@@ -493,6 +493,12 @@ const CAT_OF={
 function catOf(b){ return b.cat || CAT_OF[b.id] || 'misc'; }
 const CAT_COLOR={storage:'#16a34a',hems:'#2563eb',ci:'#d97706',vpp:'#7c3aed',analytics:'#0d9488',grid:'#475569',v2g:'#e11d48',os30:'#4f46e5',misc:'#64748b'};
 function catColor(b){ return CAT_COLOR[catOf(b)]||'#64748b'; }
+// 储能分类·市场规模权重（越大越靠前；用于排序与重新打"优先"标，仅 storage 分类生效）
+const RANK={
+  r_byd:100, deye:96, r_growatt:94, r_goodwe:92, r_solaredge:90, r_enphase:88, r_tesla:87, solax:86, solis:84, r_pylontech:83, sofar:80,
+  r_foxess:76, alphaess:75, sigenergy:74, anker:70, dyness:66, hoymiles:64, kstar:60, marstek:58, saj:56, solplanet:54, zendure:50
+};
+function isPri(b){ return catOf(b)==='storage' ? ((RANK[b.id]||0)>=85) : (b.pri===1); }
 const CN_NAME={
   '1komma5':'德国·光储VPP','sonnen':'德国·户储+VPP','gridx':'德国·EMS平台','kiwigrid':'德国·VPP平台',
   'marstek':'深圳·即插即用/阳台储能','ecoflow':'正浩·便携/户储','anker':'安克·户储','zendure':'征拓·阳台储能','sigenergy':'储能+EMS(前华为团队)',
@@ -514,7 +520,7 @@ function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=an
   const stTxt={todo:'未开始',doing:'进行中',done:'已完成'}[st];
   return `<button class="card" onclick="openBooth('${b.id}')" style="border-left:4px solid ${col}">
       <div class="top"><div class="nm">${esc(b.name)}${cn?' <span class="cn">'+esc(cn)+'</span>':''}</div>
-        ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
+        ${isPri(b)?'<span class="chip pri">⭐优先</span>':''}
         ${(b.ref&&!(s.hall||b.hall))?'<span class="chip ref">对标</span>':''}</div>
       <div class="focus">${esc(b.focus)}</div>
       <div class="meta">
@@ -664,7 +670,7 @@ async function renderList(){
   // filter
   let fl=list.filter(b=>{
     if(FILTER==='A'||FILTER==='B'||FILTER==='C'||FILTER==='G')return b.line===FILTER;
-    if(FILTER==='pri')return b.pri===1;
+    if(FILTER==='pri')return isPri(b);
     if(FILTER==='todo')return statusOf(b.id)!=='done';
     return true;});
   if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+' '+b.focus+' '+(cnOf(b)||'')+' '+(bState(b.id).hall||b.hall||'')).toLowerCase().includes(q));}
@@ -683,7 +689,7 @@ async function renderList(){
   const hallOf=b=>(bState(b.id).hall||b.hall||'');
   let html='';
   shown.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
-    items.sort((a,b)=> ((hallOf(b)?1:0)-(hallOf(a)?1:0)) || ((b.pri||0)-(a.pri||0)) || ((a.ref?1:0)-(b.ref?1:0)) );
+    items.sort((a,b)=> ((RANK[b.id]||0)-(RANK[a.id]||0)) || ((hallOf(b)?1:0)-(hallOf(a)?1:0)) || ((isPri(b)?1:0)-(isPri(a)?1:0)) || ((a.ref?1:0)-(b.ref?1:0)) );
     const folded = !single && !!OPEN_CAT[c.k] && !SEARCH;
     html+='<div class="cathead" style="border-left-color:'+(CAT_COLOR[c.k]||'#64748b')+'" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+items.length+'</span>'+(single?'':'<span class="catchev">'+(folded?'▸':'▾')+'</span>')+'</div>';
     if(folded) return;
