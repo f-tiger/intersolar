@@ -386,7 +386,11 @@ const SEED = [
     {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
     {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
   // ===== C 线：软件定义能源 3.0 —— 灵活性+结算"轨道" =====
-  {id:'c30-synth',name:'🧭 3.0 轨道·横向综判',line:'C',pri:1,hall:'走完平台/结算各家后填',focus:'升维假设：别再做"更中立的optimizer"，而是做大家都要用的接入+灵活性+结算"轨道/OS"（拥有标准与账本=拥有规则）。逛完 gridX/kiwigrid/FENECON/Entrix/Suena/volytica/TWAICE/coneva 后在此综合判断',hyp:['C-H1','C-H2','C-H3'],q:QC},
+  {id:'c30-synth',name:'🧭 3.0 轨道·横向综判',line:'C',pri:1,cat:'os30',hall:'走完平台/结算各家后填',focus:'升维假设：别再做"更中立的optimizer"，而是做大家都要用的接入+灵活性+结算"轨道/OS"（拥有标准与账本=拥有规则）。逛完 gridX/kiwigrid/FENECON/Entrix/Suena/volytica/TWAICE/coneva 后在此综合判断',hyp:['C-H1','C-H2','C-H3'],q:QC},
+  {id:'kraken',name:'Octopus Energy · Kraken',line:'C',pri:1,cat:'os30',hall:'',focus:'能源界平台/OS 标杆（Kraken 分拆估值 $8.65B）。注：可能不在 smarter E 参展，作"对标追踪"——看谁在学它做"被集成的轨道"',hyp:['C-H1','C-H2','C-H3'],q:QC},
+  {id:'greencom',name:'GreenCom Networks',line:'C',pri:0,cat:'os30',hall:'',focus:'能源 IoT 互操作/聚合平台，被零售商/公用事业集成。验证"被集成做底座"与开放标准',hyp:['C-H1','C-H3'],q:QC},
+  {id:'lumenaza',name:'Lumenaza',line:'C',pri:0,cat:'os30',hall:'',focus:'"供电即服务" / 能源社区供电+结算平台。验证结算账本与中立层',hyp:['C-H2','C-H3'],q:QC},
+  {id:'volue',name:'Volue',line:'C',pri:0,cat:'os30',hall:'',focus:'北欧能源软件 / 交易与市场系统。验证"可被集成的市场通道+结算"',hyp:['C-H1','C-H2'],q:QC},
   // ===== 通用 / 论坛 =====
   {id:'award',name:'⭐ The smarter E AWARD 颁奖',line:'G',pri:1,hall:'ICM · 6/22 17:00',focus:'一晚锁定软件/VPP风向与获奖名单。重点听 Smart Integrated Energy 类目',hyp:[],q:[
     '哪些项目获奖（区别于入围）？评审强调了什么价值点？',
@@ -418,7 +422,7 @@ const CATS=[
   {k:'analytics',t:'🔬 电池分析 · 资产层 KPI',      zone:'ees 馆 · B0–B2', refs:['Zitara','DNV','TÜV','Eatron']},
   {k:'grid',    t:'🕸 电网 · 容量 / 接入数据',       zone:'EM-Power · C 区', refs:['Envelio','Depsys','Neara','Heimdall Power']},
   {k:'v2g',     t:'🚗 V2G · 车网互动',              zone:'Power2Drive · B6', refs:['Wallbox Quasar','Fermata Energy','Voltfang','Ambibox','We Drive Solar']},
-  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      zone:'综合判断 · 无固定展位', refs:['Octopus Kraken']},
+  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      zone:'平台/OS 类 · 多在 EM-Power / Smart Grid 区（部分未必参展）', refs:['Octopus Kraken','GreenCom','Lumenaza','Volue','Powerledger']},
   {k:'misc',    t:'➕ 临时新增 / 其他',              zone:'', refs:[]}
 ];
 const CAT_OF={
