@@ -368,16 +368,28 @@ const SEED = [
     {q:'Smart Battery 接他牌电池到什么程度？',multi:false,h:'判断是潜在客户还是竞品',o:['广泛接他牌','少数型号','仅合作','不接','不确定']},
     {q:'"中立接入层"愿买/合作还是自建？',multi:false,o:['愿买/合作','自建','不确定']}]},
   // 中国户储出海主流品牌（补充 · 展位号到现场/官方App查）
-  {id:'deye',name:'Deye',line:'A',pri:1,cat:'storage',hall:'B1.450',focus:'中国户储出海龙头 · 混合/储能逆变。验证开放度、跨品牌',hyp:['A-H3'],q:QA},
-  {id:'solax',name:'SolaX Power',line:'A',pri:1,cat:'storage',hall:'B4.460 / B1.250(ees)',focus:'X3-Hybrid 混合储能逆变，欧洲主力。验证开放度',hyp:['A-H3'],q:QA},
-  {id:'alphaess',name:'AlphaESS',line:'A',pri:1,cat:'storage',hall:'B1.150',focus:'户储系统龙头，欧洲份额高。验证开放度/VPP',hyp:['A-H3'],q:QA},
-  {id:'sofar',name:'SOFAR',line:'A',pri:0,cat:'storage',hall:'B3.450',focus:'首航新能源 · 户储/混合逆变，欧洲走量。开放度',hyp:['A-H3'],q:QA},
-  {id:'solis',name:'Solis (Ginlong)',line:'A',pri:1,cat:'storage',hall:'B3.430',focus:'锦浪 · 组串/混合逆变龙头，户储发力。开放度',hyp:['A-H3'],q:QA},
-  {id:'hoymiles',name:'Hoymiles',line:'A',pri:0,cat:'storage',hall:'B3.360',focus:'禾迈 · 微逆+户储，阳台/分布式。开放度',hyp:['A-H3'],q:QA},
-  {id:'dyness',name:'Dyness',line:'A',pri:0,cat:'storage',hall:'B2.160',focus:'户储电池品牌，欧洲走量。开放度',hyp:['A-H3'],q:QA},
-  {id:'kstar',name:'KSTAR',line:'A',pri:0,cat:'storage',hall:'B4.140',focus:'科士达 · 储能逆变/系统。开放度',hyp:['A-H3'],q:QA},
-  {id:'saj',name:'SAJ',line:'A',pri:0,cat:'storage',hall:'',focus:'三晶电气 · 户储/混合逆变。开放度',hyp:['A-H3'],q:QA},
-  {id:'solplanet',name:'Solplanet',line:'A',pri:0,cat:'storage',hall:'B4.230',focus:'AISWEI 旗下户用逆变/储能。开放度',hyp:['A-H3'],q:QA},
+  {id:'deye',name:'Deye',line:'A',pri:1,cat:'storage',hall:'B1.450',focus:'中国户储出海龙头 · 混合/储能逆变。验证开放度、跨品牌',hyp:['A-H3'],q:QA,qx:[
+    {q:'混合逆变开放本地 API/Modbus？欢迎第三方调度？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'自带 VPP/聚合，还是可被第三方聚合？',multi:false,o:['可被聚合','自家VPP','无','不确定']}]},
+  {id:'solax',name:'SolaX Power',line:'A',pri:1,cat:'storage',hall:'B4.460 / B1.250(ees)',focus:'X3-Hybrid 混合储能逆变，欧洲主力。验证开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'X3/X1 系列开放 API/Modbus？跨品牌？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'是否可被第三方 VPP 聚合？',multi:false,o:['可被聚合','自家VPP','不确定']}]},
+  {id:'alphaess',name:'AlphaESS',line:'A',pri:1,cat:'storage',hall:'B1.150',focus:'户储系统龙头，欧洲份额高。验证开放度/VPP',hyp:['A-H3'],q:QA,qx:[
+    {q:'户储系统开放 API？自家 VPP 还是可被聚合？',multi:false,o:['开放可聚合','仅自家VPP','封闭','不确定']}]},
+  {id:'sofar',name:'SOFAR',line:'A',pri:0,cat:'storage',hall:'B3.450',focus:'首航新能源 · 户储/混合逆变，欧洲走量。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'开放协议 + 欧洲本地服务能力？',multi:false,o:['开放/服务强','一般','弱','不确定']}]},
+  {id:'solis',name:'Solis (Ginlong)',line:'A',pri:1,cat:'storage',hall:'B3.430',focus:'锦浪 · 组串/混合逆变龙头，户储发力。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'新储能 FlexAIO 开放度 + 混合逆变接入？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+  {id:'hoymiles',name:'Hoymiles',line:'A',pri:0,cat:'storage',hall:'B3.360',focus:'禾迈 · 微逆+户储，阳台/分布式。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'微逆+储能(阳台机)开放 API？',multi:false,o:['开放','仅自家App','不确定']}]},
+  {id:'dyness',name:'Dyness',line:'A',pri:0,cat:'storage',hall:'B2.160',focus:'户储电池品牌，欧洲走量。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'电池开放协议(CAN/RS485)？兼容哪些逆变品牌？',multi:false,o:['广泛兼容','部分','锁定','不确定']}]},
+  {id:'kstar',name:'KSTAR',line:'A',pri:0,cat:'storage',hall:'B4.140',focus:'科士达 · 储能逆变/系统。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'侧重户用还是工商？EMS 开放度？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+  {id:'saj',name:'SAJ',line:'A',pri:0,cat:'storage',hall:'',focus:'三晶电气 · 户储/混合逆变。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'户储逆变开放 API？欧洲渠道策略？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+  {id:'solplanet',name:'Solplanet',line:'A',pri:0,cat:'storage',hall:'B4.230',focus:'AISWEI 旗下户用逆变/储能。开放度',hyp:['A-H3'],q:QA,qx:[
+    {q:'AISWEI 生态开放度/跨品牌？',multi:false,o:['开放','部分','仅自家','不确定']}]},
   // ===== B 线：工商储 SaaS =====
   {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'B0.345',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3','C-H2'],q:QB,qx:[
     {q:'收益结算/归因做到多细？',multi:false,h:'直接对标 B-H3：是否设备级、可审计',o:['设备级可审计','日月报','较弱','不确定']},
@@ -422,11 +434,20 @@ const SEED = [
   {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:1,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
     {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
     {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
-  {id:'tesvolt',name:'Tesvolt',line:'B',pri:0,cat:'ci',hall:'B2.110',focus:'德国 C&I 储能龙头(AWARD 常客)。直接对标工商储',hyp:['B-H1','B-H3'],q:QB},
-  {id:'alfen',name:'Alfen',line:'B',pri:0,cat:'ci',hall:'B2.210 (EV另B6.680)',focus:'荷兰·储能+EV充电+电网变电一体。C&I储能+电网边界',hyp:['B-H1'],q:QB},
-  {id:'intilion',name:'Intilion',line:'B',pri:0,cat:'ci',hall:'',focus:'德国 C&I/大储系统(HOPPECKE 系)。展位号待现场/App 查',hyp:['B-H1'],q:QB},
-  {id:'sympower',name:'Sympower',line:'B',pri:0,cat:'vpp',hall:'',focus:'荷兰·需求响应聚合(欧洲多国)。展位号待现场/App 查',hyp:['B-H2','C-H1'],q:QB},
-  {id:'eon',name:'E.ON',line:'B',pri:0,cat:'vpp',hall:'C5.630',focus:'德国能源巨头/零售商(持股 gridX)。潜在客户/被集成方：动态电价+VPP+白标',hyp:['B-H2','C-H1'],q:QB},
+  {id:'tesvolt',name:'Tesvolt',line:'B',pri:0,cat:'ci',hall:'B2.110',focus:'德国 C&I 储能龙头(AWARD 常客)。直接对标工商储',hyp:['B-H1','B-H3'],q:QB,qx:[
+    {q:'C&I 收益结算/多市场堆叠到哪一步？',multi:false,o:['多市场+结算','仅削峰自用','不确定']},
+    {q:'跨品牌 PCS/电池接入吗？',multi:false,o:['跨品牌','仅自家','不确定']}]},
+  {id:'alfen',name:'Alfen',line:'B',pri:0,cat:'ci',hall:'B2.210 (EV另B6.680)',focus:'荷兰·储能+EV充电+电网变电一体。C&I储能+电网边界',hyp:['B-H1'],q:QB,qx:[
+    {q:'储能 EMS 给集成商白标吗？跨品牌接入？',multi:false,o:['白标/跨品牌','仅自家','不确定']},
+    {q:'储能+EV+电网一体的协同价值？',multi:false,o:['强协同','一般','不确定']}]},
+  {id:'intilion',name:'Intilion',line:'B',pri:0,cat:'ci',hall:'',focus:'德国 C&I/大储系统(HOPPECKE 系)。展位号待现场/App 查',hyp:['B-H1'],q:QB,qx:[
+    {q:'C&I/大储含调度软件吗？跨品牌？',multi:false,o:['含调度+跨品牌','仅硬件','不确定']}]},
+  {id:'sympower',name:'Sympower',line:'B',pri:0,cat:'vpp',hall:'',focus:'荷兰·需求响应聚合(欧洲多国)。展位号待现场/App 查',hyp:['B-H2','C-H1'],q:QB,qx:[
+    {q:'愿做我的市场通道(分成接入)吗？',multi:false,h:'C-H1',o:['愿意','不愿','不确定']},
+    {q:'覆盖哪些国家的需求响应市场？',multi:false,o:['多国','少数','不确定']}]},
+  {id:'eon',name:'E.ON',line:'B',pri:0,cat:'vpp',hall:'C5.630',focus:'德国能源巨头/零售商(持股 gridX)。潜在客户/被集成方：动态电价+VPP+白标',hyp:['B-H2','C-H1'],q:QB,qx:[
+    {q:'愿被集成做白标吗？接第三方电池到什么程度？',multi:false,h:'是客户还是竞品',o:['愿白标/广接','有限','只自家','不确定']},
+    {q:'动态电价+VPP 产品成色？',multi:false,o:['成熟','早期','不确定']}]},
   // ===== C 线：软件未来方向（看方向 + 对着竞对调研） =====
   {id:'dir-agentic',name:'方向① AI 自治交易/调度',line:'C',pri:1,cat:'os30',hall:'',focus:'软件从"给建议"→"自己决策+自动交易/对冲"。去看竞对：Suena、Entrix、enspired、GridBeyond、Kraken',hyp:['C-H1'],q:QD},
   {id:'dir-neutral',name:'方向② 跨品牌中立接入层',line:'C',pri:1,cat:'os30',hall:'',focus:'不绑硬件、统一接入各品牌设备做调度（接入广度=壁垒）。去看竞对：gridX、kiwigrid、Marstek/EcoFlow(开放API)、Tibber',hyp:['C-H1','C-H3'],q:QD},
@@ -479,9 +500,26 @@ const REF_FOCUS={
   'Wattstor':'英国 · C&I 储能 EMS 与项目集成'
 };
 // 只保留已查到官方展位号的对标公司；没号的不再列出
+const REF_QX={
+  'Tesla':[{q:'Powerwall/Autobidder 对第三方开放吗？',multi:false,o:['开放','仅自家生态','不确定']}],
+  'BYD':[{q:'Battery-Box 接第三方 EMS/VPP 到什么程度？',multi:false,o:['广泛','部分','仅自家','不确定']}],
+  'SolarEdge':[{q:'ONE 平台只服务自家硬件吗？开放 API？',multi:false,o:['开放','仅自家','不确定']}],
+  'Enphase':[{q:'IQ 生态封闭还是有开发者 API？',multi:false,o:['有开发者API','半封闭','封闭','不确定']}],
+  'Growatt':[{q:'逆变/储能开放本地 API？支持第三方调度？',multi:false,o:['开放','部分','仅自家','不确定']}],
+  'GoodWe':[{q:'Lynx+SEMS 开放度？跨品牌接入？',multi:false,o:['开放','部分','仅自家','不确定']}],
+  'Pylontech':[{q:'只卖电池包还是含 EMS？开放协议、兼容哪些逆变？',multi:false,o:['开放广兼容','部分','锁定','不确定']}],
+  'Fox ESS':[{q:'开放 API？欢迎第三方聚合？',multi:false,o:['开放','部分','仅自家','不确定']}],
+  'SMA':[{q:'Sunny Home Manager 接他牌设备吗？生态开放度？',multi:false,o:['开放跨品牌','部分','仅自家','不确定']}],
+  'Fluence':[{q:'Mosaic 交易/EMS 给第三方白标吗？做 SMB 吗？',multi:false,o:['白标+SMB','仅大资产','不确定']}],
+  'Wallbox':[{q:'Quasar 双向 V2G 愿被第三方平台调用吗？',multi:false,o:['愿意','仅自家','不确定']}],
+  'Solarwatt':[{q:'Manager 跨品牌吗？BMW 合作模式细节？',multi:false,o:['跨品牌','仅自家','不确定']}],
+  'Voltfang':[{q:'梯次电池供货还是整包？资产层可被采购吗？',multi:false,o:['可供货/集成','仅整包','不确定']}],
+  'DNV':[{q:'认证/可融资性方法论可被第三方采用吗？',multi:false,o:['可采用','仅自家服务','不确定']}],
+  'Wattstor':[{q:'EMS 跨品牌接入？给集成商白标？',multi:false,o:['白标/跨品牌','仅自家','不确定']}]
+};
 Object.entries(REF_MAP).forEach(([cat,names])=>names.filter(n=>REF_HALL[n]).forEach(n=>{const L=LINE_OF_CAT[cat];
   REF_SEED.push({id:'r_'+n.toLowerCase().replace(/[^a-z0-9]+/g,''),name:n,line:L,cat,pri:0,hall:REF_HALL[n],ref:1,
-    focus:REF_FOCUS[n]||'参照对标公司 · 已确认参展',hyp:HYP_OF_LINE[L],q:L==='A'?QA:L==='C'?QC:QB});
+    focus:REF_FOCUS[n]||'参照对标公司 · 已确认参展',hyp:HYP_OF_LINE[L],q:L==='A'?QA:L==='C'?QC:QB,qx:REF_QX[n]||[]});
 }));
 
 /* ============================ 存储层 ============================ */
