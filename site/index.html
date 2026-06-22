@@ -27,7 +27,7 @@
   .wrap{max-width:760px;margin:0 auto;padding:0 14px 96px}
   header{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,#1d4ed8 0%,#1e3a8a 100%);
     box-shadow:0 3px 14px rgba(30,58,138,.28);padding:env(safe-area-inset-top) 0 0}
-  .hbar{max-width:760px;margin:0 auto;padding:13px 14px;display:flex;align-items:center;gap:10px}
+  .hbar{max-width:760px;margin:0 auto;padding:13px 14px;display:flex;align-items:center;gap:10px;user-select:none;-webkit-user-select:none;cursor:default}
   .hbar h1{font-size:20px;margin:0;font-weight:800;letter-spacing:.2px;color:#fff}
   .hbar .sub{font-size:11px;color:rgba(255,255,255,.72);font-weight:500}
   .logo{width:30px;height:30px;flex:0 0 auto}
@@ -1063,17 +1063,20 @@ function pad(n){return String(n).padStart(2,'0');}
 let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
 window.openBooth=openBooth;window.go=go;window.markDone=markDone;
 
-/* 长按标题 ≈0.6s 切换"主持人模式"（显示/隐藏 验证看板·数据归档） */
-(function(){const el=document.querySelector('.hbar h1'); if(!el)return; let t=null;
-  const start=()=>{ t=setTimeout(()=>{ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'1':'0'); applyRole();
-    toast(OWNER?'已开启主持人模式':'已关闭主持人模式'); if(!OWNER&&(CUR==='dash'||CUR==='data'))go('list'); },600); };
+/* 切换"主持人模式"：连点标题 5 下 / 长按 0.6s / 网址带 #admin（显示·隐藏 验证看板·数据归档） */
+function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'1':'0'); applyRole();
+  toast(OWNER?'已开启主持人模式（显示看板/数据）':'已关闭主持人模式'); if(!OWNER&&(CUR==='dash'||CUR==='data'))go('list'); }
+(function(){const el=document.querySelector('header .hbar'); if(!el)return; let t=null,n=0,t0=0;
+  el.addEventListener('click',()=>{ const now=Date.now(); if(now-t0>1500)n=0; t0=now; if(++n>=5){n=0; toggleOwner();} });
+  const start=()=>{ t=setTimeout(toggleOwner,600); };
   const cancel=()=>{ if(t){clearTimeout(t);t=null;} };
-  el.addEventListener('touchstart',start,{passive:true}); el.addEventListener('touchend',cancel); el.addEventListener('touchmove',cancel);
+  el.addEventListener('touchstart',start,{passive:true}); ['touchend','touchmove','touchcancel'].forEach(ev=>el.addEventListener(ev,cancel));
   el.addEventListener('mousedown',start); el.addEventListener('mouseup',cancel); el.addEventListener('mouseleave',cancel);
 })();
 
 /* 启动 */
 (async()=>{
+  if(location.hash.indexOf('admin')>=0){ OWNER=true; localStorage.setItem('scout_owner','1'); }
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
   if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
   renderList(); refreshCloudUI(); applyRole();
