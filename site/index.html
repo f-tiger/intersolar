@@ -574,8 +574,10 @@ function compress(file){return new Promise(res=>{const img=new Image();const url
 
 /* ============================ 渲染 ============================ */
 let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={}, OPEN_CAT={};
-function toggleRef(k){ OPEN_REF[k]=!OPEN_REF[k]; renderList(); }
-function toggleCat(k){ OPEN_CAT[k]=!OPEN_CAT[k]; renderList(); }
+try{const ui=JSON.parse(localStorage.getItem('scout_ui')||'{}'); OPEN_REF=ui.ref||{}; OPEN_CAT=ui.cat||{};}catch(e){}
+function saveUI(){ try{localStorage.setItem('scout_ui',JSON.stringify({ref:OPEN_REF,cat:OPEN_CAT}));}catch(e){} }
+function toggleRef(k){ OPEN_REF[k]=!OPEN_REF[k]; saveUI(); renderList(); }
+function toggleCat(k){ OPEN_CAT[k]=!OPEN_CAT[k]; saveUI(); renderList(); }
 window.toggleRef=toggleRef; window.toggleCat=toggleCat;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
