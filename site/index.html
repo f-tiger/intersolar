@@ -617,7 +617,7 @@ function compress(file){return new Promise(res=>{const img=new Image();const url
 
 /* ============================ 渲染 ============================ */
 let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={}, OPEN_CAT={}, CATSEL='all';
-const CATTAB={all:'全部',storage:'🔋储能',hems:'🏠HEMS',ci:'⚡工商储',vpp:'📈VPP',analytics:'🔬分析',grid:'🕸电网',v2g:'🚗V2G',os30:'🧭未来方向',misc:'➕其他'};
+const CATTAB={all:'全部',storage:'🔋储能',hems:'🏠HEMS',ci:'⚡工商储',vpp:'📈VPP',analytics:'🔬分析',grid:'🕸电网',v2g:'🚗V2G',os30:'🧭软件未来方向',misc:'➕其他'};
 try{const ui=JSON.parse(localStorage.getItem('scout_ui')||'{}'); OPEN_REF=ui.ref||{}; OPEN_CAT=ui.cat||{};}catch(e){}
 function saveUI(){ try{localStorage.setItem('scout_ui',JSON.stringify({ref:OPEN_REF,cat:OPEN_CAT}));}catch(e){} }
 function toggleRef(k){ OPEN_REF[k]=!OPEN_REF[k]; saveUI(); renderList(); }
