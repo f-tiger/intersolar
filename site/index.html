@@ -92,6 +92,11 @@
   .q.answered .qt2{color:#15803d}
   .qhint{font-size:11.5px;color:var(--mut);margin:3px 0 1px;line-height:1.5}
   .qtag{display:inline-block;background:rgba(13,148,136,.14);color:#0f766e;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;vertical-align:middle}
+  .lean{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .lean.s{background:rgba(22,163,74,.14);color:#15803d}
+  .lean.n{background:rgba(100,116,139,.16);color:#475569}
+  .lean.r{background:rgba(220,38,38,.12);color:#b91c1c}
+  .concl{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .opts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
   .opt{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
     padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:600}
@@ -554,6 +559,7 @@ $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
 async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);const s=bState(id);
   go('detail');const v=$('#view-detail');
+  const cc=concludeBooth(b,s);
   const photos=await photosOf(id);
   v.innerHTML=`
    <button class="back" onclick="go('list')">‹ 返回展位列表</button>
@@ -601,6 +607,11 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
         </div></div>`).join('')}
    </div>`:''}
 
+   <div class="sec">
+     <h3>🧭 自动结论 <span class="n">随作答更新 · 看板汇总</span></h3>
+     <div class="concl" id="conclbox"><span class="lean ${cc.cls}">${cc.lean}</span>${cc.sel.length?'<div class="muted" style="margin-top:7px;line-height:1.6">关键信号：'+esc(cc.sel.join(' / '))+'</div>':'<div class="muted" style="margin-top:7px">选完选项，这里会给出该公司的倾向</div>'}</div>
+   </div>
+
    <div class="btnrow" style="margin-bottom:30px">
      <button class="btn green" onclick="markDone()">✓ 标记完成并返回</button>
    </div>`;
@@ -616,7 +627,7 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
   v.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;
     const h=seg.dataset.h,val=btn.dataset.val;const cur=bState(id).hyp[h];
     bState(id).hyp[h]=(cur===val)?'':val;touchBooth(id);
-    seg.querySelectorAll('button').forEach(x=>{x.className='';if(x.dataset.val===bState(id).hyp[h])x.className=x.dataset.val;});}));
+    seg.querySelectorAll('button').forEach(x=>{x.className='';if(x.dataset.val===bState(id).hyp[h])x.className=x.dataset.val;});updateConcl();}));
 }
 
 function qText(q){return typeof q==='object'?q.q:q;}
@@ -638,7 +649,7 @@ function renderQ(b,s){const QS=qsOf(b);const BL=(b.q||[]).length;$('#qlist').inn
   $$('#qlist .q').forEach(el=>{const i=el.dataset.i;
     if(el.dataset.t==='s'){
       el.querySelector('input').addEventListener('change',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
-        s2.answers[i].checked=e.target.checked;touchBooth(CURBOOTH);el.classList.toggle('checked',e.target.checked);});
+        s2.answers[i].checked=e.target.checked;touchBooth(CURBOOTH);el.classList.toggle('checked',e.target.checked);updateConcl();});
     }else{
       const multi=el.dataset.multi==='1';
       el.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>{
@@ -647,10 +658,10 @@ function renderQ(b,s){const QS=qsOf(b);const BL=(b.q||[]).length;$('#qlist').inn
         s2.answers[i].opts=arr;touchBooth(CURBOOTH);
         el.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',arr.includes(x.dataset.o)));
         const done=isAns(s2.answers[i]);el.classList.toggle('answered',done);
-        el.querySelector('.qt2').innerHTML=(done?'✓ ':'')+(i>=BL?'<span class="qtag">专属</span> ':'')+esc(qText(QS[i]))+(multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':'');}));
+        el.querySelector('.qt2').innerHTML=(done?'✓ ':'')+(i>=BL?'<span class="qtag">专属</span> ':'')+esc(qText(QS[i]))+(multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':'');updateConcl();}));
     }
     el.querySelector('textarea').addEventListener('input',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
-      s2.answers[i].text=e.target.value;touchBooth(CURBOOTH);el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));});});}
+      s2.answers[i].text=e.target.value;touchBooth(CURBOOTH);el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));updateConcl();});});}
 
 function renderPhotos(photos){const g=$('#pgrid');if(!g)return;if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片，点下方拍照或上传</p>';return;}
   g.innerHTML='';photos.forEach(p=>{const url=p.url||URL.createObjectURL(p.blob);const d=document.createElement('div');d.className='ph';
@@ -664,6 +675,26 @@ async function handleFiles(files,id){if(!files.length)return;toast(CLOUD?'上传
   toast(n+' 张已保存'+(n<files.length?'（'+(files.length-n)+' 张失败，检查网络）':''));openBooth(id);}
 
 function markDone(){bState(CURBOOTH).status='done';touchBooth(CURBOOTH);toast('已标记完成');go('list');}
+
+/* ============================ 自动结论 ============================ */
+const OPEN_KW=['愿被集成','供底层','广泛他牌','跨品牌·广泛','跨品牌·部分','开放API','OpenEMS','可嫁接','认真做SMB','已被金融','(bankable)','愿用第三方中立层','含他牌','可授权/集成','可API接入','全自治交易','全打通','全周期含结算','完整可用','欢迎','按表现分成','SunSpec支持','高度碎片'];
+const CLOSED_KW=['仅自家','完全封闭','只全栈自有','只做大项目','只大资产','只大客户','偏营销','正内化通吃','仅云API','不接','无透明结算','只是愿景','仅自家App','仅整包','仅出报告','偏规划仿真','不愿','不鼓励','被巨头锁定','仅监控','仅削峰自用','不透明'];
+function concludeBooth(b,s){
+  const sel=[]; Object.values(s.answers||{}).forEach(a=>{ if(a&&a.opts) a.opts.forEach(o=>sel.push(o)); });
+  let open=0,closed=0; sel.forEach(o=>{ if(OPEN_KW.some(k=>o.includes(k)))open++; else if(CLOSED_KW.some(k=>o.includes(k)))closed++; });
+  const hv=Object.entries(s.hyp||{}).filter(([,v])=>v);
+  const sup=hv.filter(([,v])=>v==='support').map(([h])=>h);
+  const ref=hv.filter(([,v])=>v==='refute').map(([h])=>h);
+  let lean='未调研',cls='n';
+  if(ansCount(s)||hv.length){
+    if(open>closed){lean='偏开放 / 可合作';cls='s';}
+    else if(closed>open){lean='偏封闭 / 自家闭环';cls='r';}
+    else {lean='信号不一 / 继续看';cls='n';}
+  }
+  return {lean,cls,sup,ref,sel:[...new Set(sel)]};
+}
+function updateConcl(){const box=$('#conclbox');if(!box||!CURBOOTH)return;const b=allBooths().find(x=>x.id===CURBOOTH);const cc=concludeBooth(b,bState(CURBOOTH));
+  box.innerHTML='<span class="lean '+cc.cls+'">'+cc.lean+'</span>'+(cc.sel.length?'<div class="muted" style="margin-top:7px;line-height:1.6">关键信号：'+esc(cc.sel.join(' / '))+'</div>':'<div class="muted" style="margin-top:7px">选完选项，这里会给出该公司的倾向</div>');}
 
 /* ============================ 验证看板 ============================ */
 function renderDash(){
@@ -693,6 +724,17 @@ function renderDash(){
     <b>A 立项</b>：3+ 在位者确认"只服务自家生态"(A-H1 支持≥3) 且 2+ 渠道方要中立层(A-H2)。<br>
     <b>B 立项</b>：现有产品普遍"绑硬件/偏大资产/结算薄弱"(B-H1) 且 2+ 集成商/ESaaS 愿白标付费(B-H2/H3)。<br>
     <b>C(3.0)立项</b>：2+ 在位者愿"被集成做底座"(C-H1) ＋ 结算无人达 bankable 标准(C-H2 支持) ＋ 接入/账本尚无人锁定(C-H3)＝有轨道卡位窗。</div></div>`;
+  // 各家洞察（自动结论）
+  const cards=allBooths().filter(b=>b.line!=='G').map(b=>({b,cc:concludeBooth(b,bState(b.id))})).filter(x=>x.cc.lean!=='未调研');
+  html+=`<h2 style="font-size:15px;margin:16px 0 10px">🧭 各家洞察（自动结论 · 随作答更新）</h2>`;
+  if(!cards.length){ html+='<p class="muted">还没有可结论的展位——去现场点选问题后，这里自动按各家作答生成不同结论。</p>'; }
+  cards.forEach(({b,cc})=>{
+    html+=`<div class="hcard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+      <b style="font-size:13.5px">${esc(b.name)}</b><span class="lean ${cc.cls}">${cc.lean}</span></div>
+      ${cc.sel.length?'<div class="muted" style="margin-top:6px;line-height:1.6">'+esc(cc.sel.join(' / '))+'</div>':''}
+      ${(cc.sup.length||cc.ref.length)?'<div style="margin-top:5px;font-size:11px">'+(cc.sup.length?'<span style="color:#15803d">支持 '+esc(cc.sup.join('、'))+'</span>':'')+(cc.ref.length?' <span style="color:#b91c1c">反驳 '+esc(cc.ref.join('、'))+'</span>':'')+'</div>':''}
+    </div>`;
+  });
   $('#dashbody').innerHTML=html;
 }
 
@@ -734,8 +776,10 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
       return `<li><b>${chk}</b>${esc(qText(q))}${sel}${a.text?'<br><span style="color:#475569">→ '+esc(a.text)+'</span>':''}</li>`;}).filter(Boolean).join('');
     const hyp=Object.entries(s.hyp||{}).filter(([,v])=>v).map(([h,v])=>`${h}: ${({support:'支持',neutral:'中立',refute:'反驳'})[v]}`).join(' · ');
     if(s.status==='todo'&&!ps.length&&!ans&&!s.notes&&!hyp)continue;
+    const cc=(b.line!=='G')?concludeBooth(b,s):null;
     body+=`<div class="r"><h2>${esc(b.name)} <span class="tag">${b.line==='A'?'户储':b.line==='B'?'工商储':b.line==='C'?'3.0轨道':'通用'}</span></h2>
       <p class="m">${esc(b.focus)}${(s.hall||b.hall)?' · 📍'+esc(s.hall||b.hall):''} · 状态：${({todo:'未开始',doing:'进行中',done:'已完成'})[s.status]}</p>
+      ${(cc&&cc.lean!=='未调研')?'<p class="cc"><b>🧭 自动结论：</b>'+esc(cc.lean)+(cc.sel.length?' · '+esc(cc.sel.join(' / ')):'')+'</p>':''}
       ${ans?'<ul>'+ans+'</ul>':''}
       ${s.notes?'<p class="nt"><b>笔记：</b>'+esc(s.notes).replace(/\n/g,'<br>')+'</p>':''}
       ${hyp?'<p class="hy">🎯 '+esc(hyp)+'</p>':''}
@@ -749,6 +793,7 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
     .r h2{font-size:17px;margin:0 0 4px}.tag{font-size:11px;background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:99px;vertical-align:middle}
     .m{color:#64748b;font-size:12.5px;margin:0 0 8px}ul{margin:8px 0;padding-left:20px;font-size:13.5px;line-height:1.7}
     .nt{font-size:13px;background:#f1f5f9;padding:8px 10px;border-radius:8px}.hy{font-size:12.5px;color:#0369a1}
+    .cc{font-size:13px;font-weight:600;background:#ecfdf5;color:#065f46;padding:7px 10px;border-radius:8px;margin:0 0 8px}
     .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.g img{width:100%;border-radius:8px}
     </style></head><body><h1>Intersolar Europe 2026 · 展位调研归档</h1>
     <p class="sum">导出时间：${new Date().toLocaleString('zh-CN')} · 共 ${photos.length} 张照片</p>${body||'<p>暂无已填写内容</p>'}</body></html>`;
