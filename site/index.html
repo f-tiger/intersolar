@@ -23,7 +23,7 @@
   header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);
     backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 0 0}
   .hbar{max-width:760px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px}
-  .hbar h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px}
+  .hbar h1{font-size:20px;margin:0;font-weight:800;letter-spacing:.2px}
   .hbar .sub{font-size:11px;color:var(--mut);font-weight:500}
   .logo{width:30px;height:30px;flex:0 0 auto}
   .nav{display:flex;gap:8px;max-width:760px;margin:0 auto;padding:0 12px 12px;overflow-x:auto}
@@ -605,9 +605,11 @@ async function renderList(){
   // 按类型大分类分组渲染
   let html='';
   CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
+    items.sort((a,b)=>((a.ref?1:0)-(b.ref?1:0))||((b.pri||0)-(a.pri||0)));
     html+='<div class="cathead">'+c.t+'<span class="catn">'+items.length+'</span></div>';
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
     html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
+    html+='<button class="addbtn" style="margin:2px 0 18px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
   });
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
 }
@@ -775,6 +777,15 @@ function addRef(name,catk){
   save(); if(CLOUD) cloudPushBooth(id); toast('已加入：'+name); openBooth(id);
 }
 window.addRef=addRef;
+/* 在指定分类下手动加展位 */
+function addInCat(catk){ const name=(prompt('展位 / 公司名称：')||'').trim(); if(!name)return;
+  const line=LINE_OF_CAT[catk]||'B';
+  const id='custom_'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
+  STATE.custom=STATE.custom||[];
+  STATE.custom.push({id,name,line,cat:catk,pri:0,hall:'',focus:'(现场新增)',hyp:HYP_OF_LINE[line],q:line==='A'?QA:line==='C'?QC:QB});
+  save(); if(CLOUD) cloudPushBooth(id); toast('已加入：'+name); openBooth(id);
+}
+window.addInCat=addInCat;
 
 /* ============================ 自动结论 ============================ */
 const OPEN_KW=['愿被集成','供底层','广泛他牌','跨品牌·广泛','跨品牌·部分','开放API','OpenEMS','可嫁接','认真做SMB','已被金融','(bankable)','愿用第三方中立层','含他牌','可授权/集成','可API接入','全自治交易','全打通','全周期含结算','完整可用','欢迎','按表现分成','SunSpec支持','高度碎片'];
