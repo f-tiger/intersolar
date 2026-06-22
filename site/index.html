@@ -346,108 +346,159 @@ const QD = [ // 软件未来方向 · 对着竞对调研
 const SEED = [
   // ===== A 线：户储 retrofit =====
   {id:'1komma5',name:'1KOMMA5° (Heartbeat)',line:'A',pri:1,hall:'',focus:'Heartbeat 已向存量开放、VPP 达1GW。验证"跨品牌"边界',hyp:['A-H1','A-H2'],q:QA,qx:[
-    {q:'Heartbeat 真能接他牌电池吗？',multi:false,h:'已宣布向存量开放——核实是否真接非 1K5 安装的他牌硬件',o:['仅自家装机','含他牌(有限)','广泛他牌','只是愿景','不确定']},
-    {q:'VPP 收益怎么分给业主？',multi:false,h:'1GW VPP——每户每年分多少、怎么结算',o:['固定补贴','按表现分成','并入电价','不透明','不确定']}]},
+    {q:'Heartbeat 真能接他牌电池吗？',multi:false,h:'核实是否真接非 1K5 安装的他牌硬件',o:['仅自家装机','含他牌(有限)','广泛他牌','只是愿景','不确定']},
+    {q:'VPP 收益怎么分给业主？',multi:false,h:'每户每年分多少、怎么结算',o:['固定补贴','按表现分成','并入电价','不透明','不确定']},
+    {q:'跨品牌 VPP 装机进度？',multi:false,o:['大规模跨品牌','仅自家装机','早期试点','不确定']}]},
   {id:'sonnen',name:'sonnen',line:'A',pri:1,hall:'B0.360',focus:'已接 EPEX 日内、FCR 预鉴定。是否只服务自家电池',hyp:['A-H1'],q:QA,qx:[
-    {q:'只服务自家电池吗？',multi:false,h:'核心：VPP/调度是否只接 sonnen 自家电池',o:['仅sonnen','含他牌','不确定']},
-    {q:'EPEX 日内 / FCR 实跑规模？',multi:false,h:'真在跑还是只宣传',o:['大规模在跑','试点','仅宣传','不确定']}]},
+    {q:'只服务自家电池吗？',multi:false,h:'VPP/调度是否只接 sonnen 自家电池',o:['仅sonnen','含他牌','不确定']},
+    {q:'EPEX 日内 / FCR 实跑规模？',multi:false,o:['大规模在跑','试点','仅宣传','不确定']},
+    {q:'给安装商/能源社区白标吗？',multi:false,o:['白标','仅自营','不确定']}]},
   {id:'gridx',name:'gridX (XENON)',line:'A',pri:1,hall:'B5.671',focus:'平台型在位者，已向安装商开放。接入广度/白标定价/合作边界',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
     {q:'愿被集成做我的接入底层，还是会竞争？',multi:false,h:'合作 or 竞争边界（C-H1）',o:['愿被集成/供底层','只做自有平台','看情况','不确定']},
-    {q:'XENON 接入设备广度？',multi:false,o:['极广(数百型号)','中等','有限','不确定']}]},
+    {q:'XENON 接入设备广度？',multi:false,o:['极广(数百型号)','中等','有限','不确定']},
+    {q:'白标定价模式？',multi:false,o:['per-device','分成','订阅','不确定']}]},
   {id:'kiwigrid',name:'kiwigrid',line:'A',pri:1,hall:'B5.575',focus:'2026/6 刚发泛欧VPP平台。pay-per-device、跨品牌',hyp:['A-H1','A-H2','C-H1','C-H3'],q:QA,qx:[
-    {q:'泛欧 VPP 平台对第三方开放吗？',multi:false,h:'新发平台能否被别家接入/集成',o:['开放API','仅合作方','封闭','不确定']},
-    {q:'pay-per-device 价位说清了吗？',multi:false,o:['给了具体价','区间模糊','不愿说','不确定']}]},
+    {q:'泛欧 VPP 平台对第三方开放吗？',multi:false,h:'能否被别家接入/集成',o:['开放API','仅合作方','封闭','不确定']},
+    {q:'pay-per-device 价位说清了吗？',multi:false,o:['给了具体价','区间模糊','不愿说','不确定']},
+    {q:'接入设备/品牌广度？',multi:false,o:['广','中等','有限','不确定']}]},
   {id:'marstek',name:'Marstek',line:'A',pri:1,hall:'C4.110',focus:'低价即插即用储能，有官方Local/Open API。验证开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'本地/开放 API 真可用、文档全吗？',multi:false,h:'验证 H3：消费级品牌 API 开放度',o:['完整可用','有但简陋','仅云API','无','不确定']},
-    {q:'欢迎第三方做聚合/调度吗？',multi:false,o:['欢迎','中立','不鼓励','不确定']}]},
+    {q:'本地/开放 API 真可用、文档全吗？',multi:false,h:'验证消费级品牌 API 开放度',o:['完整可用','有但简陋','仅云API','无','不确定']},
+    {q:'欢迎第三方做聚合/调度吗？',multi:false,o:['欢迎','中立','不鼓励','不确定']},
+    {q:'阳台/即插即用主打哪些市场？',multi:false,o:['德国为主','泛欧','全球','不确定']}]},
   {id:'anker',name:'Anker SOLIX',line:'A',pri:0,hall:'B1.570',focus:'Solarbank系列，偏云锁定、无官方本地API。验证封闭程度',hyp:['A-H3'],q:QA,qx:[
-    {q:'有本地/开放 API，还是纯云锁定？',multi:false,h:'验证封闭程度',o:['有本地API','仅云API','完全封闭','不确定']}]},
+    {q:'有本地/开放 API，还是纯云锁定？',multi:false,h:'验证封闭程度',o:['有本地API','仅云API','完全封闭','不确定']},
+    {q:'Solarbank 支持动态电价自动调度吗？',multi:false,o:['支持','部分','不支持','不确定']},
+    {q:'欧洲渠道/安装商策略？',multi:false,o:['强','一般','弱','不确定']}]},
   {id:'zendure',name:'Zendure',line:'A',pri:0,hall:'C1.280',focus:'SolarFlow + 动态电价TOU自动化。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'SolarFlow / TOU 对第三方开放吗？',multi:false,o:['开放','仅自家App','不确定']}]},
+    {q:'SolarFlow / TOU 对第三方开放吗？',multi:false,o:['开放','仅自家App','不确定']},
+    {q:'阳台储能可被聚合进 VPP 吗？',multi:false,o:['可聚合','仅自家','不确定']},
+    {q:'欧洲合规(§14a/认证)进度？',multi:false,o:['已就绪','进行中','未做','不确定']}]},
   {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'B3.130(Kostal展台)',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA,qx:[
     {q:'Smart Battery 接他牌电池到什么程度？',multi:false,h:'判断是潜在客户还是竞品',o:['广泛接他牌','少数型号','仅合作','不接','不确定']},
-    {q:'"中立接入层"愿买/合作还是自建？',multi:false,o:['愿买/合作','自建','不确定']}]},
+    {q:'"中立接入层"愿买/合作还是自建？',multi:false,o:['愿买/合作','自建','不确定']},
+    {q:'动态电价用户规模 / 纳管电池数？',multi:false,o:['规模大','中','小','不确定']}]},
   // 中国户储出海主流品牌（补充 · 展位号到现场/官方App查）
   {id:'deye',name:'Deye',line:'A',pri:1,cat:'storage',hall:'B1.450',focus:'中国户储出海龙头 · 混合/储能逆变。验证开放度、跨品牌',hyp:['A-H3'],q:QA,qx:[
     {q:'混合逆变开放本地 API/Modbus？欢迎第三方调度？',multi:false,o:['开放','部分','仅自家','不确定']},
-    {q:'自带 VPP/聚合，还是可被第三方聚合？',multi:false,o:['可被聚合','自家VPP','无','不确定']}]},
+    {q:'自带 VPP/聚合，还是可被第三方聚合？',multi:false,o:['可被聚合','自家VPP','无','不确定']},
+    {q:'欧洲份额最大的产品线/市场？',multi:false,o:['户用混合','工商','低压','不确定']}]},
   {id:'solax',name:'SolaX Power',line:'A',pri:1,cat:'storage',hall:'B4.460 / B1.250(ees)',focus:'X3-Hybrid 混合储能逆变，欧洲主力。验证开放度',hyp:['A-H3'],q:QA,qx:[
     {q:'X3/X1 系列开放 API/Modbus？跨品牌？',multi:false,o:['开放','部分','仅自家','不确定']},
-    {q:'是否可被第三方 VPP 聚合？',multi:false,o:['可被聚合','自家VPP','不确定']}]},
+    {q:'是否可被第三方 VPP 聚合？',multi:false,o:['可被聚合','自家VPP','不确定']},
+    {q:'动态电价/TOU 自动化做到哪一步？',multi:false,o:['成熟','基础','无','不确定']}]},
   {id:'alphaess',name:'AlphaESS',line:'A',pri:1,cat:'storage',hall:'B1.150',focus:'户储系统龙头，欧洲份额高。验证开放度/VPP',hyp:['A-H3'],q:QA,qx:[
-    {q:'户储系统开放 API？自家 VPP 还是可被聚合？',multi:false,o:['开放可聚合','仅自家VPP','封闭','不确定']}]},
+    {q:'户储系统开放 API？自家 VPP 还是可被聚合？',multi:false,o:['开放可聚合','仅自家VPP','封闭','不确定']},
+    {q:'欧洲哪些国家 VPP 已实跑？分成模式？',multi:false,o:['多国实跑','试点','无','不确定']},
+    {q:'兼容他牌逆变/电池吗？',multi:false,o:['广','部分','仅自家','不确定']}]},
   {id:'sofar',name:'SOFAR',line:'A',pri:0,cat:'storage',hall:'B3.450',focus:'首航新能源 · 户储/混合逆变，欧洲走量。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'开放协议 + 欧洲本地服务能力？',multi:false,o:['开放/服务强','一般','弱','不确定']}]},
+    {q:'开放协议 + 欧洲本地服务能力？',multi:false,o:['开放/服务强','一般','弱','不确定']},
+    {q:'户用 vs 工商储重心？',multi:false,o:['户用','工商','两手','不确定']},
+    {q:'可被第三方 VPP 聚合吗？',multi:false,o:['可','部分','锁定','不确定']}]},
   {id:'solis',name:'Solis (Ginlong)',line:'A',pri:1,cat:'storage',hall:'B3.430',focus:'锦浪 · 组串/混合逆变龙头，户储发力。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'新储能 FlexAIO 开放度 + 混合逆变接入？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+    {q:'新储能 FlexAIO 开放度 + 混合逆变接入？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'从组串向户储/储能系统转型进度？',multi:false,o:['激进','稳健','起步','不确定']},
+    {q:'可被第三方调度/聚合吗？',multi:false,o:['可','部分','锁定','不确定']}]},
   {id:'hoymiles',name:'Hoymiles',line:'A',pri:0,cat:'storage',hall:'B3.360',focus:'禾迈 · 微逆+户储，阳台/分布式。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'微逆+储能(阳台机)开放 API？',multi:false,o:['开放','仅自家App','不确定']}]},
+    {q:'微逆+储能(阳台机)开放 API？',multi:false,o:['开放','仅自家App','不确定']},
+    {q:'阳台/即插即用储能主打哪些市场？',multi:false,o:['德国为主','泛欧','全球','不确定']},
+    {q:'能被聚合进 VPP 吗？',multi:false,o:['可','仅自家','不确定']}]},
   {id:'dyness',name:'Dyness',line:'A',pri:0,cat:'storage',hall:'B2.160',focus:'户储电池品牌，欧洲走量。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'电池开放协议(CAN/RS485)？兼容哪些逆变品牌？',multi:false,o:['广泛兼容','部分','锁定','不确定']}]},
+    {q:'电池开放协议(CAN/RS485)？兼容哪些逆变品牌？',multi:false,o:['广泛兼容','部分','锁定','不确定']},
+    {q:'户用 vs 工商电池重心？',multi:false,o:['户用','工商','两手','不确定']},
+    {q:'梯次/可融资性/质保策略？',multi:false,o:['强','一般','弱','不确定']}]},
   {id:'kstar',name:'KSTAR',line:'A',pri:0,cat:'storage',hall:'B4.140',focus:'科士达 · 储能逆变/系统。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'侧重户用还是工商？EMS 开放度？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+    {q:'侧重户用还是工商？EMS 开放度？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'数据中心/大储业务在欧推进吗？',multi:false,o:['推进','观望','无','不确定']},
+    {q:'可被第三方聚合/调度吗？',multi:false,o:['可','部分','锁定','不确定']}]},
   {id:'saj',name:'SAJ',line:'A',pri:0,cat:'storage',hall:'',focus:'三晶电气 · 户储/混合逆变。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'户储逆变开放 API？欧洲渠道策略？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+    {q:'户储逆变开放 API？欧洲渠道策略？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'欧洲份额/走量主力市场？',multi:false,o:['强','一般','弱','不确定']},
+    {q:'可被第三方 VPP 聚合吗？',multi:false,o:['可','部分','锁定','不确定']}]},
   {id:'solplanet',name:'Solplanet',line:'A',pri:0,cat:'storage',hall:'B4.230',focus:'AISWEI 旗下户用逆变/储能。开放度',hyp:['A-H3'],q:QA,qx:[
-    {q:'AISWEI 生态开放度/跨品牌？',multi:false,o:['开放','部分','仅自家','不确定']}]},
+    {q:'AISWEI 生态开放度/跨品牌？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'户用储能产品线在欧推进进度？',multi:false,o:['激进','稳健','起步','不确定']},
+    {q:'可被第三方调度/聚合吗？',multi:false,o:['可','部分','锁定','不确定']}]},
   // ===== B 线：工商储 SaaS =====
   {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'B0.345',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3','C-H2'],q:QB,qx:[
     {q:'收益结算/归因做到多细？',multi:false,h:'直接对标 B-H3：是否设备级、可审计',o:['设备级可审计','日月报','较弱','不确定']},
-    {q:'面向 SMB(<1MWh) 吗？',multi:false,o:['是','偏大项目','不确定']}]},
+    {q:'面向 SMB(<1MWh) 吗？',multi:false,o:['是','偏大项目','不确定']},
+    {q:'跨品牌设备接入广度？',multi:false,o:['广','有限','仅自家','不确定']}]},
   {id:'lumera',name:'Furo (原 Lumera Energy · Lumera OS)',line:'B',pri:1,hall:'C4.170A',focus:'C&I储能规划/仿真/运营OS，入围。结算/归因怎么做',hyp:['B-H1','B-H3'],q:QB,qx:[
     {q:'是规划仿真为主，还是含实时运营+结算？',multi:false,o:['全周期含结算','偏规划仿真','不确定']},
-    {q:'跨品牌接入广度？',multi:false,o:['广','有限','不确定']}]},
+    {q:'跨品牌接入广度？',multi:false,o:['广','有限','不确定']},
+    {q:'OS 愿被集成做底座吗(被集成/白标)？',multi:false,o:['愿意','只做自营','不确定']}]},
   {id:'simpl',name:'Simpl.energy (Zympler)',line:'B',pri:1,hall:'C4.660C',focus:'PV/电池/EV/工业负荷统一EMS，入围。SMB定价、跨品牌',hyp:['B-H1','B-H2'],q:QB,qx:[
     {q:'Zympler 真能跨 PV/电池/EV/负荷统一调度？',multi:false,o:['全打通','部分','不确定']},
-    {q:'SMB 定价清晰吗？',multi:false,o:['清晰','模糊','不确定']}]},
+    {q:'SMB 定价清晰吗？',multi:false,o:['清晰','模糊','不确定']},
+    {q:'含动态电价/多市场价值堆叠吗？',multi:false,o:['有','仅削峰自用','不确定']}]},
   {id:'entrix',name:'Entrix',line:'B',pri:1,hall:'B5.471',focus:'AI多市场优化(3GW/8.5GWh)。是否做SMB？能否做我的市场通道',hyp:['B-H2','C-H1'],q:QB,qx:[
     {q:'愿做"市场通道供给方"被我分成接入吗？',multi:false,h:'C-H1：被集成做底座',o:['愿意','只做自家客户','不确定']},
-    {q:'做不做 SMB(<1MWh)？',multi:false,o:['做','只大资产','不确定']}]},
+    {q:'做不做 SMB(<1MWh)？',multi:false,o:['做','只大资产','不确定']},
+    {q:'AI 优化自治到哪一步？人还做什么？',multi:false,o:['全自治','半自动','仅建议','不确定']}]},
   {id:'suena',name:'Suena',line:'B',pri:0,hall:'B5.374',focus:'Energy Trading Autopilot。SMB？聚合分成上游？',hyp:['B-H2','C-H1'],q:QB,qx:[
     {q:'Autopilot 自治到哪一步？人还做什么？',multi:false,h:'3.0 agentic 自治成色',o:['全自治交易','半自动','仅建议','不确定']},
-    {q:'能做我的上游市场通道(分成)吗？',multi:false,o:['能','不愿','不确定']}]},
+    {q:'能做我的上游市场通道(分成)吗？',multi:false,o:['能','不愿','不确定']},
+    {q:'做 SMB(<1MWh) 还是只大资产？',multi:false,o:['做SMB','只大资产','不确定']}]},
   {id:'nextkraftwerke',name:'Next Kraftwerke',line:'B',pri:1,hall:'B5.290',focus:'欧洲最大VPP之一。分成接入(我接你市场通道)的可能',hyp:['B-H2'],q:QB,qx:[
-    {q:'能以"分成接入"做我的市场通道吗？',multi:false,h:'不自建牌照、接它的通道',o:['可以','需谈','不愿','不确定']}]},
+    {q:'能以"分成接入"做我的市场通道吗？',multi:false,h:'不自建牌照、接它的通道',o:['可以','需谈','不愿','不确定']},
+    {q:'下沉到中小工商/户用规模了吗？',multi:false,o:['已下沉','仅大资产','试点','不确定']},
+    {q:'接入第三方设备/平台的广度？',multi:false,o:['广','有限','仅合作方','不确定']}]},
   {id:'gridbeyond',name:'GridBeyond',line:'B',pri:0,hall:'',focus:'AI优化+CapEx-free电池。ESaaS模式/收益分成',hyp:['B-H2','B-H3'],q:QB,qx:[
     {q:'ESaaS/收益分成的分成结构？',multi:false,o:['已告知具体','模糊','不确定']},
-    {q:'做 SMB 吗？',multi:false,o:['做','只大客户','不确定']}]},
+    {q:'做 SMB 吗？',multi:false,o:['做','只大客户','不确定']},
+    {q:'AI 优化对接哪些市场(FCR/日内/容量)？',multi:false,o:['多市场','少数','不确定']}]},
   {id:'sigenergy',name:'Sigenergy (AI in All)',line:'B',pri:1,hall:'B1.330',focus:'SigenStor Neo五合一、AI叙事、ees入围。EMS开放度',hyp:['B-H1'],q:QB,qx:[
     {q:'"AI in All" 有实质还是营销话术？',multi:false,o:['有实质','偏营销','不确定']},
-    {q:'EMS 对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']}]},
+    {q:'EMS 对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']},
+    {q:'五合一(SigenStor)是真集成还是拼装？',multi:false,o:['深度集成','拼装','不确定']}]},
   {id:'sungrow',name:'Sungrow (iSolarEMS)',line:'B',pri:1,hall:'B3.410 (另P2D B6.110)',focus:'iSolarCloud偏监控/运维。是否只服务自家硬件',hyp:['B-H1'],q:QB,qx:[
     {q:'iSolarEMS 只服务自家硬件吗？',multi:false,o:['仅自家','含他牌','不确定']},
-    {q:'有多市场价值堆叠能力吗？',multi:false,o:['有','仅削峰自用','无','不确定']}]},
+    {q:'有多市场价值堆叠能力吗？',multi:false,o:['有','仅削峰自用','无','不确定']},
+    {q:'C&I/大储 EMS 给集成商白标吗？',multi:false,o:['白标','仅自营','不确定']}]},
   {id:'huawei',name:'Huawei FusionSolar',line:'B',pri:1,hall:'C1.111',focus:'C&I EMS。多市场/价值堆叠能力边界',hyp:['B-H1'],q:QB,qx:[
     {q:'C&I 的价值堆叠到哪一步？',multi:false,o:['多市场','仅自用削峰','不确定']},
-    {q:'对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']}]},
+    {q:'对他牌设备开放吗？',multi:false,o:['开放','仅自家','不确定']},
+    {q:'FusionSolar 的 AI/智能调度有实质吗？',multi:false,o:['有实质','偏营销','不确定']}]},
   {id:'fenecon',name:'FENECON (OpenEMS)',line:'B',pri:1,hall:'B1.410',focus:'混合逆变器+开源OpenEMS生态，入围。可嫁接？开源=潜在中立标准',hyp:['B-H1','B-H2','C-H3'],q:QB,qx:[
     {q:'OpenEMS 能作中立标准被我嫁接吗？',multi:false,h:'C-H3：开源=潜在中立标准',o:['可嫁接/欢迎','有限','不确定']},
-    {q:'社区版/商业版边界清晰吗？',multi:false,o:['清晰','模糊','不确定']}]},
+    {q:'社区版/商业版边界清晰吗？',multi:false,o:['清晰','模糊','不确定']},
+    {q:'OpenEMS 接入的设备/品牌生态多大？',multi:false,o:['大且活跃','中等','小','不确定']}]},
   {id:'volytica',name:'volytica diagnostics (AvEn)',line:'B',pri:1,hall:'B2.470',focus:'确定性BESS可调度可用能量KPI，ees入围。能否作我的资产层模块(买非自研)',hyp:['B-H3','C-H2'],q:QB,qx:[
     {q:'AvEn 能作我的资产层模块(买非自研)吗？',multi:false,o:['可授权/集成','仅整包','不确定']},
-    {q:'KPI 能被金融/保险接受吗？',multi:false,h:'bankability',o:['能(bankable)','内部用','不确定']}]},
+    {q:'KPI 能被金融/保险接受吗？',multi:false,h:'bankability',o:['能(bankable)','内部用','不确定']},
+    {q:'支持哪些电池/PCS 品牌的数据接入？',multi:false,o:['广','有限','不确定']}]},
   {id:'twaice',name:'TWAICE / ACCURE',line:'B',pri:1,hall:'TWAICE B0.336 · ACCURE B2.380',focus:'电池分析/SOH/衰减。资产层模块候选；印证50%/47%痛点',hyp:['B-H3','C-H2'],q:QB,qx:[
     {q:'分析结果可作可融资业绩证据吗？',multi:false,h:'bankability',o:['可(bankable)','参考用','不确定']},
-    {q:'印证"缺单一可信数据源"痛点吗？',multi:false,o:['强烈印证','一般','否','不确定']}]},
+    {q:'印证"缺单一可信数据源"痛点吗？',multi:false,o:['强烈印证','一般','否','不确定']},
+    {q:'TWAICE 与 ACCURE 合并后产品如何整合？',multi:false,o:['已整合','并行','不确定']}]},
   {id:'blindleister',name:'Blindleister (Grid Data Intelligence)',line:'B',pri:1,hall:'C4.370A',focus:'图神经网络+AI卫星做电网容量画像，入围。接入/选址数据源',hyp:['B-H1'],q:QB,qx:[
-    {q:'容量画像能作我的接入/选址数据源吗？',multi:false,o:['可API接入','仅出报告','不确定']}]},
+    {q:'容量画像能作我的接入/选址数据源吗？',multi:false,o:['可API接入','仅出报告','不确定']},
+    {q:'覆盖哪些国家/电网区域？',multi:false,o:['多国','德国为主','少数','不确定']},
+    {q:'数据精度/更新频率可用于实时决策吗？',multi:false,o:['可实时','周期更新','仅静态','不确定']}]},
   {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:1,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
     {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
-    {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
+    {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']},
+    {q:'V2G 在欧合规/量产落地进度？',multi:false,o:['量产','试点','延期','不确定']}]},
   {id:'tesvolt',name:'Tesvolt',line:'B',pri:0,cat:'ci',hall:'B2.110',focus:'德国 C&I 储能龙头(AWARD 常客)。直接对标工商储',hyp:['B-H1','B-H3'],q:QB,qx:[
     {q:'C&I 收益结算/多市场堆叠到哪一步？',multi:false,o:['多市场+结算','仅削峰自用','不确定']},
-    {q:'跨品牌 PCS/电池接入吗？',multi:false,o:['跨品牌','仅自家','不确定']}]},
+    {q:'跨品牌 PCS/电池接入吗？',multi:false,o:['跨品牌','仅自家','不确定']},
+    {q:'EMS 软件给集成商白标/开放吗？',multi:false,o:['白标/开放','仅自家','不确定']}]},
   {id:'alfen',name:'Alfen',line:'B',pri:0,cat:'ci',hall:'B2.210 (EV另B6.680)',focus:'荷兰·储能+EV充电+电网变电一体。C&I储能+电网边界',hyp:['B-H1'],q:QB,qx:[
     {q:'储能 EMS 给集成商白标吗？跨品牌接入？',multi:false,o:['白标/跨品牌','仅自家','不确定']},
-    {q:'储能+EV+电网一体的协同价值？',multi:false,o:['强协同','一般','不确定']}]},
+    {q:'储能+EV+电网一体的协同价值？',multi:false,o:['强协同','一般','不确定']},
+    {q:'含多市场价值堆叠/调度软件吗？',multi:false,o:['有','仅削峰自用','不确定']}]},
   {id:'intilion',name:'Intilion',line:'B',pri:0,cat:'ci',hall:'',focus:'德国 C&I/大储系统(HOPPECKE 系)。展位号待现场/App 查',hyp:['B-H1'],q:QB,qx:[
-    {q:'C&I/大储含调度软件吗？跨品牌？',multi:false,o:['含调度+跨品牌','仅硬件','不确定']}]},
+    {q:'C&I/大储含调度软件吗？跨品牌？',multi:false,o:['含调度+跨品牌','仅硬件','不确定']},
+    {q:'收益结算/多市场堆叠能力？',multi:false,o:['多市场+结算','仅削峰','不确定']},
+    {q:'软件愿被集成/白标吗？',multi:false,o:['愿意','仅自家','不确定']}]},
   {id:'sympower',name:'Sympower',line:'B',pri:0,cat:'vpp',hall:'',focus:'荷兰·需求响应聚合(欧洲多国)。展位号待现场/App 查',hyp:['B-H2','C-H1'],q:QB,qx:[
     {q:'愿做我的市场通道(分成接入)吗？',multi:false,h:'C-H1',o:['愿意','不愿','不确定']},
-    {q:'覆盖哪些国家的需求响应市场？',multi:false,o:['多国','少数','不确定']}]},
+    {q:'覆盖哪些国家的需求响应市场？',multi:false,o:['多国','少数','不确定']},
+    {q:'下沉到中小工商/分布式资产了吗？',multi:false,o:['已下沉','仅大资产','试点','不确定']}]},
   {id:'eon',name:'E.ON',line:'B',pri:0,cat:'vpp',hall:'C5.630',focus:'德国能源巨头/零售商(持股 gridX)。潜在客户/被集成方：动态电价+VPP+白标',hyp:['B-H2','C-H1'],q:QB,qx:[
     {q:'愿被集成做白标吗？接第三方电池到什么程度？',multi:false,h:'是客户还是竞品',o:['愿白标/广接','有限','只自家','不确定']},
-    {q:'动态电价+VPP 产品成色？',multi:false,o:['成熟','早期','不确定']}]},
+    {q:'动态电价+VPP 产品成色？',multi:false,o:['成熟','早期','不确定']},
+    {q:'与 gridX 的关系：自建还是依赖其平台？',multi:false,o:['依赖gridX','自建','混合','不确定']}]},
   // ===== C 线：软件未来方向（看方向 + 对着竞对调研） =====
   {id:'dir-agentic',name:'方向① AI 自治交易/调度',line:'C',pri:1,cat:'os30',hall:'',focus:'软件从"给建议"→"自己决策+自动交易/对冲"。去看竞对：Suena、Entrix、enspired、GridBeyond、Kraken',hyp:['C-H1'],q:QD},
   {id:'dir-neutral',name:'方向② 跨品牌中立接入层',line:'C',pri:1,cat:'os30',hall:'',focus:'不绑硬件、统一接入各品牌设备做调度（接入广度=壁垒）。去看竞对：gridX、kiwigrid、Marstek/EcoFlow(开放API)、Tibber',hyp:['C-H1','C-H3'],q:QD},
@@ -501,21 +552,66 @@ const REF_FOCUS={
 };
 // 只保留已查到官方展位号的对标公司；没号的不再列出
 const REF_QX={
-  'Tesla':[{q:'Powerwall/Autobidder 对第三方开放吗？',multi:false,o:['开放','仅自家生态','不确定']}],
-  'BYD':[{q:'Battery-Box 接第三方 EMS/VPP 到什么程度？',multi:false,o:['广泛','部分','仅自家','不确定']}],
-  'SolarEdge':[{q:'ONE 平台只服务自家硬件吗？开放 API？',multi:false,o:['开放','仅自家','不确定']}],
-  'Enphase':[{q:'IQ 生态封闭还是有开发者 API？',multi:false,o:['有开发者API','半封闭','封闭','不确定']}],
-  'Growatt':[{q:'逆变/储能开放本地 API？支持第三方调度？',multi:false,o:['开放','部分','仅自家','不确定']}],
-  'GoodWe':[{q:'Lynx+SEMS 开放度？跨品牌接入？',multi:false,o:['开放','部分','仅自家','不确定']}],
-  'Pylontech':[{q:'只卖电池包还是含 EMS？开放协议、兼容哪些逆变？',multi:false,o:['开放广兼容','部分','锁定','不确定']}],
-  'Fox ESS':[{q:'开放 API？欢迎第三方聚合？',multi:false,o:['开放','部分','仅自家','不确定']}],
-  'SMA':[{q:'Sunny Home Manager 接他牌设备吗？生态开放度？',multi:false,o:['开放跨品牌','部分','仅自家','不确定']}],
-  'Fluence':[{q:'Mosaic 交易/EMS 给第三方白标吗？做 SMB 吗？',multi:false,o:['白标+SMB','仅大资产','不确定']}],
-  'Wallbox':[{q:'Quasar 双向 V2G 愿被第三方平台调用吗？',multi:false,o:['愿意','仅自家','不确定']}],
-  'Solarwatt':[{q:'Manager 跨品牌吗？BMW 合作模式细节？',multi:false,o:['跨品牌','仅自家','不确定']}],
-  'Voltfang':[{q:'梯次电池供货还是整包？资产层可被采购吗？',multi:false,o:['可供货/集成','仅整包','不确定']}],
-  'DNV':[{q:'认证/可融资性方法论可被第三方采用吗？',multi:false,o:['可采用','仅自家服务','不确定']}],
-  'Wattstor':[{q:'EMS 跨品牌接入？给集成商白标？',multi:false,o:['白标/跨品牌','仅自家','不确定']}]
+  'Tesla':[
+    {q:'Powerwall/Autobidder 对第三方开放吗？',multi:false,o:['开放','仅自家生态','不确定']},
+    {q:'VPP(如 Tesla Electric)在欧洲落地了吗？',multi:false,o:['已落地','试点','无','不确定']},
+    {q:'Powerwall 3 在欧户储份额/渠道策略？',multi:false,o:['激进扩张','稳健','收缩','不确定']}],
+  'BYD':[
+    {q:'Battery-Box 接第三方 EMS/VPP 到什么程度？',multi:false,o:['广泛','部分','仅自家','不确定']},
+    {q:'兼容哪些逆变品牌？兼容清单更新快吗？',multi:false,o:['广且更新快','有限','锁定','不确定']},
+    {q:'户用 vs 工商储重心？欧洲走量主力？',multi:false,o:['户用','工商','两手','不确定']}],
+  'SolarEdge':[
+    {q:'ONE 平台只服务自家硬件吗？开放 API？',multi:false,o:['开放','仅自家','不确定']},
+    {q:'经营困境后欧洲投入是否收缩？',multi:false,o:['收缩','维持','加码','不确定']},
+    {q:'动态电价/VPP 软件成色？',multi:false,o:['成熟','早期','无','不确定']}],
+  'Enphase':[
+    {q:'IQ 生态封闭还是有开发者 API？',multi:false,o:['有开发者API','半封闭','封闭','不确定']},
+    {q:'微逆+电池在欧渗透率/重心市场？',multi:false,o:['高','中','低','不确定']},
+    {q:'动态电价/VPP 在欧洲落地了吗？',multi:false,o:['已落地','试点','无','不确定']}],
+  'Growatt':[
+    {q:'逆变/储能开放本地 API？支持第三方调度？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'自家 VPP/聚合，还是可被第三方聚合？',multi:false,o:['可被聚合','自家VPP','无','不确定']},
+    {q:'户用 vs 工商重心？欧洲走量主力？',multi:false,o:['户用','工商','两手','不确定']}],
+  'GoodWe':[
+    {q:'Lynx+SEMS 开放度？跨品牌接入？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'SEMS 能多市场价值堆叠吗？',multi:false,o:['能','仅监控','不确定']},
+    {q:'欧洲渠道/服务能力？',multi:false,o:['强','一般','弱','不确定']}],
+  'Pylontech':[
+    {q:'只卖电池包还是含 EMS？开放协议、兼容哪些逆变？',multi:false,o:['开放广兼容','部分','锁定','不确定']},
+    {q:'电池可被第三方 BMS/EMS 调度吗？',multi:false,o:['可','部分','锁定','不确定']},
+    {q:'户用 vs 工商电池重心？',multi:false,o:['户用','工商','两手','不确定']}],
+  'Fox ESS':[
+    {q:'开放 API？欢迎第三方聚合？',multi:false,o:['开放','部分','仅自家','不确定']},
+    {q:'自家 VPP 还是可被聚合？',multi:false,o:['可被聚合','自家VPP','无','不确定']},
+    {q:'欧洲渠道/品牌策略(麦田能源)？',multi:false,o:['强','一般','弱','不确定']}],
+  'SMA':[
+    {q:'Sunny Home Manager 接他牌设备吗？生态开放度？',multi:false,o:['开放跨品牌','部分','仅自家','不确定']},
+    {q:'愿被集成做接入底层吗？还是会竞争？',multi:false,o:['愿被集成','只做自有','看情况','不确定']},
+    {q:'工商/大储 EMS 多市场堆叠能力？',multi:false,o:['强','一般','弱','不确定']}],
+  'Fluence':[
+    {q:'Mosaic 交易/EMS 给第三方白标吗？做 SMB 吗？',multi:false,o:['白标+SMB','仅大资产','不确定']},
+    {q:'AI 自治交易自治到哪一步？',multi:false,o:['全自治','半自动','仅建议','不确定']},
+    {q:'欧洲市场份额/落地项目规模？',multi:false,o:['大','中','小','不确定']}],
+  'Wallbox':[
+    {q:'Quasar 双向 V2G 愿被第三方平台调用吗？',multi:false,o:['愿意','仅自家','不确定']},
+    {q:'V2G 在欧合规/量产进度？',multi:false,o:['量产','试点','延期','不确定']},
+    {q:'充电+储能协同的软件能力？',multi:false,o:['强','一般','弱','不确定']}],
+  'Solarwatt':[
+    {q:'Manager 跨品牌吗？BMW 合作模式细节？',multi:false,o:['跨品牌','仅自家','不确定']},
+    {q:'HEMS 含动态电价/VPP 吗？',multi:false,o:['含','无','不确定']},
+    {q:'电池+HEMS 整包 vs 开放接入？',multi:false,o:['开放','仅整包','不确定']}],
+  'Voltfang':[
+    {q:'梯次电池供货还是整包？资产层可被采购吗？',multi:false,o:['可供货/集成','仅整包','不确定']},
+    {q:'梯次电池的可融资性/质保如何？',multi:false,o:['bankable','一般','弱','不确定']},
+    {q:'C&I 工商储为主还是户用？',multi:false,o:['工商','户用','两手','不确定']}],
+  'DNV':[
+    {q:'认证/可融资性方法论可被第三方采用吗？',multi:false,o:['可采用','仅自家服务','不确定']},
+    {q:'对 BESS 健康/衰减有标准方法吗？',multi:false,o:['有标准','研究中','无','不确定']},
+    {q:'金融/保险方接受其结论吗？',multi:false,o:['接受','参考','不确定']}],
+  'Wattstor':[
+    {q:'EMS 跨品牌接入？给集成商白标？',multi:false,o:['白标/跨品牌','仅自家','不确定']},
+    {q:'面向 SMB(<1MWh) 工商储吗？',multi:false,o:['做','只大项目','不确定']},
+    {q:'收益结算/归因做到多细？',multi:false,o:['设备级可审计','日月报','较弱','不确定']}]
 };
 Object.entries(REF_MAP).forEach(([cat,names])=>names.filter(n=>REF_HALL[n]).forEach(n=>{const L=LINE_OF_CAT[cat];
   REF_SEED.push({id:'r_'+n.toLowerCase().replace(/[^a-z0-9]+/g,''),name:n,line:L,cat,pri:0,hall:REF_HALL[n],ref:1,
@@ -880,7 +976,7 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
 }
 
 function qText(q){return typeof q==='object'?q.q:q;}
-function qsOf(b){return (b.q||[]).concat(b.qx||[]);}
+function qsOf(b){return (b.qx&&b.qx.length)?b.qx:(b.q||[]);}
 function renderQ(b,s){const QS=qsOf(b);const BL=(b.q||[]).length;$('#qlist').innerHTML=QS.map((q,i)=>{const a=s.answers[i]||{};
   if(typeof q!=='object'){ // 论坛/自定义：勾选 + 文字
     return `<div class="q ${a.checked?'checked':''}" data-i="${i}" data-t="s">
