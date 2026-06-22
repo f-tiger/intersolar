@@ -103,6 +103,9 @@
   .catref{font-size:11.5px;color:var(--mut);background:var(--panel2);border:1px dashed var(--line);
     border-radius:9px;padding:7px 11px;margin:0 0 11px;line-height:1.65}
   .catref b{color:var(--txt)}
+  .refchip{display:inline-block;background:var(--panel);border:1px solid var(--line);color:var(--acc);
+    font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;margin:4px 5px 0 0}
+  .refchip:active{background:var(--panel2)}
   .opts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
   .opt{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
     padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:600}
@@ -408,15 +411,15 @@ function bState(id){ if(!STATE.booths[id]) STATE.booths[id]={status:'todo',hall:
 
 /* ---------- 展位分类（按类型，含热门参照公司） ---------- */
 const CATS=[
-  {k:'storage', t:'🔋 储能硬件 · 即插即用 / 电池', ref:'<b>热门参照：</b>Tesla Powerwall、BYD、SolarEdge、Enphase、Huawei LUNA、Growatt、GoodWe、Pylontech、Fox ESS'},
-  {k:'hems',    t:'🏠 户用软件 · HEMS / VPP',      ref:'<b>热门参照：</b>Tesla(VPP/Autobidder)、Enphase IQ、SolarEdge ONE、SMA Sunny Home、Loxone、Solarwatt Manager、Voltware'},
-  {k:'ci',      t:'⚡ 工商储 · EMS / 调度软件',     ref:'<b>热门参照：</b>SMA Commercial、Fluence、Stem、AMMP、Wattstor、Sungrow iSolarEMS、Huawei FusionSolar'},
-  {k:'vpp',     t:'📈 VPP · 聚合 · 能量交易 / 动态电价', ref:'<b>热门参照：</b>Octopus Kraken、enspired、Habitat Energy、Sympower、Flower、Enpal、Voltus、Leap'},
-  {k:'analytics',t:'🔬 电池分析 · 资产层 KPI',      ref:'<b>热门参照：</b>TWAICE、ACCURE、Zitara、DNV、TÜV'},
-  {k:'grid',    t:'🕸 电网 · 容量 / 接入数据',       ref:'<b>热门参照：</b>Envelio、Depsys、Neara、Heimdall Power、gridICT'},
-  {k:'v2g',     t:'🚗 V2G · 车网互动',              ref:'<b>热门参照：</b>Wallbox Quasar、Fermata Energy、Voltfang、Ambibox、We Drive Solar'},
-  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      ref:'尚无现成对标——这正是 3.0 的卡位空位（最接近：Octopus Kraken 的平台化）'},
-  {k:'misc',    t:'➕ 临时新增 / 其他',              ref:''}
+  {k:'storage', t:'🔋 储能硬件 · 即插即用 / 电池', refs:['Tesla Powerwall','BYD','SolarEdge','Enphase','Huawei LUNA','Growatt','GoodWe','Pylontech','Fox ESS']},
+  {k:'hems',    t:'🏠 户用软件 · HEMS / VPP',      refs:['Tesla VPP','Enphase IQ','SolarEdge ONE','SMA Sunny Home','Loxone','Solarwatt Manager','Voltware']},
+  {k:'ci',      t:'⚡ 工商储 · EMS / 调度软件',     refs:['SMA Commercial','Fluence','Stem','AMMP','Wattstor','Wattsight']},
+  {k:'vpp',     t:'📈 VPP · 聚合 · 能量交易 / 动态电价', refs:['Octopus Kraken','enspired','Habitat Energy','Sympower','Flower','Enpal','Voltus','Leap']},
+  {k:'analytics',t:'🔬 电池分析 · 资产层 KPI',      refs:['Zitara','DNV','TÜV','Eatron']},
+  {k:'grid',    t:'🕸 电网 · 容量 / 接入数据',       refs:['Envelio','Depsys','Neara','Heimdall Power']},
+  {k:'v2g',     t:'🚗 V2G · 车网互动',              refs:['Wallbox Quasar','Fermata Energy','Voltfang','Ambibox','We Drive Solar']},
+  {k:'os30',    t:'🧭 软件定义能源 3.0 · 轨道',      refs:['Octopus Kraken']},
+  {k:'misc',    t:'➕ 临时新增 / 其他',              refs:[]}
 ];
 const CAT_OF={
   '1komma5':'hems','sonnen':'hems','gridx':'hems','kiwigrid':'hems',
@@ -577,10 +580,14 @@ async function renderList(){
   const pcArr=await Promise.all(fl.map(b=>countPhotos2(b.id)));
   const pcMap={}; fl.forEach((b,i)=>pcMap[b.id]=pcArr[i]);
   // 按类型大分类分组渲染
+  const defView = FILTER==='all' && !SEARCH;
   let html='';
-  CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length)return;
+  CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k);
+    const showRefs = defView && c.refs && c.refs.length;
+    if(!items.length && !showRefs) return;
     html+='<div class="cathead">'+c.t+'<span class="catn">'+items.length+'</span></div>';
-    if(c.ref) html+='<div class="catref">'+c.ref+'</div>';
+    if(showRefs) html+='<div class="catref"><b>热门参照</b>（点击 + 加入调研）：'
+      +c.refs.map(n=>'<span class="refchip" onclick="addRef(\''+n.replace(/'/g,'')+'\',\''+c.k+'\')">+ '+esc(n)+'</span>').join('')+'</div>';
     html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
   });
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
@@ -736,6 +743,19 @@ async function handleFiles(files,id){if(!files.length)return;toast(CLOUD?'上传
   toast(n+' 张已保存'+(n<files.length?'（'+(files.length-n)+' 张失败，检查网络）':''));openBooth(id);}
 
 function markDone(){bState(CURBOOTH).status='done';touchBooth(CURBOOTH);toast('已标记完成');go('list');}
+
+/* 点参照公司 → 现场加入调研（生成临时展位） */
+function addRef(name,catk){
+  const exist=(STATE.custom||[]).find(x=>x.name===name);
+  if(exist){ openBooth(exist.id); return; }
+  const line=(catk==='storage'||catk==='hems')?'A':(catk==='os30')?'C':'B';
+  const HQ={A:['A-H1','A-H2','A-H3'],B:['B-H1','B-H2','B-H3'],C:['C-H1','C-H2','C-H3']};
+  const id='ref_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  STATE.custom=STATE.custom||[];
+  STATE.custom.push({id,name,line,cat:catk,pri:0,hall:'',focus:'(参照对标 · 现场加入)',hyp:HQ[line],q:line==='A'?QA:line==='C'?QC:QB});
+  save(); if(CLOUD) cloudPushBooth(id); toast('已加入：'+name); openBooth(id);
+}
+window.addRef=addRef;
 
 /* ============================ 自动结论 ============================ */
 const OPEN_KW=['愿被集成','供底层','广泛他牌','跨品牌·广泛','跨品牌·部分','开放API','OpenEMS','可嫁接','认真做SMB','已被金融','(bankable)','愿用第三方中立层','含他牌','可授权/集成','可API接入','全自治交易','全打通','全周期含结算','完整可用','欢迎','按表现分成','SunSpec支持','高度碎片'];
