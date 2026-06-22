@@ -500,7 +500,9 @@ function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=an
       </div></button>`; }
 
 /* ---------- 云协作（Supabase 实时；未配置=纯本地） ---------- */
-let CLOUD=false, SB=null, EVENT='', ME=localStorage.getItem('scout_me')||'';
+let CLOUD=false, SB=null, EVENT='', ME=localStorage.getItem('scout_me')||'', OWNER=localStorage.getItem('scout_owner')==='1';
+function applyRole(){ const restricted=CLOUD&&!OWNER;
+  document.querySelectorAll('#nav button[data-v="dash"],#nav button[data-v="data"]').forEach(b=>{b.style.display=restricted?'none':'';}); }
 let PHOTOS=[]; // 云模式照片缓存 {id,boothId,by,cap,ts,path,url}
 const _pushT={};
 function getCfg(){ try{
@@ -613,7 +615,8 @@ function selCat(k){ CATSEL=k; renderList(); window.scrollTo(0,0); }
 window.toggleRef=toggleRef; window.toggleCat=toggleCat; window.selCat=selCat;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
-function go(v){CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
+function go(v){ if((v==='dash'||v==='data')&&CLOUD&&!OWNER) v='list';
+  CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   if(v==='list')renderList(); if(v==='conf')renderConf(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
@@ -984,6 +987,7 @@ $('#cloud-on')&&$('#cloud-on').addEventListener('click',()=>{
   const url=$('#cf-url').value.trim(),key=$('#cf-key').value.trim(),ev=$('#cf-ev').value.trim(),me=$('#cf-me').value.trim();
   if(!url||!key||!ev){alert('请填 Supabase URL / anon key / 活动代号');return;}
   if(me){ME=me;localStorage.setItem('scout_me',ME);}
+  localStorage.setItem('scout_owner','1'); // 用配置表单启用者=主持人
   setCfg(url,key,ev);toast('正在连接…');setTimeout(()=>location.reload(),300);});
 function ensureCfg(){ let c=getCfg();
   if(!c){ const url=($('#cf-url')&&$('#cf-url').value.trim()),key=($('#cf-key')&&$('#cf-key').value.trim()),ev=($('#cf-ev')&&$('#cf-ev').value.trim());
@@ -1015,7 +1019,7 @@ window.openBooth=openBooth;window.go=go;window.markDone=markDone;
 (async()=>{
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
   if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
-  renderList(); refreshCloudUI();
+  renderList(); refreshCloudUI(); applyRole();
 })();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
