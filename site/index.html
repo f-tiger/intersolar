@@ -63,8 +63,9 @@
     padding:13px 14px;margin-bottom:10px;display:block;width:100%;text-align:left;color:inherit;box-shadow:0 1px 2px rgba(16,24,40,.05)}
   .card:active{background:var(--panel);transform:scale(.995);box-shadow:0 4px 14px rgba(16,24,40,.1)}
   .card .top{display:flex;align-items:flex-start;gap:8px}
-  .card .nm{font-weight:700;font-size:15.5px;flex:1}
-  .card .nm .cn{font-size:12px;color:var(--mut);font-weight:600;margin-left:2px}
+  .card .nm{font-weight:700;font-size:16px;flex:1;line-height:1.35;letter-spacing:.1px}
+  .card .nm .cn{font-size:12px;color:var(--mut);font-weight:600;margin-left:3px}
+  .chip.ref{background:var(--panel2);color:var(--mut)}
   .chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
   .chip.A{background:rgba(99,102,241,.14);color:#4338ca}
   .chip.B{background:rgba(14,165,233,.14);color:#0369a1}
@@ -467,6 +468,8 @@ const CAT_OF={
   'volytica':'analytics','twaice':'analytics','blindleister':'grid','mobilityhouse':'v2g','c30-synth':'os30'
 };
 function catOf(b){ return b.cat || CAT_OF[b.id] || 'misc'; }
+const CAT_COLOR={storage:'#16a34a',hems:'#2563eb',ci:'#d97706',vpp:'#7c3aed',analytics:'#0d9488',grid:'#475569',v2g:'#e11d48',os30:'#4f46e5',misc:'#64748b'};
+function catColor(b){ return CAT_COLOR[catOf(b)]||'#64748b'; }
 const CN_NAME={
   '1komma5':'德国·光储VPP','sonnen':'德国·户储+VPP','gridx':'德国·EMS平台','kiwigrid':'德国·VPP平台',
   'marstek':'深圳·即插即用/阳台储能','ecoflow':'正浩·便携/户储','anker':'安克·户储','zendure':'征拓·阳台储能','sigenergy':'储能+EMS(前华为团队)',
@@ -483,13 +486,12 @@ const CN_NAME={
   'Wallbox':'西班牙·充电+V2G','Voltfang':'德国·梯次储能','Ambibox':'德国·V2G/充电'
 };
 function cnOf(b){ return CN_NAME[b.id]||CN_NAME[b.name]||''; }
-function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=ansCount(s);const cn=cnOf(b);
+function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=ansCount(s);const cn=cnOf(b);const col=catColor(b);
   const stTxt={todo:'未开始',doing:'进行中',done:'已完成'}[st];
-  return `<button class="card" onclick="openBooth('${b.id}')">
+  return `<button class="card" onclick="openBooth('${b.id}')" style="border-left:4px solid ${col}">
       <div class="top"><div class="nm">${esc(b.name)}${cn?' <span class="cn">'+esc(cn)+'</span>':''}</div>
         ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
-        ${(b.ref&&!(s.hall||b.hall))?'<span class="chip" style="background:var(--panel2);color:var(--mut)">对标</span>':''}
-        <span class="chip ${b.line}">${b.line==='A'?'户储':b.line==='B'?'工商储':b.line==='C'?'3.0':'通用'}</span></div>
+        ${(b.ref&&!(s.hall||b.hall))?'<span class="chip ref">对标</span>':''}</div>
       <div class="focus">${esc(b.focus)}</div>
       <div class="meta">
         <span><i class="dot st-${st}"></i>${stTxt}</span>
@@ -656,7 +658,7 @@ async function renderList(){
   shown.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
     items.sort((a,b)=> ((hallOf(b)?1:0)-(hallOf(a)?1:0)) || ((b.pri||0)-(a.pri||0)) || ((a.ref?1:0)-(b.ref?1:0)) );
     const folded = !single && !!OPEN_CAT[c.k] && !SEARCH;
-    html+='<div class="cathead" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+items.length+'</span>'+(single?'':'<span class="catchev">'+(folded?'▸':'▾')+'</span>')+'</div>';
+    html+='<div class="cathead" style="border-left-color:'+(CAT_COLOR[c.k]||'#64748b')+'" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+items.length+'</span>'+(single?'':'<span class="catchev">'+(folded?'▸':'▾')+'</span>')+'</div>';
     if(folded) return;
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
     html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
