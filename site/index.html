@@ -422,6 +422,10 @@ const SEED = [
   {id:'mobilityhouse',name:'The Mobility House',line:'B',pri:1,hall:'B6.510',focus:'多OEM V2G平台，入围。V2G是否纳入优化对象',hyp:['B-H1','C-H1'],q:QB,qx:[
     {q:'V2G 愿被第三方轨道调用吗？',multi:false,h:'C-H1',o:['愿意','仅自家','不确定']},
     {q:'多 OEM 覆盖广度？',multi:false,o:['广','有限','不确定']}]},
+  {id:'tesvolt',name:'Tesvolt',line:'B',pri:0,cat:'ci',hall:'B2.110',focus:'德国 C&I 储能龙头(AWARD 常客)。直接对标工商储',hyp:['B-H1','B-H3'],q:QB},
+  {id:'alfen',name:'Alfen',line:'B',pri:0,cat:'ci',hall:'B2.210 (EV另B6.680)',focus:'荷兰·储能+EV充电+电网变电一体。C&I储能+电网边界',hyp:['B-H1'],q:QB},
+  {id:'intilion',name:'Intilion',line:'B',pri:0,cat:'ci',hall:'',focus:'德国 C&I/大储系统(HOPPECKE 系)。展位号待现场/App 查',hyp:['B-H1'],q:QB},
+  {id:'sympower',name:'Sympower',line:'B',pri:0,cat:'vpp',hall:'',focus:'荷兰·需求响应聚合(欧洲多国)。展位号待现场/App 查',hyp:['B-H2','C-H1'],q:QB},
   {id:'eon',name:'E.ON',line:'B',pri:0,cat:'vpp',hall:'C5.630',focus:'德国能源巨头/零售商(持股 gridX)。潜在客户/被集成方：动态电价+VPP+白标',hyp:['B-H2','C-H1'],q:QB},
   // ===== C 线：软件未来方向（看方向 + 对着竞对调研） =====
   {id:'dir-agentic',name:'方向① AI 自治交易/调度',line:'C',pri:1,cat:'os30',hall:'',focus:'软件从"给建议"→"自己决策+自动交易/对冲"。去看竞对：Suena、Entrix、enspired、GridBeyond、Kraken',hyp:['C-H1'],q:QD},
@@ -495,10 +499,23 @@ const CAT_COLOR={storage:'#16a34a',hems:'#2563eb',ci:'#d97706',vpp:'#7c3aed',ana
 function catColor(b){ return CAT_COLOR[catOf(b)]||'#64748b'; }
 // 储能分类·市场规模权重（越大越靠前；用于排序与重新打"优先"标，仅 storage 分类生效）
 const RANK={
+  // 🔋 储能硬件
   r_byd:100, deye:96, r_growatt:94, r_goodwe:92, r_solaredge:90, r_enphase:88, r_tesla:87, solax:86, solis:84, r_pylontech:83, sofar:80,
-  r_foxess:76, alphaess:75, sigenergy:74, anker:70, dyness:66, hoymiles:64, kstar:60, marstek:58, saj:56, solplanet:54, zendure:50
+  r_foxess:76, alphaess:75, sigenergy:74, anker:70, dyness:66, hoymiles:64, kstar:60, marstek:58, saj:56, solplanet:54, zendure:50,
+  // 🏠 户用软件 HEMS
+  r_sma:92, gridx:90, '1komma5':88, sonnen:86, kiwigrid:85, r_solarwatt:70, r_loxone:60, r_voltware:40,
+  // ⚡ 工商储 EMS
+  sungrow:95, huawei:94, r_fluence:90, alfen:86, tesvolt:85, fenecon:78, coneva:76, intilion:72, simpl:60, lumera:58, r_ammp:55, r_wattstor:52,
+  // 📈 VPP/聚合/交易
+  eon:95, nextkraftwerke:90, entrix:85, tibber:78, gridbeyond:72, sympower:66, suena:62,
+  // 🔬 电池分析
+  twaice:86, r_dnv:75, volytica:72,
+  // 🕸 电网
+  blindleister:70,
+  // 🚗 V2G
+  r_wallbox:88, mobilityhouse:85, r_voltfang:55
 };
-function isPri(b){ return catOf(b)==='storage' ? ((RANK[b.id]||0)>=85) : (b.pri===1); }
+function isPri(b){ const r=RANK[b.id]; return r!=null ? r>=85 : (b.pri===1); }
 const CN_NAME={
   '1komma5':'德国·光储VPP','sonnen':'德国·户储+VPP','gridx':'德国·EMS平台','kiwigrid':'德国·VPP平台',
   'marstek':'深圳·即插即用/阳台储能','ecoflow':'正浩·便携/户储','anker':'安克·户储','zendure':'征拓·阳台储能','sigenergy':'储能+EMS(前华为团队)',
@@ -513,7 +530,8 @@ const CN_NAME={
   'Zitara':'美国·电池软件','Eatron':'英国·电池AI(BMS)','DNV':'挪威·认证/咨询',
   'Envelio':'德国·配网智能','Depsys':'瑞士·配网监测','Neara':'澳洲·电网三维建模','Heimdall Power':'挪威·电网传感',
   'Wallbox':'西班牙·充电+V2G','Voltfang':'德国·梯次储能','Ambibox':'德国·V2G/充电',
-  'Deye':'德业 · 宁波(混合/储能逆变)','SolaX Power':'浙江 · 混合储能逆变','SOFAR':'首航新能源','Solis (Ginlong)':'锦浪科技','Hoymiles':'禾迈 · 微逆/储能','AlphaESS':'安徽 · 户储系统','Dyness':'户储电池品牌','KSTAR':'科士达','SAJ':'三晶电气','Solplanet':'AISWEI · 上海','E.ON':'德国 · 能源巨头/零售商'
+  'Deye':'德业 · 宁波(混合/储能逆变)','SolaX Power':'浙江 · 混合储能逆变','SOFAR':'首航新能源','Solis (Ginlong)':'锦浪科技','Hoymiles':'禾迈 · 微逆/储能','AlphaESS':'安徽 · 户储系统','Dyness':'户储电池品牌','KSTAR':'科士达','SAJ':'三晶电气','Solplanet':'AISWEI · 上海','E.ON':'德国 · 能源巨头/零售商',
+  'Tesvolt':'德国 · 工商储龙头','Alfen':'荷兰 · 储能+EV+电网','Intilion':'德国 · C&I/大储(HOPPECKE系)'
 };
 function cnOf(b){ return CN_NAME[b.id]||CN_NAME[b.name]||''; }
 function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=ansCount(s);const cn=cnOf(b);const col=catColor(b);
