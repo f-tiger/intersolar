@@ -197,6 +197,20 @@
   <!-- DATA VIEW -->
   <section id="view-data" class="hidden">
     <div class="sec">
+      <h3>☁️ 多人实时协作（可选）</h3>
+      <p class="muted" id="cloud-status">当前：本地模式（数据仅存本机）。配置 Supabase 后可与同事实时共享、照片自动入云。</p>
+      <label class="fld">Supabase URL</label><input type="text" id="cf-url" placeholder="https://xxxx.supabase.co">
+      <label class="fld">anon public key（公开密钥）</label><input type="text" id="cf-key" placeholder="eyJhbGci...">
+      <label class="fld">活动代号（同代号=同一份数据）</label><input type="text" id="cf-ev" placeholder="如 intersolar2026">
+      <label class="fld">你的名字（拍照/填写署名）</label><input type="text" id="cf-me" placeholder="你的名字">
+      <div class="btnrow">
+        <button class="btn green" id="cloud-on">启用 / 连接实时协作</button>
+        <button class="btn sec2" id="cloud-share">复制分享链接给同事</button>
+      </div>
+      <button class="btn ghost" id="cloud-off" style="margin-top:8px;width:100%">退出云模式（回本地，本地数据保留）</button>
+      <p class="muted" style="font-size:11px;margin-top:8px">分享链接已含连接配置，同事点开即连同一份数据、各自填名字即可。⚠️ 现场 wifi 不稳时照片上传可能失败，可改用下方"导出/合并导入"兜底。临时新增的展位仅本机可见。</p>
+    </div>
+    <div class="sec">
       <h3>📦 归档导出</h3>
       <p class="muted">数据保存在本机浏览器（localStorage + IndexedDB）。导出后可永久归档、跨设备迁移。建议每天结束导出一次。</p>
       <div class="btnrow">
@@ -330,21 +344,101 @@ function save(){ localStorage.setItem(LS_KEY, JSON.stringify(STATE)); }
 function allBooths(){ return [...SEED, ...(STATE.custom||[])]; }
 function bState(id){ if(!STATE.booths[id]) STATE.booths[id]={status:'todo',hall:'',notes:'',answers:{},hyp:{}}; return STATE.booths[id]; }
 
-/* IndexedDB for photos */
+/* ---------- 云协作（Supabase 实时；未配置=纯本地） ---------- */
+let CLOUD=false, SB=null, EVENT='', ME=localStorage.getItem('scout_me')||'';
+let PHOTOS=[]; // 云模式照片缓存 {id,boothId,by,cap,ts,path,url}
+const _pushT={};
+function getCfg(){ try{
+  let raw=null; const h=location.hash.match(/cfg=([^&]+)/);
+  if(h){ raw=decodeURIComponent(escape(atob(decodeURIComponent(h[1])))); localStorage.setItem('scout_cfg',raw); }
+  else raw=localStorage.getItem('scout_cfg');
+  return raw?JSON.parse(raw):null;
+}catch(e){ return null; } }
+function setCfg(url,key,ev){ localStorage.setItem('scout_cfg',JSON.stringify({url,key,ev})); }
+function shareLink(){ const c=getCfg(); if(!c)return'';
+  return location.origin+location.pathname+'#cfg='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(c))))); }
+function hasData(s){ return !!(s&&(s.hall||s.notes||(s.status&&s.status!=='todo')||Object.keys(s.answers||{}).length||Object.keys(s.hyp||{}).length)); }
+async function initCloud(){
+  const c=getCfg(); if(!c||!c.url||!c.key||!c.ev) return false;
+  try{
+    const m=await import('https://esm.sh/@supabase/supabase-js@2');
+    SB=m.createClient(c.url,c.key); EVENT=c.ev; CLOUD=true;
+    if(!ME){ ME=((prompt('你的名字（标注谁拍/谁填）：')||'').trim())||'匿名'; localStorage.setItem('scout_me',ME); }
+    const {data:bs,error:e1}=await SB.from('booth_state').select('*').eq('event',EVENT); if(e1) throw e1;
+    const pulled=new Set(); (bs||[]).forEach(r=>{ if(r.booth_id&&r.data){ STATE.booths[r.booth_id]=r.data; pulled.add(r.booth_id); } });
+    save();
+    const {data:ps,error:e2}=await SB.from('photos').select('*').eq('event',EVENT).order('ts',{ascending:true}); if(e2) throw e2;
+    PHOTOS=(ps||[]).map(r=>({id:r.id,boothId:r.booth_id,by:r.by,cap:r.caption||'',ts:r.ts,path:r.path,
+      url:SB.storage.from('photos').getPublicUrl(r.path).data.publicUrl}));
+    subscribeRT();
+    // 首次连接：把本机已有、云端还没有的展位数据迁移上云（不覆盖云端较新数据）
+    Object.keys(STATE.booths||{}).forEach(id=>{ if(!pulled.has(id)&&hasData(STATE.booths[id])) cloudPushBooth(id); });
+    return true;
+  }catch(err){ console.warn('云端初始化失败，回退本地：',err); CLOUD=false; SB=null; toast('云端连接失败，已用本地模式'); return false; }
+}
+function subscribeRT(){
+  SB.channel('scout-rt')
+    .on('postgres_changes',{event:'*',schema:'public',table:'booth_state',filter:'event=eq.'+EVENT},p=>{
+      const r=p.new; if(!r||!r.booth_id||p.eventType==='DELETE') return;
+      STATE.booths[r.booth_id]=r.data; save();
+      if(CUR==='list')renderList(); else if(CUR==='dash')renderDash();
+      else if(CUR==='detail'&&CURBOOTH===r.booth_id&&r.updated_by&&r.updated_by!==ME) toast((r.updated_by||'他人')+' 更新了本展位');
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'photos',filter:'event=eq.'+EVENT},p=>{
+      if(p.eventType==='INSERT'){ const r=p.new; if(!PHOTOS.find(x=>x.id===r.id))
+        PHOTOS.push({id:r.id,boothId:r.booth_id,by:r.by,cap:r.caption||'',ts:r.ts,path:r.path,
+          url:SB.storage.from('photos').getPublicUrl(r.path).data.publicUrl}); }
+      else if(p.eventType==='DELETE'){ PHOTOS=PHOTOS.filter(x=>x.id!==(p.old&&p.old.id)); }
+      if(CUR==='list')renderList(); else if(CUR==='detail')renderPhotos(PHOTOS.filter(x=>x.boothId===CURBOOTH));
+    })
+    .subscribe();
+}
+function touchBooth(id){ save(); if(CLOUD&&SB){ clearTimeout(_pushT[id]); _pushT[id]=setTimeout(()=>cloudPushBooth(id),500); } }
+async function cloudPushBooth(id){ try{
+  const {error}=await SB.from('booth_state').upsert({event:EVENT,booth_id:id,data:bState(id),updated_by:ME,updated_at:new Date().toISOString()},{onConflict:'event,booth_id'});
+  if(error) throw error;
+}catch(err){ console.warn('同步失败',err); toast('同步失败，稍后重试'); } }
+
+/* IndexedDB for photos（本地模式） */
 let DB;
 function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('intersolar_photos',1);
   r.onupgradeneeded=e=>{const db=e.target.result; if(!db.objectStoreNames.contains('photos')){
     const s=db.createObjectStore('photos',{keyPath:'id',autoIncrement:true}); s.createIndex('booth','boothId');}};
   r.onsuccess=e=>{DB=e.target.result;res(DB)}; r.onerror=e=>rej(e);});}
 function txStore(mode){return DB.transaction('photos',mode).objectStore('photos');}
-function addPhoto(p){return new Promise((res,rej)=>{const r=txStore('readwrite').add(p);r.onsuccess=()=>res(r.result);r.onerror=rej;});}
-function delPhoto(id){return new Promise((res,rej)=>{const r=txStore('readwrite').delete(id);r.onsuccess=res;r.onerror=rej;});}
-function photosOf(boothId){return new Promise((res,rej)=>{const out=[];const idx=txStore('readonly').index('booth');
+function _idbAdd(p){return new Promise((res,rej)=>{const r=txStore('readwrite').add(p);r.onsuccess=()=>res(r.result);r.onerror=rej;});}
+function _idbDel(id){return new Promise((res,rej)=>{const r=txStore('readwrite').delete(id);r.onsuccess=res;r.onerror=rej;});}
+function _idbOf(boothId){return new Promise((res,rej)=>{const out=[];const idx=txStore('readonly').index('booth');
   const r=idx.openCursor(IDBKeyRange.only(boothId));r.onsuccess=e=>{const c=e.target.result;if(c){out.push(c.value);c.continue()}else res(out)};r.onerror=rej;});}
-function allPhotos(){return new Promise((res,rej)=>{const out=[];const r=txStore('readonly').openCursor();
+function _idbAll(){return new Promise((res,rej)=>{const out=[];const r=txStore('readonly').openCursor();
   r.onsuccess=e=>{const c=e.target.result;if(c){out.push(c.value);c.continue()}else res(out)};r.onerror=rej;});}
-function countPhotos(){return new Promise((res)=>{const r=txStore('readonly').count();r.onsuccess=()=>res(r.result);});}
+function _idbCount(){return new Promise((res)=>{const r=txStore('readonly').count();r.onsuccess=()=>res(r.result);});}
 function clearPhotos(){return new Promise((res,rej)=>{const r=txStore('readwrite').clear();r.onsuccess=res;r.onerror=rej;});}
+
+/* 统一照片接口：云端→Supabase Storage；本地→IndexedDB */
+async function addPhoto(p){ // p:{boothId,blob,cap,ts}
+  if(CLOUD&&SB){
+    const id=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now()+'-'+Math.random().toString(16).slice(2));
+    const path=EVENT+'/'+p.boothId+'/'+id+'.jpg';
+    const up=await SB.storage.from('photos').upload(path,p.blob,{contentType:'image/jpeg',upsert:true}); if(up.error) throw up.error;
+    const ins=await SB.from('photos').insert({id,event:EVENT,booth_id:p.boothId,path,caption:p.cap||'',by:ME,ts:p.ts||Date.now()}); if(ins.error) throw ins.error;
+    PHOTOS.push({id,boothId:p.boothId,by:ME,cap:p.cap||'',ts:p.ts||Date.now(),path,url:SB.storage.from('photos').getPublicUrl(path).data.publicUrl});
+    return id;
+  }
+  return _idbAdd(p);
+}
+async function delPhoto(id){
+  if(CLOUD&&SB){ const ph=PHOTOS.find(x=>x.id===id);
+    const d=await SB.from('photos').delete().eq('id',id); if(d.error) throw d.error;
+    if(ph) await SB.storage.from('photos').remove([ph.path]).catch(()=>{});
+    PHOTOS=PHOTOS.filter(x=>x.id!==id); return;
+  }
+  return _idbDel(id);
+}
+function photosOf(boothId){ return CLOUD?Promise.resolve(PHOTOS.filter(x=>x.boothId===boothId)):_idbOf(boothId); }
+function allPhotos(){ return CLOUD?Promise.resolve(PHOTOS.slice()):_idbAll(); }
+function countPhotos(){ return CLOUD?Promise.resolve(PHOTOS.length):_idbCount(); }
+function photoBlob(p){ return p.blob?Promise.resolve(p.blob):fetch(p.url).then(r=>r.blob()); }
 
 /* 图片压缩 */
 function compress(file){return new Promise(res=>{const img=new Image();const url=URL.createObjectURL(file);
@@ -359,7 +453,7 @@ const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
 function go(v){CUR=v;['list','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  if(v==='list')renderList(); if(v==='dash')renderDash(); window.scrollTo(0,0);}
+  if(v==='list')renderList(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
 function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
@@ -463,14 +557,14 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
   renderPhotos(photos);
   renderQ(b,s);
   // bindings
-  $('#f-hall').addEventListener('input',e=>{bState(id).hall=e.target.value;save();});
-  $('#f-status').addEventListener('change',e=>{bState(id).status=e.target.value;save();});
-  $('#f-notes').addEventListener('input',e=>{bState(id).notes=e.target.value;save();});
+  $('#f-hall').addEventListener('input',e=>{bState(id).hall=e.target.value;touchBooth(id);});
+  $('#f-status').addEventListener('change',e=>{bState(id).status=e.target.value;touchBooth(id);});
+  $('#f-notes').addEventListener('input',e=>{bState(id).notes=e.target.value;touchBooth(id);});
   $('#cap').addEventListener('change',e=>handleFiles(e.target.files,id));
   $('#pick').addEventListener('change',e=>handleFiles(e.target.files,id));
   v.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;
     const h=seg.dataset.h,val=btn.dataset.val;const cur=bState(id).hyp[h];
-    bState(id).hyp[h]=(cur===val)?'':val;save();
+    bState(id).hyp[h]=(cur===val)?'':val;touchBooth(id);
     seg.querySelectorAll('button').forEach(x=>{x.className='';if(x.dataset.val===bState(id).hyp[h])x.className=x.dataset.val;});}));
 }
 
@@ -491,31 +585,32 @@ function renderQ(b,s){$('#qlist').innerHTML=b.q.map((q,i)=>{const a=s.answers[i]
   $$('#qlist .q').forEach(el=>{const i=el.dataset.i;
     if(el.dataset.t==='s'){
       el.querySelector('input').addEventListener('change',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
-        s2.answers[i].checked=e.target.checked;save();el.classList.toggle('checked',e.target.checked);});
+        s2.answers[i].checked=e.target.checked;touchBooth(CURBOOTH);el.classList.toggle('checked',e.target.checked);});
     }else{
       const multi=el.dataset.multi==='1';
       el.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>{
         const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};let arr=s2.answers[i].opts||[];const o=btn.dataset.o;
         if(arr.includes(o))arr=arr.filter(x=>x!==o); else if(multi)arr.push(o); else arr=[o];
-        s2.answers[i].opts=arr;save();
+        s2.answers[i].opts=arr;touchBooth(CURBOOTH);
         el.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',arr.includes(x.dataset.o)));
         const done=isAns(s2.answers[i]);el.classList.toggle('answered',done);
         el.querySelector('.qt2').innerHTML=(done?'✓ ':'')+esc(qText(b.q[i]))+(multi?' <span class="muted" style="font-size:10.5px">·可多选</span>':'');}));
     }
     el.querySelector('textarea').addEventListener('input',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
-      s2.answers[i].text=e.target.value;save();el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));});});}
+      s2.answers[i].text=e.target.value;touchBooth(CURBOOTH);el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));});});}
 
-function renderPhotos(photos){const g=$('#pgrid');if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片，点下方拍照或上传</p>';return;}
-  g.innerHTML='';photos.forEach(p=>{const url=URL.createObjectURL(p.blob);const d=document.createElement('div');d.className='ph';
-    d.innerHTML=`<img src="${url}" onclick="window.open('${url}')"><button class="del">×</button>${p.cap?'<div class="cap">'+esc(p.cap)+'</div>':''}`;
-    d.querySelector('.del').addEventListener('click',async()=>{if(confirm('删除这张照片？')){await delPhoto(p.id);openBooth(CURBOOTH);}});
+function renderPhotos(photos){const g=$('#pgrid');if(!g)return;if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片，点下方拍照或上传</p>';return;}
+  g.innerHTML='';photos.forEach(p=>{const url=p.url||URL.createObjectURL(p.blob);const d=document.createElement('div');d.className='ph';
+    const cap=[p.by?('👤'+p.by):'',p.cap||''].filter(Boolean).join(' · ');
+    d.innerHTML=`<img src="${url}" onclick="window.open('${url}')"><button class="del">×</button>${cap?'<div class="cap">'+esc(cap)+'</div>':''}`;
+    d.querySelector('.del').addEventListener('click',async()=>{if(confirm('删除这张照片？')){try{await delPhoto(p.id);}catch(e){toast('删除失败');}openBooth(CURBOOTH);}});
     g.appendChild(d);});}
 
-async function handleFiles(files,id){if(!files.length)return;toast('处理中…');
-  for(const f of files){const blob=await compress(f);await addPhoto({boothId:id,blob,cap:'',ts:Date.now()});}
-  toast('已保存 '+files.length+' 张');openBooth(id);}
+async function handleFiles(files,id){if(!files.length)return;toast(CLOUD?'上传中…':'处理中…');
+  let n=0;for(const f of files){try{const blob=await compress(f);await addPhoto({boothId:id,blob,cap:'',ts:Date.now()});n++;}catch(err){console.warn('照片失败',err);}}
+  toast(n+' 张已保存'+(n<files.length?'（'+(files.length-n)+' 张失败，检查网络）':''));openBooth(id);}
 
-function markDone(){bState(CURBOOTH).status='done';save();toast('已标记完成');go('list');}
+function markDone(){bState(CURBOOTH).status='done';touchBooth(CURBOOTH);toast('已标记完成');go('list');}
 
 /* ============================ 验证看板 ============================ */
 function renderDash(){
@@ -552,20 +647,32 @@ function renderDash(){
 function blobToDataURL(b){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b);});}
 
 $('#exp-json').addEventListener('click',async()=>{toast('生成中…');
-  const photos=await allPhotos();const ph=[];for(const p of photos){ph.push({boothId:p.boothId,cap:p.cap,ts:p.ts,data:await blobToDataURL(p.blob)});}
+  const photos=await allPhotos();const ph=[];for(const p of photos){ph.push({boothId:p.boothId,cap:p.cap,ts:p.ts,by:p.by||'',data:await blobToDataURL(await photoBlob(p))});}
   const out={app:'intersolar-booth-scout',v:2,exportedAt:new Date().toISOString(),state:STATE,photos:ph};
   download('intersolar-backup-'+stamp()+'.json',JSON.stringify(out),'application/json');});
 
+function mergeBooth(a,b){ a=a||{status:'todo',hall:'',notes:'',answers:{},hyp:{}}; b=b||{};
+  const out={status:(b.status&&b.status!=='todo')?b.status:(a.status||'todo'), hall:b.hall||a.hall||'',
+    notes:[a.notes,b.notes].filter(Boolean).join((a.notes&&b.notes)?'\n— — —\n':''), answers:Object.assign({},a.answers), hyp:Object.assign({},a.hyp,b.hyp)};
+  Object.keys(b.answers||{}).forEach(i=>{ out.answers[i]=isAns(b.answers[i])?b.answers[i]:(a.answers&&a.answers[i]||b.answers[i]); });
+  return out; }
 $('#imp-json').addEventListener('click',()=>$('#impfile').click());
 $('#impfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
-  try{const j=JSON.parse(await f.text());if(j.state){STATE=j.state;save();}
-    if(j.photos){await clearPhotos();for(const p of j.photos){const blob=await(await fetch(p.data)).blob();
-      await addPhoto({boothId:p.boothId,blob,cap:p.cap||'',ts:p.ts||Date.now()});}}
-    toast('已恢复');go('list');}catch(err){alert('导入失败：'+err.message);}});
+  try{const j=JSON.parse(await f.text());
+    const merge = CLOUD ? true : confirm('如何导入？\n\n【确定】= 合并到现有数据（汇总多人时用）\n【取消】= 覆盖现有数据');
+    if(j.state){
+      if(merge){ const inc=j.state.booths||{}; Object.keys(inc).forEach(id=>{STATE.booths[id]=mergeBooth(STATE.booths[id],inc[id]);});
+        (j.state.custom||[]).forEach(c=>{ if(!(STATE.custom||[]).find(x=>x.id===c.id)&&!SEED.find(x=>x.id===c.id)){STATE.custom=STATE.custom||[];STATE.custom.push(c);} }); }
+      else { STATE=j.state; }
+      save(); if(CLOUD) Object.keys(STATE.booths).forEach(id=>cloudPushBooth(id));
+    }
+    if(j.photos){ if(!merge&&!CLOUD) await clearPhotos();
+      for(const p of j.photos){const blob=await(await fetch(p.data)).blob(); await addPhoto({boothId:p.boothId,blob,cap:p.cap||'',ts:p.ts||Date.now()});} }
+    toast(merge?'已合并':'已恢复');go('list');}catch(err){alert('导入失败：'+err.message);}});
 
 $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…');
   const photos=await allPhotos();const byB={};for(const p of photos){(byB[p.boothId]=byB[p.boothId]||[]).push(p);}
-  const datas={};for(const p of photos){datas[p.id]=await blobToDataURL(p.blob);}
+  const datas={};for(const p of photos){datas[p.id]=await blobToDataURL(await photoBlob(p));}
   let body='';
   for(const b of allBooths()){const s=bState(b.id);const ps=byB[b.id]||[];
     const ans=b.q.map((q,i)=>{const a=s.answers[i]||{};if(!isAns(a))return'';
@@ -603,6 +710,22 @@ $('#addbooth').addEventListener('click',()=>{const name=prompt('展位名称：'
   STATE.custom.push({id,name,line:L,pri:0,hall:'',focus:'(临时新增)',hyp:[],q:L==='A'?QA:L==='B'?QB:['现场要点1','现场要点2','现场要点3']});
   save();openBooth(id);});
 
+/* ============================ 云协作 UI ============================ */
+function refreshCloudUI(){ const c=getCfg(); const st=$('#cloud-status'); if(!st)return;
+  if(CLOUD){ st.innerHTML='✅ 实时协作中 · 活动 <b>'+esc(EVENT)+'</b> · 你是 <b>'+esc(ME)+'</b>（改动自动同步）'; }
+  else if(c){ st.innerHTML='⚠️ 已配置但未连接，<b>刷新页面</b>即可连接。'; }
+  else { st.textContent='当前：本地模式（数据仅存本机）。配置 Supabase 后可与同事实时共享、照片自动入云。'; }
+  if(c){ if($('#cf-url'))$('#cf-url').value=c.url||''; if($('#cf-key'))$('#cf-key').value=c.key||''; if($('#cf-ev'))$('#cf-ev').value=c.ev||''; }
+  if($('#cf-me'))$('#cf-me').value=ME||''; }
+$('#cloud-on')&&$('#cloud-on').addEventListener('click',()=>{
+  const url=$('#cf-url').value.trim(),key=$('#cf-key').value.trim(),ev=$('#cf-ev').value.trim(),me=$('#cf-me').value.trim();
+  if(!url||!key||!ev){alert('请填 Supabase URL / anon key / 活动代号');return;}
+  if(me){ME=me;localStorage.setItem('scout_me',ME);}
+  setCfg(url,key,ev);toast('正在连接…');setTimeout(()=>location.reload(),300);});
+$('#cloud-share')&&$('#cloud-share').addEventListener('click',async()=>{const l=shareLink();if(!l){alert('请先填配置并启用');return;}
+  try{await navigator.clipboard.writeText(l);toast('分享链接已复制');}catch(e){prompt('复制此链接发给同事：',l);}});
+$('#cloud-off')&&$('#cloud-off').addEventListener('click',()=>{if(confirm('退出云模式、回到本地？（本地数据保留）')){localStorage.removeItem('scout_cfg');location.hash='';location.reload();}});
+
 /* ============================ 工具 ============================ */
 function esc(s){return(s==null?'':String(s)).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function download(name,content,type){const b=new Blob([content],{type});const u=URL.createObjectURL(b);
@@ -613,7 +736,11 @@ let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('sh
 window.openBooth=openBooth;window.go=go;window.markDone=markDone;
 
 /* 启动 */
-openDB().then(()=>renderList()).catch(()=>renderList());
+(async()=>{
+  try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
+  if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
+  renderList(); refreshCloudUI();
+})();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
 </body>
