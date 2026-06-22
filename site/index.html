@@ -107,6 +107,9 @@
   .refchip{display:inline-block;background:var(--panel);border:1px solid var(--line);color:var(--acc);
     font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;margin:4px 5px 0 0}
   .refchip:active{background:var(--panel2)}
+  .refToggle{width:100%;background:var(--panel2);border:1px dashed var(--line);color:var(--mut);
+    padding:11px;border-radius:10px;font-size:13px;font-weight:700;margin:0 0 16px}
+  .refToggle:active{background:var(--panel)}
   .opts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
   .opt{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
     padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:600}
@@ -569,7 +572,9 @@ function compress(file){return new Promise(res=>{const img=new Image();const url
   img.onerror=()=>{URL.revokeObjectURL(url);res(file)};img.src=url;});}
 
 /* ============================ 渲染 ============================ */
-let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='';
+let CUR='list', CURBOOTH=null, FILTER='all', SEARCH='', OPEN_REF={};
+function toggleRef(k){ OPEN_REF[k]=!OPEN_REF[k]; renderList(); }
+window.toggleRef=toggleRef;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
 function go(v){CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
@@ -605,11 +610,16 @@ async function renderList(){
   // 按类型大分类分组渲染
   let html='';
   CATS.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
-    items.sort((a,b)=>((a.ref?1:0)-(b.ref?1:0))||((b.pri||0)-(a.pri||0)));
-    html+='<div class="cathead">'+c.t+'<span class="catn">'+items.length+'</span></div>';
+    const conf=items.filter(b=>!b.ref).sort((a,b)=>(b.pri||0)-(a.pri||0));
+    const refs=items.filter(b=>b.ref);
+    html+='<div class="cathead">'+c.t+'<span class="catn">'+conf.length+'</span></div>';
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
-    html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
-    html+='<button class="addbtn" style="margin:2px 0 18px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
+    html+=conf.map(b=>cardHtml(b,pcMap[b.id])).join('');
+    html+='<button class="addbtn" style="margin:2px 0 12px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
+    if(refs.length){ const open=OPEN_REF[c.k]||!!SEARCH;
+      html+='<button class="refToggle" onclick="toggleRef(\''+c.k+'\')">'+(open?'▾ 收起对标参照':'▸ 展开对标参照 '+refs.length+' 家')+'</button>';
+      if(open) html+='<div style="margin-bottom:16px">'+refs.map(b=>cardHtml(b,pcMap[b.id])).join('')+'</div>';
+    }
   });
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
 }
