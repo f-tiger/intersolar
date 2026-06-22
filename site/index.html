@@ -1015,6 +1015,15 @@ function pad(n){return String(n).padStart(2,'0');}
 let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
 window.openBooth=openBooth;window.go=go;window.markDone=markDone;
 
+/* 长按标题 ≈0.6s 切换"主持人模式"（显示/隐藏 验证看板·数据归档） */
+(function(){const el=document.querySelector('.hbar h1'); if(!el)return; let t=null;
+  const start=()=>{ t=setTimeout(()=>{ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'1':'0'); applyRole();
+    toast(OWNER?'已开启主持人模式':'已关闭主持人模式'); if(!OWNER&&(CUR==='dash'||CUR==='data'))go('list'); },600); };
+  const cancel=()=>{ if(t){clearTimeout(t);t=null;} };
+  el.addEventListener('touchstart',start,{passive:true}); el.addEventListener('touchend',cancel); el.addEventListener('touchmove',cancel);
+  el.addEventListener('mousedown',start); el.addEventListener('mouseup',cancel); el.addEventListener('mouseleave',cancel);
+})();
+
 /* 启动 */
 (async()=>{
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
