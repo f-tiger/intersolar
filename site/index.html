@@ -461,10 +461,27 @@ const LINE_OF_CAT={storage:'A',hems:'A',ci:'B',vpp:'B',analytics:'B',grid:'B',v2
 const HYP_OF_LINE={A:['A-H1','A-H2','A-H3'],B:['B-H1','B-H2','B-H3'],C:['C-H1','C-H2','C-H3']};
 const REF_HALL={'SMA':'B3.210','Wallbox':'B6.320','GoodWe':'B4.210','Growatt':'B3.230','Enphase':'C5.530','Solarwatt':'C5.640','Fox ESS':'B1.210','BYD':'B1.131','Pylontech':'B1.350','Fluence':'C2.140','SolarEdge':'B4.110','Tesla':'C2.130','Wattstor':'B5.676','DNV':'C4.340','Voltfang':'B2.109'};
 const REF_SEED=[];
+const REF_FOCUS={
+  'Tesla':'特斯拉 · Powerwall 户储 + Autobidder VPP，全球标杆',
+  'BYD':'比亚迪 · 刀片电池 + Battery-Box 户储，全球出货巨头',
+  'SolarEdge':'以色列 · 优化器+逆变器+户储，ONE 能管平台',
+  'Enphase':'美国 · 微型逆变 + IQ 电池 + 家庭能源管理',
+  'Growatt':'古瑞瓦特 · 户用逆变/储能出货全球前列',
+  'GoodWe':'固德威 · 混合逆变 + Lynx 户储，全球份额高',
+  'Pylontech':'派能科技 · 欧洲户储电池龙头(高压堆叠)',
+  'Fox ESS':'麦田能源 · 户储逆变+电池，欧洲走量',
+  'SMA':'德国逆变龙头 · Sunny Home Manager 家庭能管',
+  'Fluence':'美国(AES/西门子) · 大储与 C&I 系统 + AI 交易',
+  'Wallbox':'西班牙 · 充电桩 + Quasar 双向 V2G + 能管',
+  'Solarwatt':'德国 · 组件+户储+Manager 能管(BMW 合作)',
+  'Voltfang':'德国 · 梯次利用电池做 C&I 储能',
+  'DNV':'挪威 · 认证/咨询(储能安全与可融资性背书)',
+  'Wattstor':'英国 · C&I 储能 EMS 与项目集成'
+};
 // 只保留已查到官方展位号的对标公司；没号的不再列出
 Object.entries(REF_MAP).forEach(([cat,names])=>names.filter(n=>REF_HALL[n]).forEach(n=>{const L=LINE_OF_CAT[cat];
   REF_SEED.push({id:'r_'+n.toLowerCase().replace(/[^a-z0-9]+/g,''),name:n,line:L,cat,pri:0,hall:REF_HALL[n],ref:1,
-    focus:'参照对标公司 · 已确认参展',hyp:HYP_OF_LINE[L],q:L==='A'?QA:L==='C'?QC:QB});
+    focus:REF_FOCUS[n]||'参照对标公司 · 已确认参展',hyp:HYP_OF_LINE[L],q:L==='A'?QA:L==='C'?QC:QB});
 }));
 
 /* ============================ 存储层 ============================ */
