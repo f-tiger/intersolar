@@ -631,7 +631,7 @@ async function renderList(){
     if(FILTER==='pri')return b.pri===1;
     if(FILTER==='todo')return statusOf(b.id)!=='done';
     return true;});
-  if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+b.focus).toLowerCase().includes(q));}
+  if(SEARCH){const q=SEARCH.toLowerCase();fl=fl.filter(b=>(b.name+' '+b.focus+' '+(cnOf(b)||'')+' '+(bState(b.id).hall||b.hall||'')).toLowerCase().includes(q));}
   const pcArr=await Promise.all(fl.map(b=>countPhotos2(b.id)));
   const pcMap={}; fl.forEach((b,i)=>pcMap[b.id]=pcArr[i]);
   // 分类横向 tab
