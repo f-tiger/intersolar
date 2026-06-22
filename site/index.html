@@ -367,6 +367,17 @@ const SEED = [
   {id:'tibber',name:'Tibber / Rabot / aWATTar',line:'A',pri:0,hall:'B3.130(Kostal展台)',focus:'动态电价供应商。Smart Battery接第三方电池到什么程度？客户or竞品',hyp:['A-H2'],q:QA,qx:[
     {q:'Smart Battery 接他牌电池到什么程度？',multi:false,h:'判断是潜在客户还是竞品',o:['广泛接他牌','少数型号','仅合作','不接','不确定']},
     {q:'"中立接入层"愿买/合作还是自建？',multi:false,o:['愿买/合作','自建','不确定']}]},
+  // 中国户储出海主流品牌（补充 · 展位号到现场/官方App查）
+  {id:'deye',name:'Deye',line:'A',pri:1,cat:'storage',hall:'B1.450',focus:'中国户储出海龙头 · 混合/储能逆变。验证开放度、跨品牌',hyp:['A-H3'],q:QA},
+  {id:'solax',name:'SolaX Power',line:'A',pri:1,cat:'storage',hall:'',focus:'X3-Hybrid 混合储能逆变，欧洲主力。验证开放度',hyp:['A-H3'],q:QA},
+  {id:'alphaess',name:'AlphaESS',line:'A',pri:1,cat:'storage',hall:'B1.150',focus:'户储系统龙头，欧洲份额高。验证开放度/VPP',hyp:['A-H3'],q:QA},
+  {id:'sofar',name:'SOFAR',line:'A',pri:0,cat:'storage',hall:'',focus:'首航新能源 · 户储/混合逆变，欧洲走量。开放度',hyp:['A-H3'],q:QA},
+  {id:'solis',name:'Solis (Ginlong)',line:'A',pri:1,cat:'storage',hall:'B3.430',focus:'锦浪 · 组串/混合逆变龙头，户储发力。开放度',hyp:['A-H3'],q:QA},
+  {id:'hoymiles',name:'Hoymiles',line:'A',pri:0,cat:'storage',hall:'',focus:'禾迈 · 微逆+户储，阳台/分布式。开放度',hyp:['A-H3'],q:QA},
+  {id:'dyness',name:'Dyness',line:'A',pri:0,cat:'storage',hall:'',focus:'户储电池品牌，欧洲走量。开放度',hyp:['A-H3'],q:QA},
+  {id:'kstar',name:'KSTAR',line:'A',pri:0,cat:'storage',hall:'',focus:'科士达 · 储能逆变/系统。开放度',hyp:['A-H3'],q:QA},
+  {id:'saj',name:'SAJ',line:'A',pri:0,cat:'storage',hall:'',focus:'三晶电气 · 户储/混合逆变。开放度',hyp:['A-H3'],q:QA},
+  {id:'solplanet',name:'Solplanet',line:'A',pri:0,cat:'storage',hall:'',focus:'AISWEI 旗下户用逆变/储能。开放度',hyp:['A-H3'],q:QA},
   // ===== B 线：工商储 SaaS =====
   {id:'coneva',name:'coneva (coneva Flex)',line:'B',pri:1,hall:'B0.345',focus:'C&I 模块化EMS，Smart Integrated Energy入围。直接对标',hyp:['B-H1','B-H3','C-H2'],q:QB,qx:[
     {q:'收益结算/归因做到多细？',multi:false,h:'直接对标 B-H3：是否设备级、可审计',o:['设备级可审计','日月报','较弱','不确定']},
@@ -494,7 +505,8 @@ const CN_NAME={
   'enspired':'奥地利·AI交易','Habitat Energy':'英国·储能优化交易','Sympower':'荷兰·需求响应聚合','Flower':'瑞典·VPP/交易','Enpal':'德国·光储租赁+VPP',
   'Zitara':'美国·电池软件','Eatron':'英国·电池AI(BMS)','DNV':'挪威·认证/咨询',
   'Envelio':'德国·配网智能','Depsys':'瑞士·配网监测','Neara':'澳洲·电网三维建模','Heimdall Power':'挪威·电网传感',
-  'Wallbox':'西班牙·充电+V2G','Voltfang':'德国·梯次储能','Ambibox':'德国·V2G/充电'
+  'Wallbox':'西班牙·充电+V2G','Voltfang':'德国·梯次储能','Ambibox':'德国·V2G/充电',
+  'Deye':'德业 · 宁波(混合/储能逆变)','SolaX Power':'浙江 · 混合储能逆变','SOFAR':'首航新能源','Solis (Ginlong)':'锦浪科技','Hoymiles':'禾迈 · 微逆/储能','AlphaESS':'安徽 · 户储系统','Dyness':'户储电池品牌','KSTAR':'科士达','SAJ':'三晶电气','Solplanet':'AISWEI · 上海'
 };
 function cnOf(b){ return CN_NAME[b.id]||CN_NAME[b.name]||''; }
 function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=ansCount(s);const cn=cnOf(b);const col=catColor(b);
