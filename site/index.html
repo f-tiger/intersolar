@@ -27,20 +27,20 @@
   .hbar .sub{font-size:11px;color:rgba(255,255,255,.72);font-weight:500}
   .logo{width:30px;height:30px;flex:0 0 auto}
   .nav{display:flex;gap:8px;max-width:760px;margin:0 auto;padding:0 12px 12px;overflow-x:auto}
-  .nav button{flex:0 0 auto;background:rgba(255,255,255,.16);color:#eaf0ff;border:1px solid rgba(255,255,255,.2);
-    padding:11px 20px;border-radius:999px;font-size:16px;font-weight:700}
-  .nav button.on{background:#fff;color:#1e3a8a;border-color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .nav button{flex:0 0 auto;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.28);
+    padding:11px 20px;border-radius:999px 999px 0 0;font-size:16px;font-weight:700}
+  .nav button.on{background:#eef1f6;color:#1e3a8a;border-color:#eef1f6;font-weight:800;box-shadow:0 -2px 8px rgba(0,0,0,.12)}
   /* progress bar */
-  .prog{height:8px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden;margin:4px 0}
-  .prog>i{display:block;height:100%;background:#fff}
-  /* summary card（商务深蓝） */
-  .summary{background:linear-gradient(135deg,#2563eb 0%,#1e3a8a 100%);border:none;border-radius:var(--radius);
-    padding:15px;margin:14px 0;color:#fff;box-shadow:0 6px 18px rgba(30,58,138,.22)}
-  .summary #progtxt{color:rgba(255,255,255,.85)}
-  .statrow{display:flex;gap:10px;text-align:center;margin-top:12px}
-  .statrow .s{flex:1;background:rgba(255,255,255,.14);border-radius:10px;padding:9px 4px}
-  .statrow .s b{display:block;font-size:20px;color:#fff}
-  .statrow .s span{font-size:11px;color:rgba(255,255,255,.82)}
+  .prog{height:6px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:4px 0}
+  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+  /* summary card（紧凑浅色，弱化存在感） */
+  .summary{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:10px 13px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .summary #progtxt{color:var(--mut)}
+  .statrow{display:flex;gap:8px;text-align:center;margin-top:8px}
+  .statrow .s{flex:1;background:var(--panel2);border-radius:9px;padding:6px 4px}
+  .statrow .s b{display:block;font-size:16px;color:var(--txt)}
+  .statrow .s span{font-size:10.5px;color:var(--mut)}
   /* filters */
   .filters{display:flex;gap:6px;margin:6px 0 12px;flex-wrap:wrap}
   .filters button{background:var(--panel);color:var(--mut);border:1px solid var(--line);
