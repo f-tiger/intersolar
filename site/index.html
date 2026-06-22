@@ -202,9 +202,8 @@
     </div>
     <input class="search" id="search" placeholder="搜索展位名 / 关键词…">
     <div class="filters" id="filters">
-      <button data-l="all" class="on">全部</button>
-      <button data-l="pri">⭐ 优先</button>
-      <button data-l="todo">未完成</button>
+      <button data-l="pri">⭐ 只看优先</button>
+      <button data-l="todo">只看未完成</button>
     </div>
     <div class="cattabs" id="cattabs"></div>
     <div id="boothlist"></div>
@@ -482,7 +481,7 @@ function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=an
   return `<button class="card" onclick="openBooth('${b.id}')">
       <div class="top"><div class="nm">${esc(b.name)}${cn?' <span class="cn">'+esc(cn)+'</span>':''}</div>
         ${b.pri===1?'<span class="chip pri">⭐优先</span>':''}
-        ${b.ref?'<span class="chip" style="background:var(--panel2);color:var(--mut)">对标</span>':''}
+        ${(b.ref&&!(s.hall||b.hall))?'<span class="chip" style="background:var(--panel2);color:var(--mut)">对标</span>':''}
         <span class="chip ${b.line}">${b.line==='A'?'户储':b.line==='B'?'工商储':b.line==='C'?'3.0':'通用'}</span></div>
       <div class="focus">${esc(b.focus)}</div>
       <div class="meta">
@@ -645,27 +644,24 @@ async function renderList(){
   // 按选中分类渲染（全部=分组展示）
   const single = CATSEL!=='all';
   const shown = single?CATS.filter(c=>c.k===CATSEL):CATS;
+  const hallOf=b=>(bState(b.id).hall||b.hall||'');
   let html='';
   shown.forEach(c=>{ const items=fl.filter(b=>catOf(b)===c.k); if(!items.length) return;
-    const conf=items.filter(b=>!b.ref).sort((a,b)=>(b.pri||0)-(a.pri||0));
-    const refs=items.filter(b=>b.ref);
+    items.sort((a,b)=> ((hallOf(b)?1:0)-(hallOf(a)?1:0)) || ((b.pri||0)-(a.pri||0)) || ((a.ref?1:0)-(b.ref?1:0)) );
     const folded = !single && !!OPEN_CAT[c.k] && !SEARCH;
-    html+='<div class="cathead" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+conf.length+'</span>'+(single?'':'<span class="catchev">'+(folded?'▸':'▾')+'</span>')+'</div>';
+    html+='<div class="cathead" onclick="toggleCat(\''+c.k+'\')"><span style="flex:1">'+c.t+'</span><span class="catn">'+items.length+'</span>'+(single?'':'<span class="catchev">'+(folded?'▸':'▾')+'</span>')+'</div>';
     if(folded) return;
     if(c.zone) html+='<div class="catzone">📍 '+esc(c.zone)+'</div>';
-    html+=conf.map(b=>cardHtml(b,pcMap[b.id])).join('');
-    html+='<button class="addbtn" style="margin:2px 0 12px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
-    if(refs.length){ const open=OPEN_REF[c.k]||!!SEARCH||single;
-      html+='<button class="refToggle" onclick="toggleRef(\''+c.k+'\')">'+(open?'▾ 收起对标参照':'▸ 展开对标参照 '+refs.length+' 家')+'</button>';
-      if(open) html+='<div style="margin-bottom:16px">'+refs.map(b=>cardHtml(b,pcMap[b.id])).join('')+'</div>';
-    }
+    html+=items.map(b=>cardHtml(b,pcMap[b.id])).join('');
+    html+='<button class="addbtn" style="margin:2px 0 16px" onclick="addInCat(\''+c.k+'\')">＋ 在本分类加展位</button>';
   });
   $('#boothlist').innerHTML=html||'<p class="muted" style="text-align:center;padding:30px">无匹配展位</p>';
 }
 function countPhotos2(id){return photosOf(id).then(a=>a.length);}
 
 $('#filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  FILTER=b.dataset.l;$$('#filters button').forEach(x=>x.classList.toggle('on',x===b));renderList();});
+  const l=b.dataset.l; FILTER=(FILTER===l)?'all':l;
+  $$('#filters button').forEach(x=>x.classList.toggle('on',x.dataset.l===FILTER));renderList();});
 $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
 /* ============================ 会议 / 论坛排期 ============================ */
