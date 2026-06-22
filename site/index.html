@@ -431,7 +431,7 @@ const REF_MAP={
 };
 const LINE_OF_CAT={storage:'A',hems:'A',ci:'B',vpp:'B',analytics:'B',grid:'B',v2g:'B',os30:'C'};
 const HYP_OF_LINE={A:['A-H1','A-H2','A-H3'],B:['B-H1','B-H2','B-H3'],C:['C-H1','C-H2','C-H3']};
-const REF_HALL={'SMA':'B3.210','Wallbox':'B6.320','GoodWe':'B4.210','Growatt':'B3.230','Enphase':'C5.530','Solarwatt':'C5.640','Fox ESS':'B1.210','BYD':'B1.131','Pylontech':'B1.350'};
+const REF_HALL={'SMA':'B3.210','Wallbox':'B6.320','GoodWe':'B4.210','Growatt':'B3.230','Enphase':'C5.530','Solarwatt':'C5.640','Fox ESS':'B1.210','BYD':'B1.131','Pylontech':'B1.350','Fluence':'C2.140'};
 const REF_SEED=[];
 Object.entries(REF_MAP).forEach(([cat,names])=>names.forEach(n=>{const L=LINE_OF_CAT[cat];const h=REF_HALL[n]||'';
   REF_SEED.push({id:'r_'+n.toLowerCase().replace(/[^a-z0-9]+/g,''),name:n,line:L,cat,pri:0,hall:h,ref:1,
