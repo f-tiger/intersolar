@@ -45,10 +45,9 @@ alter publication supabase_realtime add table public.booth_state;
 alter publication supabase_realtime add table public.photos;
 ```
 
-## 3. 建照片/视频存储桶
+## 3. 建照片存储桶
 1. 左侧 **Storage → New bucket** → 名字填 **`photos`** → 勾 **Public bucket** → 创建。
-   - 想传**视频**：在该桶设置把 **File size limit** 调大（如 50–200MB），默认上限较小会导致大视频上传失败。建议现场只拍短视频（≤30 秒）。
-2. 再回 **SQL Editor** 跑这段（让协作者能上传/删除照片/视频）：
+2. 再回 **SQL Editor** 跑这段（让协作者能上传/删除照片）：
 
 ```sql
 create policy "anon upload photos" on storage.objects for insert to anon with check (bucket_id = 'photos');

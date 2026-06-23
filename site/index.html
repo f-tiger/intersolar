@@ -132,7 +132,7 @@
   /* photos */
   .photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
   .ph{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:var(--panel2)}
-  .ph img,.ph video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block}
   .ph .del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.6);color:#fff;border:none;
     width:24px;height:24px;border-radius:50%;font-size:14px;line-height:1}
   .ph .cap{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);font-size:9px;
@@ -777,21 +777,14 @@ function _idbAll(){return new Promise((res,rej)=>{const out=[];const r=txStore('
 function _idbCount(){return new Promise((res)=>{const r=txStore('readonly').count();r.onsuccess=()=>res(r.result);});}
 function clearPhotos(){return new Promise((res,rej)=>{const r=txStore('readwrite').clear();r.onsuccess=res;r.onerror=rej;});}
 
-/* 统一媒体接口：云端→Supabase Storage；本地→IndexedDB（照片+视频） */
-function isVideoType(t){ return /^video\//.test(t||''); }
-function extFromType(t){ return ({'video/mp4':'mp4','video/quicktime':'mov','video/webm':'webm','video/x-m4v':'m4v','video/3gpp':'3gp'})[t]||(isVideoType(t)?'mp4':'jpg'); }
-function mediaKind(p){ if(p&&p.kind)return p.kind;
-  const t=(p&&p.type)||(p&&p.blob&&p.blob.type)||''; if(t)return isVideoType(t)?'video':'image';
-  const src=(p&&(p.path||p.url))||''; return /\.(mp4|mov|webm|m4v|3gp|avi|mkv)(\?|$)/i.test(src)?'video':'image'; }
+/* 统一照片接口：云端→Supabase Storage；本地→IndexedDB */
 async function addPhoto(p){ // p:{boothId,blob,cap,ts}
-  const isVid=isVideoType(p.blob&&p.blob.type);
   if(CLOUD&&SB){
     const id=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now()+'-'+Math.random().toString(16).slice(2));
-    const ct=(p.blob&&p.blob.type)||(isVid?'video/mp4':'image/jpeg');
-    const path=EVENT+'/'+p.boothId+'/'+id+'.'+(isVid?extFromType(ct):'jpg');
-    const up=await SB.storage.from('photos').upload(path,p.blob,{contentType:ct,upsert:true}); if(up.error) throw up.error;
+    const path=EVENT+'/'+p.boothId+'/'+id+'.jpg';
+    const up=await SB.storage.from('photos').upload(path,p.blob,{contentType:'image/jpeg',upsert:true}); if(up.error) throw up.error;
     const ins=await SB.from('photos').insert({id,event:EVENT,booth_id:p.boothId,path,caption:p.cap||'',by:ME,ts:p.ts||Date.now()}); if(ins.error) throw ins.error;
-    PHOTOS.push({id,boothId:p.boothId,by:ME,cap:p.cap||'',ts:p.ts||Date.now(),path,kind:isVid?'video':'image',url:SB.storage.from('photos').getPublicUrl(path).data.publicUrl});
+    PHOTOS.push({id,boothId:p.boothId,by:ME,cap:p.cap||'',ts:p.ts||Date.now(),path,url:SB.storage.from('photos').getPublicUrl(path).data.publicUrl});
     return id;
   }
   return _idbAdd(p);
@@ -827,10 +820,13 @@ function selCat(k){ CATSEL=k; renderList(); window.scrollTo(0,0); }
 window.toggleRef=toggleRef; window.toggleCat=toggleCat; window.selCat=selCat;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
+let LIST_SCROLL=0;
 function go(v){ if((v==='dash'||v==='data')&&CLOUD&&!OWNER) v='list';
+  if(CUR==='list' && v!=='list') LIST_SCROLL=window.scrollY||window.pageYOffset||0;
   CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  if(v==='list')renderList(); if(v==='conf')renderConf(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
+  if(v==='list'){ renderList().then(()=>window.scrollTo(0,LIST_SCROLL)); return; }
+  if(v==='conf')renderConf(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
 function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
@@ -935,14 +931,13 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
    </div>
 
    <div class="sec">
-     <h3>📷 现场照片 / 视频 <span class="n">${photos.length} 个</span></h3>
+     <h3>📷 现场照片 <span class="n">${photos.length} 张</span></h3>
      <div class="photogrid" id="pgrid"></div>
      <div class="btnrow">
-       <label class="btn" style="cursor:pointer">📸 拍照<input type="file" accept="image/*" id="cap" class="hidden" multiple></label>
-       <label class="btn" style="cursor:pointer">🎬 录像<input type="file" accept="video/*" id="capv" class="hidden"></label>
-       <label class="btn sec2" style="cursor:pointer">🖼 从相册<input type="file" accept="image/*,video/*" id="pick" class="hidden" multiple></label>
+       <label class="btn" style="cursor:pointer">📸 拍照<input type="file" accept="image/*" capture="environment" id="cap" class="hidden" multiple></label>
+       <label class="btn sec2" style="cursor:pointer">🖼 从相册<input type="file" accept="image/*" id="pick" class="hidden" multiple></label>
      </div>
-     <p class="muted" style="font-size:11px;margin:6px 0 0"><b>嫌网页相机糊？</b>用手机<b>自带相机 App 先拍/录</b>，再点「🖼 从相册」上传——画质和系统相机完全一致。网页内唤起的相机受浏览器限制会偏糊；<b>若在微信里打开</b>，请点右上角「···→ 在浏览器打开」(Safari/Chrome) 再拍。视频不压缩、建议≤30秒，wifi 不稳可网络好时补传。</p>
+     <p class="muted" style="font-size:11px;margin:6px 0 0"><b>嫌相机糊？</b>用手机<b>自带相机 App 先拍</b>，再点「🖼 从相册」上传——画质和系统相机一致。若在微信里打开，请点右上角「···→ 在浏览器打开」(Safari/Chrome) 再拍、点一下画面对焦。</p>
    </div>
 
    <div class="sec">
@@ -983,7 +978,6 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
   $('#f-status').addEventListener('change',e=>{bState(id).status=e.target.value;touchBooth(id);});
   $('#f-notes').addEventListener('input',e=>{bState(id).notes=e.target.value;touchBooth(id);});
   $('#cap').addEventListener('change',e=>handleFiles(e.target.files,id));
-  $('#capv').addEventListener('change',e=>handleFiles(e.target.files,id));
   $('#pick').addEventListener('change',e=>handleFiles(e.target.files,id));
   v.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;
     const h=seg.dataset.h,val=btn.dataset.val;const cur=bState(id).hyp[h];
@@ -1024,23 +1018,16 @@ function renderQ(b,s){const QS=qsOf(b);const BL=(b.q||[]).length;$('#qlist').inn
     el.querySelector('textarea').addEventListener('input',e=>{const s2=bState(CURBOOTH);s2.answers[i]=s2.answers[i]||{};
       s2.answers[i].text=e.target.value;touchBooth(CURBOOTH);el.classList.toggle(el.dataset.t==='o'?'answered':'checked-x',isAns(s2.answers[i]));updateConcl();});});}
 
-function renderPhotos(photos){const g=$('#pgrid');if(!g)return;if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片/视频，点下方拍照、录像或上传</p>';return;}
+function renderPhotos(photos){const g=$('#pgrid');if(!g)return;if(!photos.length){g.innerHTML='<p class="muted" style="grid-column:1/-1">还没有照片，点下方拍照或上传</p>';return;}
   g.innerHTML='';photos.forEach(p=>{const url=p.url||URL.createObjectURL(p.blob);const d=document.createElement('div');d.className='ph';
     const cap=[p.by?('👤'+p.by):'',p.cap||''].filter(Boolean).join(' · ');
-    const media=mediaKind(p)==='video'
-      ? `<video src="${url}" controls preload="metadata" playsinline></video>`
-      : `<img src="${url}" onclick="window.open('${url}')">`;
-    d.innerHTML=`${media}<button class="del">×</button>${cap?'<div class="cap">'+esc(cap)+'</div>':''}`;
-    d.querySelector('.del').addEventListener('click',async()=>{if(confirm('删除这个照片/视频？')){try{await delPhoto(p.id);}catch(e){toast('删除失败');}openBooth(CURBOOTH);}});
+    d.innerHTML=`<img src="${url}" onclick="window.open('${url}')"><button class="del">×</button>${cap?'<div class="cap">'+esc(cap)+'</div>':''}`;
+    d.querySelector('.del').addEventListener('click',async()=>{if(confirm('删除这张照片？')){try{await delPhoto(p.id);}catch(e){toast('删除失败');}openBooth(CURBOOTH);}});
     g.appendChild(d);});}
 
 async function handleFiles(files,id){if(!files.length)return;toast(CLOUD?'上传中…':'处理中…');
-  let n=0;for(const f of files){try{
-    const isVid=isVideoType(f.type)||/\.(mp4|mov|webm|m4v|3gp)$/i.test(f.name||'');
-    const blob=isVid?f:await compress(f);
-    await addPhoto({boothId:id,blob,cap:'',ts:Date.now()});n++;
-  }catch(err){console.warn('媒体失败',err);}}
-  toast(n+' 个已保存'+(n<files.length?'（'+(files.length-n)+' 个失败，检查网络）':''));openBooth(id);}
+  let n=0;for(const f of files){try{const blob=await compress(f);await addPhoto({boothId:id,blob,cap:'',ts:Date.now()});n++;}catch(err){console.warn('照片失败',err);}}
+  toast(n+' 张已保存'+(n<files.length?'（'+(files.length-n)+' 张失败，检查网络）':''));openBooth(id);}
 
 function markDone(){bState(CURBOOTH).status='done';touchBooth(CURBOOTH);toast('已标记完成');go('list');}
 
@@ -1173,7 +1160,7 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
       ${ans?'<ul>'+ans+'</ul>':''}
       ${s.notes?'<p class="nt"><b>笔记：</b>'+esc(s.notes).replace(/\n/g,'<br>')+'</p>':''}
       ${hyp?'<p class="hy">🎯 '+esc(hyp)+'</p>':''}
-      ${ps.length?'<div class="g">'+ps.map(p=>mediaKind(p)==='video'?`<video src="${datas[p.id]}" controls preload="metadata"></video>`:`<img src="${datas[p.id]}">`).join('')+'</div>':''}
+      ${ps.length?'<div class="g">'+ps.map(p=>`<img src="${datas[p.id]}">`).join('')+'</div>':''}
     </div>`;}
   const doc=`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Intersolar 2026 调研归档 ${stamp()}</title><style>
@@ -1184,9 +1171,9 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
     .m{color:#64748b;font-size:12.5px;margin:0 0 8px}ul{margin:8px 0;padding-left:20px;font-size:13.5px;line-height:1.7}
     .nt{font-size:13px;background:#f1f5f9;padding:8px 10px;border-radius:8px}.hy{font-size:12.5px;color:#0369a1}
     .cc{font-size:13px;font-weight:600;background:#ecfdf5;color:#065f46;padding:7px 10px;border-radius:8px;margin:0 0 8px}
-    .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.g img,.g video{width:100%;border-radius:8px;background:#000}
+    .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.g img{width:100%;border-radius:8px}
     </style></head><body><h1>Intersolar Europe 2026 · 展位调研归档</h1>
-    <p class="sum">导出时间：${new Date().toLocaleString('zh-CN')} · 共 ${photos.length} 个照片/视频</p>${body||'<p>暂无已填写内容</p>'}</body></html>`;
+    <p class="sum">导出时间：${new Date().toLocaleString('zh-CN')} · 共 ${photos.length} 张照片</p>${body||'<p>暂无已填写内容</p>'}</body></html>`;
   download('intersolar-归档-'+stamp()+'.html',doc,'text/html');});
 
 $('#wipe').addEventListener('click',async()=>{if(confirm('确定清空所有本地数据（含照片）？此操作不可恢复。')){
@@ -1223,11 +1210,11 @@ async function renderAdmin(){ const box=$('#admin-body'); if(!box)return;
     const totP=rows.reduce((s,r)=>s+r.photos,0);
     if(!rows.length){ box.innerHTML='<p class="muted" style="margin-top:6px">暂无参与记录（还没人填写或上传）。</p>'; return; }
     const fmt=t=>{ if(!t)return'—'; const d=new Date(t); return pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()); };
-    box.innerHTML='<p class="muted" style="margin:6px 0">共 <b>'+rows.length+'</b> 位参与者 · 累计 <b>'+totP+'</b> 个照片/视频</p>'
+    box.innerHTML='<p class="muted" style="margin:6px 0">共 <b>'+rows.length+'</b> 位参与者 · 累计 <b>'+totP+'</b> 张照片</p>'
       +'<table style="width:100%;border-collapse:collapse;font-size:13px">'
       +'<thead><tr style="text-align:left;border-bottom:1px solid #334155;color:#94a3b8">'
       +'<th style="padding:6px 4px">用户</th><th style="padding:6px 4px;text-align:right">填写展位</th>'
-      +'<th style="padding:6px 4px;text-align:right">上传照片/视频</th><th style="padding:6px 4px;text-align:right">最近活跃</th></tr></thead><tbody>'
+      +'<th style="padding:6px 4px;text-align:right">上传照片</th><th style="padding:6px 4px;text-align:right">最近活跃</th></tr></thead><tbody>'
       +rows.map(r=>'<tr style="border-bottom:1px solid #1e293b">'
         +'<td style="padding:6px 4px">'+esc(r.n)+(r.n===ME?' <span class="muted">(你)</span>':'')+'</td>'
         +'<td style="padding:6px 4px;text-align:right">'+r.booths+'</td>'
