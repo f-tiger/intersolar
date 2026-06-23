@@ -248,6 +248,12 @@
       <button class="btn ghost" id="cloud-off" style="margin-top:8px;width:100%">退出云模式（回本地，本地数据保留）</button>
       <p class="muted" style="font-size:11px;margin-top:8px">分享链接已含连接配置，同事点开即连同一份数据、各自填名字即可。⚠️ 现场 wifi 不稳时照片上传可能失败，可改用下方"导出/合并导入"兜底。临时新增的展位仅本机可见。</p>
     </div>
+    <div class="sec" id="admin-sec">
+      <h3>👥 用户管理（管理员）</h3>
+      <p class="muted">协作活动里所有参与者的情况：谁加入了、各填了多少展位、各上传了多少照片。仅管理员可见。</p>
+      <div class="btnrow"><button class="btn sec2" id="admin-refresh">🔄 刷新统计</button></div>
+      <div id="admin-body"></div>
+    </div>
     <div class="sec">
       <h3>📦 归档导出</h3>
       <p class="muted">数据保存在本机浏览器（localStorage + IndexedDB）。导出后可永久归档、跨设备迁移。建议每天结束导出一次。</p>
@@ -1181,7 +1187,39 @@ function refreshCloudUI(){ const c=getCfg(); const st=$('#cloud-status'); if(!st
   else if(c){ st.innerHTML='⚠️ 已配置但未连接，<b>刷新页面</b>即可连接。'; }
   else { st.textContent='当前：本地模式（数据仅存本机）。配置 Supabase 后可与同事实时共享、照片自动入云。'; }
   if(c){ if($('#cf-url'))$('#cf-url').value=c.url||''; if($('#cf-key'))$('#cf-key').value=c.key||''; if($('#cf-ev'))$('#cf-ev').value=c.ev||''; }
-  if($('#cf-me'))$('#cf-me').value=ME||''; }
+  if($('#cf-me'))$('#cf-me').value=ME||''; renderAdmin(); }
+/* 管理员隐藏菜单：注册（参与）用户情况 + 每人上传照片数（仅云协作模式有数据） */
+async function renderAdmin(){ const box=$('#admin-body'); if(!box)return;
+  if(!CLOUD||!SB){ box.innerHTML='<p class="muted" style="margin-top:6px">仅在「☁️ 多人实时协作」连接后才有多用户数据。当前为本地模式。</p>'; return; }
+  box.innerHTML='<p class="muted" style="margin-top:6px">加载中…</p>';
+  try{
+    const [{data:bs,error:e1},{data:ps,error:e2}]=await Promise.all([
+      SB.from('booth_state').select('updated_by,updated_at,booth_id').eq('event',EVENT),
+      SB.from('photos').select('by,ts').eq('event',EVENT)
+    ]);
+    if(e1)throw e1; if(e2)throw e2;
+    const U={}; const u=n=>{ n=(n&&String(n).trim())||'匿名'; return U[n]||(U[n]={booths:new Set(),photos:0,last:0}); };
+    (bs||[]).forEach(r=>{ const x=u(r.updated_by); if(r.booth_id)x.booths.add(r.booth_id); const t=Date.parse(r.updated_at)||0; if(t>x.last)x.last=t; });
+    (ps||[]).forEach(r=>{ const x=u(r.by); x.photos++; const t=Number(r.ts)||0; if(t>x.last)x.last=t; });
+    const rows=Object.entries(U).map(([n,v])=>({n,booths:v.booths.size,photos:v.photos,last:v.last}))
+      .sort((a,b)=> b.photos-a.photos || b.booths-a.booths || a.n.localeCompare(b.n));
+    const totP=rows.reduce((s,r)=>s+r.photos,0);
+    if(!rows.length){ box.innerHTML='<p class="muted" style="margin-top:6px">暂无参与记录（还没人填写或上传）。</p>'; return; }
+    const fmt=t=>{ if(!t)return'—'; const d=new Date(t); return pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()); };
+    box.innerHTML='<p class="muted" style="margin:6px 0">共 <b>'+rows.length+'</b> 位参与者 · 累计 <b>'+totP+'</b> 张照片</p>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:13px">'
+      +'<thead><tr style="text-align:left;border-bottom:1px solid #334155;color:#94a3b8">'
+      +'<th style="padding:6px 4px">用户</th><th style="padding:6px 4px;text-align:right">填写展位</th>'
+      +'<th style="padding:6px 4px;text-align:right">上传照片</th><th style="padding:6px 4px;text-align:right">最近活跃</th></tr></thead><tbody>'
+      +rows.map(r=>'<tr style="border-bottom:1px solid #1e293b">'
+        +'<td style="padding:6px 4px">'+esc(r.n)+(r.n===ME?' <span class="muted">(你)</span>':'')+'</td>'
+        +'<td style="padding:6px 4px;text-align:right">'+r.booths+'</td>'
+        +'<td style="padding:6px 4px;text-align:right"><b>'+r.photos+'</b></td>'
+        +'<td style="padding:6px 4px;text-align:right;color:#94a3b8">'+fmt(r.last)+'</td></tr>').join('')
+      +'</tbody></table>';
+  }catch(err){ console.warn('用户统计加载失败',err); box.innerHTML='<p class="muted" style="margin-top:6px">加载失败（检查网络/权限）。</p>'; }
+}
+$('#admin-refresh')&&$('#admin-refresh').addEventListener('click',renderAdmin);
 $('#cloud-on')&&$('#cloud-on').addEventListener('click',()=>{
   const url=$('#cf-url').value.trim(),key=$('#cf-key').value.trim(),ev=$('#cf-ev').value.trim(),me=$('#cf-me').value.trim();
   if(!url||!key||!ev){alert('请填 Supabase URL / anon key / 活动代号');return;}
