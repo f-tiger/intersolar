@@ -250,6 +250,14 @@
       <button class="btn ghost" id="cloud-off" style="margin-top:8px;width:100%">退出云模式（回本地，本地数据保留）</button>
       <p class="muted" style="font-size:11px;margin-top:8px">分享链接已含连接配置，同事点开即连同一份数据、各自填名字即可。⚠️ 现场 wifi 不稳时照片上传可能失败，可改用下方"导出/合并导入"兜底。临时新增的展位仅本机可见。</p>
     </div>
+    <div class="sec" id="ai-sec">
+      <h3>🤖 AI 自动会议总结</h3>
+      <p class="muted">配置后：在「会议」某场<b>拍照</b> → 点<b>"标记完成并返回"</b>，自动用 AI 读幻灯片生成总结，汇入「总结」tab（随云同步，多人共享）。<b>Key 仅存本机、绝不随分享链接外发。</b></p>
+      <label class="fld">Anthropic API Key（sk-ant-…）</label><input type="password" id="ai-key" placeholder="sk-ant-...">
+      <label class="fld">模型（留空=claude-sonnet-4-6）</label><input type="text" id="ai-model" placeholder="claude-sonnet-4-6">
+      <button class="btn green" id="ai-save" style="width:100%;margin-top:8px">保存 AI 配置</button>
+      <p class="muted" style="font-size:11px;margin-top:6px">需联网调用 api.anthropic.com（浏览器直连）。每场最多取 8 张照片。也可在某场详情手动重跑。</p>
+    </div>
     <div class="sec" id="admin-sec">
       <h3>👥 用户管理（管理员）</h3>
       <p class="muted">协作活动里所有参与者的情况：谁加入了、各填了多少展位、各上传了多少照片。仅管理员可见。</p>
@@ -1191,13 +1199,26 @@ function renderSummary(){
   // 现场记录的各场结论（来自「会议」里你记的笔记/作答）
   const recorded=[]; CONF.forEach(g=>g.items.forEach(it=>{ if(!it.id)return; const n=sessNote(it.id); const st=bState(it.id);
     if(n || st.status==='done') recorded.push({it,n,done:st.status==='done'}); }));
-  let h='<div class="tip" style="line-height:1.7"><b>📝 会议总结 · 总目录</b><br>把每一场的<b>关键结论</b>沉淀到这里。下面「精选结论」为人工整理；「我现场记录的结论」自动汇总你在「会议」里每场记的笔记/作答。</div>';
+  // AI 自动生成的会议总结（存在每场 bState.aiSummary，随云同步，多人共享）
+  const aiArts=allBooths().filter(b=>b.line==='G' && bState(b.id).aiSummary && bState(b.id).aiSummary.text)
+    .map(b=>({b,a:bState(b.id).aiSummary})).sort((x,y)=>(y.a.at||0)-(x.a.at||0));
+  let h='<div class="tip" style="line-height:1.7"><b>📝 会议总结 · 总目录</b><br>把每一场的<b>关键结论</b>沉淀到这里。「🤖 AI 自动总结」由会议拍照后点"标记完成"自动生成；「精选结论」为人工整理；「我现场记录的结论」自动汇总你在「会议」里每场记的笔记/作答。</div>';
   // 总目录
   let toc='<ol style="padding-left:18px;margin:6px 0;line-height:1.9">';
+  if(aiArts.length) toc+='<li><a href="javascript:void(0)" onclick="sumJump(\'sum-ai\')" style="color:#93c5fd;text-decoration:none">🤖 AI 自动会议总结</a> <span class="muted" style="font-size:11px">· '+aiArts.length+' 篇</span></li>';
   MEET_SUMMARY.forEach(m=>{ toc+='<li><a href="javascript:void(0)" onclick="sumJump(\'sum-'+m.id+'\')" style="color:#93c5fd;text-decoration:none">'+(m.star?'⭐ ':'')+esc(m.title)+'</a> <span class="muted" style="font-size:11px">· '+esc(m.src)+'</span></li>'; });
   toc+='<li><a href="javascript:void(0)" onclick="sumJump(\'sum-recorded\')" style="color:#93c5fd;text-decoration:none">🗒 我现场记录的结论</a> <span class="muted" style="font-size:11px">· '+recorded.length+' 场</span></li>';
   toc+='</ol>';
   h+=sec('📑 总目录', toc);
+  // AI 自动总结文章
+  if(aiArts.length){
+    let ai='';
+    aiArts.forEach(({b,a})=>{ const d=a.at?new Date(a.at):null; const when=d?(pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())):'';
+      ai+='<div class="card" style="cursor:default"><div class="nm" style="font-weight:700">'+esc(b.name)+'</div>'
+        +'<div class="muted" style="font-size:11px;margin:2px 0 6px">🤖 AI 生成'+(a.by?' · '+esc(a.by):'')+(when?' · '+when:'')+'</div>'
+        +'<div style="font-size:13px;line-height:1.7">'+esc(a.text).replace(/\n/g,'<br>')+'</div></div>'; });
+    h+=sec('🤖 AI 自动会议总结（'+aiArts.length+' 篇）', ai, 'sum-ai');
+  }
   // 精选结论卡片
   MEET_SUMMARY.forEach(m=>{
     let inner='<p class="muted" style="margin:0 0 6px">'+(m.tag?'<span class="chip" style="background:#4f46e5;color:#fff;margin-right:6px">'+esc(m.tag)+'</span>':'')+esc(m.src)+'</p>';
@@ -1315,6 +1336,7 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
 
    <div class="btnrow" style="margin-bottom:30px">
      <button class="btn green" onclick="markDone()">✓ 标记完成并返回</button>
+     ${b.line==='G'?'<button class="btn sec2" onclick="generateAISummary(CURBOOTH)">🤖 AI 总结本场</button>':''}
    </div>`;
 
   renderPhotos(photos);
@@ -1375,7 +1397,43 @@ async function handleFiles(files,id){if(!files.length)return;toast(CLOUD?'上传
   let n=0;for(const f of files){try{const blob=await compress(f);await addPhoto({boothId:id,blob,cap:'',ts:Date.now()});n++;}catch(err){console.warn('照片失败',err);}}
   toast(n+' 张已保存'+(n<files.length?'（'+(files.length-n)+' 张失败，检查网络）':''));openBooth(id);}
 
-function markDone(){bState(CURBOOTH).status='done';touchBooth(CURBOOTH);toast('已标记完成');go('list');}
+async function markDone(){ const id=CURBOOTH; const b=allBooths().find(x=>x.id===id);
+  bState(id).status='done'; touchBooth(id); toast('已标记完成');
+  const isConf = b && b.line==='G';
+  go(isConf?'conf':'list');
+  if(isConf){ const ph=await photosOf(id); if(ph.length){ if(getAI().key) generateAISummary(id); else toast('已完成（在「数据/归档」配置 AI Key 后可自动总结）'); } }
+}
+/* ---------- AI 自动会议总结（会议拍照→标记完成→AI 读幻灯片成文→同步到「总结」） ---------- */
+function getAI(){ try{return JSON.parse(localStorage.getItem('scout_ai')||'{}')}catch(e){return{}} }
+function setAI(o){ localStorage.setItem('scout_ai',JSON.stringify(o)); }
+function blobToB64(b){ return new Promise((res,rej)=>{const fr=new FileReader();fr.onloadend=()=>res(String(fr.result).split(',')[1]||'');fr.onerror=rej;fr.readAsDataURL(b);}); }
+async function generateAISummary(id){
+  const ai=getAI(); if(!ai.key){ toast('未配置 AI Key'); return false; }
+  const b=allBooths().find(x=>x.id===id); if(!b) return false;
+  const photos=await photosOf(id);
+  if(!photos.length){ toast('本场没有照片，无法 AI 总结'); return false; }
+  toast('🤖 AI 读取幻灯片、生成总结中…');
+  try{
+    const imgs=[];
+    for(const p of photos.slice(0,8)){ try{ const d=await blobToB64(await photoBlob(p)); if(d) imgs.push(d); }catch(e){} }
+    if(!imgs.length) throw new Error('照片读取失败');
+    const note=sessNote(id);
+    const prompt='你是 EcoFlow（消费/阳台/户储/能源软件）的现场会议分析师。以下是会议「'+b.name+'」'+(b.hall?'（'+b.hall+'）':'')+'的现场幻灯片照片'+(note?('，外加我的笔记：'+note):'')+'。请用简体中文输出一篇**会议总结文章**：①3–6 条关键要点（尽量带数字/事实，逐条换行，以"· "开头）；②一句话结论（以"结论："开头）；③对 EcoFlow 的启示（以"对 EcoFlow："开头）。只输出正文、不要寒暄、不要 markdown 符号。';
+    const content=[{type:'text',text:prompt}];
+    imgs.forEach(d=>content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:d}}));
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+      'x-api-key':ai.key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:ai.model||'claude-sonnet-4-6',max_tokens:1400,messages:[{role:'user',content}]})});
+    if(!res.ok){ const t=await res.text(); throw new Error(res.status+' '+t.slice(0,140)); }
+    const j=await res.json();
+    const text=((j.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n')).trim();
+    if(!text) throw new Error('AI 返回空');
+    bState(id).aiSummary={text,at:Date.now(),by:ME||'',name:b.name}; touchBooth(id);
+    toast('✅ AI 总结已生成 → 「总结」tab'); if(CUR==='summary') renderSummary();
+    return true;
+  }catch(e){ console.warn('AI 总结失败',e); toast('AI 总结失败：'+String(e.message||e).slice(0,50)); return false; }
+}
+window.generateAISummary=generateAISummary;
 
 /* 点参照公司 → 现场加入调研（生成临时展位） */
 function addRef(name,catk){
@@ -1495,7 +1553,9 @@ function refreshCloudUI(){ const c=getCfg(); const st=$('#cloud-status'); if(!st
   else if(c){ st.innerHTML='⚠️ 已配置但未连接，<b>刷新页面</b>即可连接。'; }
   else { st.textContent='当前：本地模式（数据仅存本机）。配置 Supabase 后可与同事实时共享、照片自动入云。'; }
   if(c){ if($('#cf-url'))$('#cf-url').value=c.url||''; if($('#cf-key'))$('#cf-key').value=c.key||''; if($('#cf-ev'))$('#cf-ev').value=c.ev||''; }
-  if($('#cf-me'))$('#cf-me').value=ME||''; renderAdmin(); }
+  if($('#cf-me'))$('#cf-me').value=ME||''; const ai=getAI(); if($('#ai-key'))$('#ai-key').value=ai.key||''; if($('#ai-model'))$('#ai-model').value=ai.model||''; renderAdmin(); }
+$('#ai-save')&&$('#ai-save').addEventListener('click',()=>{ const key=($('#ai-key').value||'').trim(), model=($('#ai-model').value||'').trim();
+  setAI({key,model}); toast(key?'AI 配置已保存（仅存本机）':'已清空 AI 配置'); });
 /* 管理员隐藏菜单：注册（参与）用户情况 + 每人上传照片数（仅云协作模式有数据） */
 async function renderAdmin(){ const box=$('#admin-body'); if(!box)return;
   if(!CLOUD||!SB){ box.innerHTML='<p class="muted" style="margin-top:6px">仅在「☁️ 多人实时协作」连接后才有多用户数据。当前为本地模式。</p>'; return; }
