@@ -731,7 +731,9 @@ async function initCloud(){
     SB=m.createClient(c.url,c.key); EVENT=c.ev; CLOUD=true;
     if(!ME){ ME=((prompt('你的名字（标注谁拍/谁填）：')||'').trim())||'匿名'; localStorage.setItem('scout_me',ME); }
     const {data:bs,error:e1}=await SB.from('booth_state').select('*').eq('event',EVENT); if(e1) throw e1;
-    const pulled=new Set(); (bs||[]).forEach(r=>{ if(r.booth_id&&r.data){ STATE.booths[r.booth_id]=r.data; pulled.add(r.booth_id); } });
+    const pulled=new Set(); (bs||[]).forEach(r=>{ if(!r.booth_id) return;
+      if(r.booth_id==='__custom__'){ mergeCustomDefs(r.data&&r.data.defs); return; }
+      if(r.data){ STATE.booths[r.booth_id]=r.data; pulled.add(r.booth_id); } });
     save();
     const {data:ps,error:e2}=await SB.from('photos').select('*').eq('event',EVENT).order('ts',{ascending:true}); if(e2) throw e2;
     PHOTOS=(ps||[]).map(r=>({id:r.id,boothId:r.booth_id,by:r.by,cap:r.caption||'',ts:r.ts,path:r.path,
@@ -739,6 +741,7 @@ async function initCloud(){
     subscribeRT();
     // 首次连接：把本机已有、云端还没有的展位数据迁移上云（不覆盖云端较新数据）
     Object.keys(STATE.booths||{}).forEach(id=>{ if(!pulled.has(id)&&hasData(STATE.booths[id])) cloudPushBooth(id); });
+    if(STATE.custom&&STATE.custom.length) cloudPushCustom(); // 本机自定义展位上云，供同事可见
     return true;
   }catch(err){ console.warn('云端初始化失败，回退本地：',err); CLOUD=false; SB=null; toast('云端连接失败，已用本地模式'); return false; }
 }
@@ -746,6 +749,7 @@ function subscribeRT(){
   SB.channel('scout-rt')
     .on('postgres_changes',{event:'*',schema:'public',table:'booth_state',filter:'event=eq.'+EVENT},p=>{
       const r=p.new; if(!r||!r.booth_id||p.eventType==='DELETE') return;
+      if(r.booth_id==='__custom__'){ if(mergeCustomDefs(r.data&&r.data.defs)){ if(CUR==='list')renderList(); else if(CUR==='conf')renderConf(); } return; }
       STATE.booths[r.booth_id]=r.data; save();
       if(CUR==='list')renderList(); else if(CUR==='dash')renderDash();
       else if(CUR==='detail'&&CURBOOTH===r.booth_id&&r.updated_by&&r.updated_by!==ME) toast((r.updated_by||'他人')+' 更新了本展位');
@@ -764,6 +768,15 @@ async function cloudPushBooth(id){ try{
   const {error}=await SB.from('booth_state').upsert({event:EVENT,booth_id:id,data:bState(id),updated_by:ME,updated_at:new Date().toISOString()},{onConflict:'event,booth_id'});
   if(error) throw error;
 }catch(err){ console.warn('同步失败',err); toast('同步失败，稍后重试'); } }
+// 自定义（现场新增）展位的「定义」同步：存一行 booth_id='__custom__' 的注册表，供所有人看到彼此新增的展位
+function knownBoothId(id){ return SEED.some(b=>b.id===id)||REF_SEED.some(b=>b.id===id)||(typeof CONF_BOOTHS!=='undefined'&&CONF_BOOTHS.some(b=>b.id===id)); }
+function mergeCustomDefs(defs){ if(!Array.isArray(defs))return false; STATE.custom=STATE.custom||[]; let chg=false;
+  defs.forEach(d=>{ if(!d||!d.id||knownBoothId(d.id))return; if(!STATE.custom.find(x=>x.id===d.id)){ STATE.custom.push(d); chg=true; } });
+  if(chg) save(); return chg; }
+async function cloudPushCustom(){ if(!(CLOUD&&SB))return; try{
+  const {error}=await SB.from('booth_state').upsert({event:EVENT,booth_id:'__custom__',data:{defs:STATE.custom||[]},updated_by:ME,updated_at:new Date().toISOString()},{onConflict:'event,booth_id'});
+  if(error) throw error;
+}catch(err){ console.warn('自定义展位同步失败',err); } }
 
 /* IndexedDB for photos（本地模式） */
 let DB;
@@ -1235,7 +1248,7 @@ function addRef(name,catk){
   const id='ref_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
   STATE.custom=STATE.custom||[];
   STATE.custom.push({id,name,line,cat:catk,pri:0,hall:'',focus:'(参照对标 · 现场加入)',hyp:HQ[line],q:line==='A'?QA:line==='C'?QC:QB});
-  save(); if(CLOUD) cloudPushBooth(id); toast('已加入：'+name); openBooth(id);
+  save(); if(CLOUD){ cloudPushBooth(id); cloudPushCustom(); } toast('已加入：'+name); openBooth(id);
 }
 window.addRef=addRef;
 /* 在指定分类下手动加展位 */
@@ -1244,7 +1257,7 @@ function addInCat(catk){ const name=(prompt('展位 / 公司名称：')||'').tri
   const id='custom_'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
   STATE.custom=STATE.custom||[];
   STATE.custom.push({id,name,line,cat:catk,pri:0,hall:'',focus:'(现场新增)',hyp:HYP_OF_LINE[line],q:line==='A'?QA:line==='C'?QC:QB});
-  save(); if(CLOUD) cloudPushBooth(id); toast('已加入：'+name); openBooth(id);
+  save(); if(CLOUD){ cloudPushBooth(id); cloudPushCustom(); } toast('已加入：'+name); openBooth(id);
 }
 window.addInCat=addInCat;
 
@@ -1331,7 +1344,7 @@ $('#impfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!
       if(merge){ const inc=j.state.booths||{}; Object.keys(inc).forEach(id=>{STATE.booths[id]=mergeBooth(STATE.booths[id],inc[id]);});
         (j.state.custom||[]).forEach(c=>{ if(!(STATE.custom||[]).find(x=>x.id===c.id)&&!SEED.find(x=>x.id===c.id)){STATE.custom=STATE.custom||[];STATE.custom.push(c);} }); }
       else { STATE=j.state; }
-      save(); if(CLOUD) Object.keys(STATE.booths).forEach(id=>cloudPushBooth(id));
+      save(); if(CLOUD){ Object.keys(STATE.booths).forEach(id=>cloudPushBooth(id)); cloudPushCustom(); }
     }
     if(j.photos){ if(!merge&&!CLOUD) await clearPhotos();
       for(const p of j.photos){const blob=await(await fetch(p.data)).blob(); await addPhoto({boothId:p.boothId,blob,cap:p.cap||'',ts:p.ts||Date.now()});} }
@@ -1378,7 +1391,7 @@ $('#addbooth').addEventListener('click',()=>{const name=prompt('展位名称：'
   const line=prompt('归类 A=户储 / B=工商储 / G=通用：','G').toUpperCase();const L=['A','B','G'].includes(line)?line:'G';
   const id='custom_'+Date.now();STATE.custom=STATE.custom||[];
   STATE.custom.push({id,name,line:L,pri:0,hall:'',focus:'(临时新增)',hyp:[],q:L==='A'?QA:L==='B'?QB:['现场要点1','现场要点2','现场要点3']});
-  save();openBooth(id);});
+  save(); if(CLOUD){ cloudPushBooth(id); cloudPushCustom(); } openBooth(id);});
 
 /* ============================ 云协作 UI ============================ */
 function refreshCloudUI(){ const c=getCfg(); const st=$('#cloud-status'); if(!st)return;
