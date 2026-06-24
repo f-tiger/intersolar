@@ -1162,7 +1162,7 @@ window.exportInsightHTML=exportInsightHTML;
 /* ============================ 会议总结页（总目录 · 逐场结论） ============================ */
 // 精选会议结论（人工整理）；要把新的一场加进来，往这个数组里加一条即可
 const MEET_SUMMARY=[
-  {id:'spe-outlook', title:'《欧洲电池储能市场展望》发布', src:'SolarPower Europe · 6/24 ees Forum', tag:'市场数据', star:1,
+  {id:'spe-outlook', title:'第一部分 · 欧洲储能市场《电池储能市场展望》', src:'SolarPower Europe · 6/24 ees Forum', tag:'市场数据', star:1,
    points:[
      '<b>2025 欧洲新增储能 36 GWh</b>(创新高)：2021–23 由气价飙升催动户储增长，23–24 因户储装机下滑而放缓，<b>24–25 大储成为增长主力、分布式回暖</b>。',
      '<b>结构——大储已占半壁</b>：2025 利用规模(utility)≈53%、户储 34%、C&I 13%（2024 为 49 / 40 / 11）。',
@@ -1173,6 +1173,16 @@ const MEET_SUMMARY=[
      '<b>政策建议</b>：①破除并网/许可壁垒 ②让市场与系统激励真正奖励储能 ③提供清晰稳定、<b>可融资(bankable)</b>的投资条件 ④用定向 EU 工具放量。'
    ],
    ecoflow:'户储增速放缓、份额被大储与 C&I 蚕食 → EcoFlow 户用/阳台基本盘增长趋缓，增量在 <b>C&I(+30%)</b> 与 <b>新兴市场(乌/保/西/荷)</b>。"可融资/bankable"再成政策与产业共识 → 印证软件 3.0 的结算/账本方向。打法：①跟上 C&I 与新兴市场；②把"省钱 App"升级为能服务 VPP/灵活性变现的软件层。'
+  },
+  {id:'ees-am-0624', title:'第二部分 · 今早 ees Forum 其他厂商要点', src:'6/24 上午 Industry Pitches · 据现场议程整理', tag:'现场速记',
+   points:[
+     '<b>华为 FusionSolar</b>：分享构网型(GFM)储能在<b>西班牙的实地测试</b>——构网/黑启动支撑高比例可再生电网，是大储/电网级的竞争焦点。',
+     '<b>Anker 安克</b>：发表演讲——EcoFlow <b>直接同行</b>(消费/即插即用储能)，重点关注其欧洲打法与软件叙事（细节待补）。',
+     '<b>Canadian Solar 阿特斯</b>：把光储变成客户价值——<b>C&I 方案与欧洲真实项目</b>，呼应"C&I 是增量赛道"。',
+     '<b>FOX ESS</b> / <b>Solinteg</b>(新一代混合智能) / <b>Felicity Solar</b>(品牌战略·市场愿景·政策行动)：厂商演讲（细节待补）。',
+     '<b>灵活性圆桌</b>（FENECON CEO、ECO STOR）：储能在繁荣/监管/市场设计之间的<b>压力</b>——呼应 bankability 与灵活性变现主题。'
+   ],
+   ecoflow:'上午主线两条：① 大厂(华为)把竞争推到<b>构网/电网级</b>；② 同行(Anker)与组件厂(Canadian Solar)都在抢 <b>C&I 与"光储一体客户价值"</b>。EcoFlow 户用/阳台基本盘之外应盯紧 C&I 与软件变现；Anker 作为最同质对手需持续跟踪。'
   }
 ];
 function sessNote(id){ const s=bState(id); const parts=[]; if(s.notes)parts.push(s.notes);
