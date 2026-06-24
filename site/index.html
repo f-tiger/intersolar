@@ -1128,10 +1128,32 @@ function renderInsight(){
     'bankability(可融资账本)被反复提及，是 3.0 结算轨道的需求信号。'
   ]));
   h+='<div class="tip" style="font-size:11.5px;line-height:1.7"><b>来源 / 可信度</b>：综合上传的现场资料 + 官方定调 + 公开报道与融资数据交叉（详见仓库《Intersolar-2026-机会点扫描.md》来源清单）。⚠️ 部分现场议程/数字为 AI 整理草稿，正式商用前请回溯一手原文；展位/获奖以官方为准。</div>';
-  h+='<div class="sec"><h3>📤 分享给同事</h3><p class="muted" style="margin:0 0 8px">扫码或转发链接，同事点开<b>直达这份「洞察」总结</b>（无需登录、手机可读）。</p><button class="btn green" id="ins-share" style="width:100%">📱 生成分享二维码</button><div id="ins-qrbox"></div></div>';
+  h+='<div class="sec"><h3>📤 分享给同事</h3><p class="muted" style="margin:0 0 8px">扫码或转发链接，同事点开<b>直达这份「洞察」总结</b>（无需登录、手机可读）。</p><button class="btn green" id="ins-share" style="width:100%">📱 生成分享二维码</button><button class="btn sec2" id="ins-export" style="width:100%;margin-top:8px">💾 导出为独立 HTML（离线/可当附件发）</button><div id="ins-qrbox"></div></div>';
   $('#insightbody').innerHTML=h;
   const sb=$('#ins-share'); if(sb) sb.addEventListener('click',insightShareQR);
+  const eb=$('#ins-export'); if(eb) eb.addEventListener('click',exportInsightHTML);
 }
+function exportInsightHTML(){
+  const body=$('#insightbody'); if(!body) return;
+  if(!body.innerHTML.trim()) renderInsight();
+  const clone=$('#insightbody').cloneNode(true);
+  const sh=clone.querySelector('#ins-share'); if(sh){ const sec=sh.closest('.sec'); if(sec) sec.remove(); }
+  const css='body{font-family:-apple-system,system-ui,"PingFang SC",sans-serif;background:#0b1120;color:#e2e8f0;margin:0;padding:16px;line-height:1.6;-webkit-text-size-adjust:100%}'
+    +'.wrap{max-width:860px;margin:0 auto}h1{font-size:18px;margin:2px 0}'
+    +'.sec{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:12px 14px;margin:12px 0}'
+    +'.sec h3{margin:0 0 8px;font-size:15px}'
+    +'.tip{background:rgba(79,70,229,.14);border:1px solid #4f46e5;border-radius:10px;padding:10px 12px;margin:12px 0;font-size:13px}'
+    +'.muted{color:#94a3b8}ul{margin:6px 0;padding-left:18px}li{margin:3px 0}'
+    +'table{width:100%;border-collapse:collapse}td,th{vertical-align:top}';
+  const doc='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>EcoFlow 现场洞察 · Intersolar / The smarter E 2026</title><style>'+css+'</style></head><body><div class="wrap">'
+    +'<h1>📊 EcoFlow 现场洞察 · Intersolar / The smarter E 2026</h1>'
+    +'<p class="muted" style="font-size:12px;margin:0 0 6px">导出时间：'+new Date().toLocaleString('zh-CN')+' · 仅供内部参考</p>'
+    +clone.innerHTML+'</div></body></html>';
+  download('EcoFlow-Intersolar2026-洞察-'+stamp()+'.html', doc, 'text/html;charset=utf-8');
+  toast('已导出洞察 HTML');
+}
+window.exportInsightHTML=exportInsightHTML;
 function shareInsightLink(){ const base=location.origin+location.pathname; const c=getCfg();
   if(c){ const l=shareLink(); return l+(l.indexOf('#')>=0?'&':'#')+'view=insight'; }
   return base+'#view=insight'; }
