@@ -973,6 +973,7 @@ function renderInsight(){
   const sec=(title,inner)=>'<div class="sec"><h3>'+title+'</h3>'+inner+'</div>';
   const li=arr=>'<ul style="padding-left:18px;margin:6px 0;line-height:1.75">'+arr.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
   const sub=t=>'<div style="font-weight:700;margin:10px 0 2px;color:#cbd5e1">'+t+'</div>';
+  const seg3=(c1,rows)=>'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px"><thead><tr style="text-align:left;border-bottom:2px solid #334155;color:#94a3b8"><th style="padding:6px 5px">'+c1+'</th><th style="padding:6px 5px">头部玩家</th><th style="padding:6px 5px">EcoFlow 位置</th></tr></thead><tbody>'+rows.map(r=>'<tr style="border-bottom:1px solid #1e293b">'+r.map((c,i)=>'<td style="padding:6px 5px'+(i===0?';font-weight:700':'')+'">'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
   let h='';
   // 顶部 TL;DR
   h+='<div class="tip" style="line-height:1.7"><b>📊 现场洞察 · 2026 Intersolar / The smarter E（站在 EcoFlow 视角）</b><br>基于已上传的现场资料 + 官方定调 + 公开报道/融资数据交叉。<b>结论：硬件在快速商品化，价值确定性迁移到「软件 + 灵活性 + 结算」层——这是 EcoFlow 从"卖设备"转"卖系统/订阅/调度"的窗口。</b></div>';
@@ -989,30 +990,30 @@ function renderInsight(){
       '增速见顶、结构分化：意大利 −40%、英国 +130%、德国平台期；大储首次反超户储(占 55%)。',
       '今日 6/24 现场主题：钠离子电池商业化(CATL/Verkor)、长时储能(液流/压缩空气/氢)、构网型逆变器(grid-forming)、储能安全/液冷消防、<b>EU 储能供应链法案 + 碳关税</b>(对中国厂商影响大)。'
     ])+
-    sub('竞争格局')+li([
-      '德业 / 比亚迪 / Growatt / SolarEdge / Solis：混合逆变 + 户储系统，走<b>安装商渠道</b>。',
-      'Tesla / sonnen：高端一体化生态。',
-      '中国即插即用(EcoFlow / Marstek / Anker / Zendure)：阳台 / 便携 / DTC。'
+    sub('按细分场景对比（阳台 / 家储 / 工商储）')+seg3('细分场景',[
+      ['🪟 阳台储能','Marstek、安克 SOLIX、Zendure、Hoymiles(微逆)、Growatt NEO','⭐<b>最强</b>：PowerStream / STREAM、DTC 品牌力、迭代快'],
+      ['🏠 家储(户储系统)','德业、比亚迪、SolarEdge、Sungrow、Solis、AlphaESS、sonnen、Tesla、华为 LUNA','起步：PowerOcean 三相；缺<b>安装商渠道 / 系统化交付</b>'],
+      ['⚡ 工商储 C&I','Tesvolt、Alfen、Intilion、Sungrow、华为、BYD、CATL、思格','<b>基本空白(最大缺口)</b>']
     ])+
-    sub('▶ EcoFlow 位置')+li([
-      '强：便携 + 阳台 + 即插即用 + DTC 品牌力、产品迭代快。',
-      '弱：工商储(C&I)、安装商渠道与系统化交付、与电网/合规深度(§14a / EEBUS)。'
+    sub('▶ 小结')+li([
+      '阳台强、家储起步、工商储几乎缺位——越往"系统化 / 渠道 / 电网侧"走，EcoFlow 越弱，但那正是价值与利润迁移的方向。'
     ]));
   // 维度2 储能软件
-  h+=sec('🧩 维度二 · 储能软件（HEMS / VPP / EMS）',
+  h+=sec('🧩 维度二 · 储能软件（App / HEMS / VPP / EMS）',
     sub('现场信号')+li([
       'HEMS 绑硬件捆绑销售从 2024 的 40% 升到 2025 的 <b>51%</b>；约 1/5 单品牌孤岛；<b>53%</b> 市场靠逐品牌定制集成。',
       '欧洲约 <b>100 GW 户用灵活性 &lt;20% 被变现</b>；动态电价 DE 已强制(§41a)，但智能电表渗透仅 ~5.5% → 增长曲线在前面。'
     ])+
-    sub('竞争格局')+li([
-      'gridX / kiwigrid：跨品牌平台、愿"被集成"做底座(kiwigrid 2026/6 发泛欧 VPP)。',
-      '1KOMMA5° Heartbeat：跨品牌 VPP 1GW、已向<b>存量</b>开放；sonnen / Tesla：VPP(偏自家)。',
-      'coneva / Furo / Simpl：C&I EMS；Next Kraftwerke / Entrix / Suena：VPP + 交易。'
+    sub('按软件层次对比（App / HEMS / VPP / EMS）')+seg3('软件层次',[
+      ['📱 消费端 App','安克、Marstek、各厂自家 App(监控+基础优化)','有(EcoFlow App / OASIS)；但<b>自家生态 / 云锁定</b>'],
+      ['🏠 HEMS 户用能管','gridX、kiwigrid、1KOMMA5° Heartbeat、SMA、Loxone、sonnen、Solarwatt','弱：偏自家设备，<b>缺跨品牌中立接入</b>'],
+      ['📈 VPP / 聚合 / 交易','1KOMMA5°、sonnen、Next Kraftwerke、Tibber、Entrix、Kraken','<b>基本无</b> VPP 收益分成 / 动态电价自动套利'],
+      ['⚡ C&I EMS 调度','coneva、Furo、Simpl、Sungrow iSolarEMS、华为、FENECON(开源)','<b>无</b>(对应硬件工商储缺位)']
     ])+
-    sub('▶ EcoFlow 位置 / 差距')+li([
-      'OASIS 有 AI 能量管理，但偏<b>自家生态 / 云锁定</b>。',
+    sub('▶ EcoFlow 位置 / 机会')+li([
+      '强在最浅的"消费端 App"层，越往 HEMS→VPP→EMS 走越弱——而<b>价值正沿这条链上移</b>。',
       '缺：跨品牌中立接入、VPP 收益分成、动态电价自动套利、安装商批量纳管、收益结算透明。',
-      '<b>机会(对应扫描 D)</b>：给中国即插即用洪流做独立智能调度 / 聚合层。'
+      '<b>机会(对应扫描 D)</b>：把自家 App 升级为给中国即插即用洪流做<b>独立跨品牌调度 / 聚合层</b>。'
     ]));
   // 维度3 AI+Energy —— 储能同行 AI 成色对比（含华为/思格/安克）
   const aiPeers=[
