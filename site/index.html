@@ -1212,7 +1212,7 @@ function renderSummary(){
   const sb=$('#sum-share'); if(sb) sb.addEventListener('click',summaryShareQR);
   const eb=$('#sum-export'); if(eb) eb.addEventListener('click',exportSummaryHTML);
 }
-async function summaryShareQR(){ const box=$('#sum-qrbox'); if(!box)return; const link=location.origin+location.pathname+'#view=summary';
+async function summaryShareQR(){ const box=$('#sum-qrbox'); if(!box)return; const link=location.origin+location.pathname+'?view=summary';
   box.innerHTML='<p class="muted" style="text-align:center;margin-top:8px">生成中…</p>';
   try{ const m=await import('https://esm.sh/qrcode@1'); const QR=m.default||m;
     const url=await QR.toDataURL(link,{width:280,margin:1,color:{dark:'#0b1120',light:'#ffffff'}});
@@ -1238,7 +1238,7 @@ function exportSummaryHTML(){ const body=$('#summarybody'); if(!body) return; if
   download('EcoFlow-Intersolar2026-会议总结-'+stamp()+'.html', doc, 'text/html;charset=utf-8'); toast('已导出会议总结 HTML'); }
 window.summaryShareQR=summaryShareQR; window.exportSummaryHTML=exportSummaryHTML;
 window.renderSummary=renderSummary;
-function shareInsightLink(){ return location.origin+location.pathname+'#view=insight'; } // 洞察是静态内容，无需带云配置，链接保持短
+function shareInsightLink(){ return location.origin+location.pathname+'?view=insight'; } // 用 query 参数，微信/各浏览器更稳；静态内容无需带云配置
 async function insightShareQR(){ const box=$('#ins-qrbox'); if(!box)return; const link=shareInsightLink();
   box.innerHTML='<p class="muted" style="text-align:center;margin-top:8px">生成中…</p>';
   try{ const m=await import('https://esm.sh/qrcode@1'); const QR=m.default||m;
@@ -1613,8 +1613,10 @@ function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
   if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
   renderList(); refreshCloudUI(); applyRole();
-  if(/view=insight/.test(location.hash)) go('insight'); else if(/view=summary/.test(location.hash)) go('summary'); // 分享链接直达
+  const tv=urlView(); if(tv) go(tv); // 分享链接直达（支持 ?view= 或 #view=）
 })();
+function urlView(){ const m=(location.search+location.hash).match(/view=(insight|summary|conf|dash|data|list)/); return m?m[1]:''; }
+window.addEventListener('hashchange',()=>{ const tv=urlView(); if(tv) go(tv); });
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
 </body>
