@@ -187,6 +187,7 @@
   <nav class="nav" id="nav">
     <button data-v="list" class="on">展位</button>
     <button data-v="conf">会议</button>
+    <button data-v="insight">洞察</button>
     <button data-v="dash">验证看板</button>
     <button data-v="data">数据/归档</button>
   </nav>
@@ -220,6 +221,9 @@
 
   <!-- CONF VIEW -->
   <section id="view-conf" class="hidden"><div id="confbody"></div></section>
+
+  <!-- INSIGHT VIEW -->
+  <section id="view-insight" class="hidden"><div id="insightbody"></div></section>
 
   <!-- DETAIL VIEW -->
   <section id="view-detail" class="hidden"></section>
@@ -823,10 +827,10 @@ const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 let LIST_SCROLL=0;
 function go(v){ if((v==='dash'||v==='data')&&CLOUD&&!OWNER) v='list';
   if(CUR==='list' && v!=='list') LIST_SCROLL=window.scrollY||window.pageYOffset||0;
-  CUR=v;['list','conf','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
+  CUR=v;['list','conf','insight','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   if(v==='list'){ renderList().then(()=>window.scrollTo(0,LIST_SCROLL)); return; }
-  if(v==='conf')renderConf(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
+  if(v==='conf')renderConf(); if(v==='insight')renderInsight(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
 function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
@@ -962,6 +966,96 @@ async function renderConf(){
       +'</div>'; });
   });
   $('#confbody').innerHTML=h+(body||'<p class="muted" style="text-align:center;padding:30px">无匹配场次</p>');
+}
+
+/* ============================ 洞察 / 结论（现场总结，对标 EcoFlow） ============================ */
+function renderInsight(){
+  const sec=(title,inner)=>'<div class="sec"><h3>'+title+'</h3>'+inner+'</div>';
+  const li=arr=>'<ul style="padding-left:18px;margin:6px 0;line-height:1.75">'+arr.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  const sub=t=>'<div style="font-weight:700;margin:10px 0 2px;color:#cbd5e1">'+t+'</div>';
+  let h='';
+  // 顶部 TL;DR
+  h+='<div class="tip" style="line-height:1.7"><b>📊 现场洞察 · 2026 Intersolar / The smarter E（站在 EcoFlow 视角）</b><br>基于已上传的现场资料 + 官方定调 + 公开报道/融资数据交叉。<b>结论：硬件在快速商品化，价值确定性迁移到「软件 + 灵活性 + 结算」层——这是 EcoFlow 从"卖设备"转"卖系统/订阅/调度"的窗口。</b></div>';
+  h+=sec('🧭 一页结论（TL;DR）', li([
+    '<b>硬件白菜化</b>：户储电池包 ~$70/kWh（−45%）、户储新机连续两年下滑(−6%)、大储首超户储(55%)。差异化只能来自软件/服务。',
+    '<b>软件 2.0 已拥挤、α 压缩</b>：FCR 饱和、英国调频收入曾暴跌 73%；"多榨 X% 收益"会越卷越薄。',
+    '<b>真正高地在 3.0</b>：跨品牌接入 + 可融资结算「轨道/账本」(bankability)，目前<b>无人占稳</b>。',
+    '<b>AI 在升级</b>：从"看板/建议"→"自治交易/调度 + 可信账本"（Suena/Entrix/Kraken $8.65B、volytica/TWAICE）。EcoFlow 的 AI(OASIS)仍偏消费端自家生态。',
+    '<b>对 EcoFlow 最大杠杆</b>：把海量「即插即用」装机（现为封闭 App）→ 开放成跨品牌灵活性池 + VPP + 安装商工具，向 3.0 轨道卡位，而非再做一个更封闭的家庭 App。'
+  ]));
+  // 维度1 储能硬件
+  h+=sec('🔋 维度一 · 储能硬件',
+    sub('现场信号')+li([
+      '增速见顶、结构分化：意大利 −40%、英国 +130%、德国平台期；大储首次反超户储(占 55%)。',
+      '今日 6/24 现场主题：钠离子电池商业化(CATL/Verkor)、长时储能(液流/压缩空气/氢)、构网型逆变器(grid-forming)、储能安全/液冷消防、<b>EU 储能供应链法案 + 碳关税</b>(对中国厂商影响大)。'
+    ])+
+    sub('竞争格局')+li([
+      '德业 / 比亚迪 / Growatt / SolarEdge / Solis：混合逆变 + 户储系统，走<b>安装商渠道</b>。',
+      'Tesla / sonnen：高端一体化生态。',
+      '中国即插即用(EcoFlow / Marstek / Anker / Zendure)：阳台 / 便携 / DTC。'
+    ])+
+    sub('▶ EcoFlow 位置')+li([
+      '强：便携 + 阳台 + 即插即用 + DTC 品牌力、产品迭代快。',
+      '弱：工商储(C&I)、安装商渠道与系统化交付、与电网/合规深度(§14a / EEBUS)。'
+    ]));
+  // 维度2 储能软件
+  h+=sec('🧩 维度二 · 储能软件（HEMS / VPP / EMS）',
+    sub('现场信号')+li([
+      'HEMS 绑硬件捆绑销售从 2024 的 40% 升到 2025 的 <b>51%</b>；约 1/5 单品牌孤岛；<b>53%</b> 市场靠逐品牌定制集成。',
+      '欧洲约 <b>100 GW 户用灵活性 &lt;20% 被变现</b>；动态电价 DE 已强制(§41a)，但智能电表渗透仅 ~5.5% → 增长曲线在前面。'
+    ])+
+    sub('竞争格局')+li([
+      'gridX / kiwigrid：跨品牌平台、愿"被集成"做底座(kiwigrid 2026/6 发泛欧 VPP)。',
+      '1KOMMA5° Heartbeat：跨品牌 VPP 1GW、已向<b>存量</b>开放；sonnen / Tesla：VPP(偏自家)。',
+      'coneva / Furo / Simpl：C&I EMS；Next Kraftwerke / Entrix / Suena：VPP + 交易。'
+    ])+
+    sub('▶ EcoFlow 位置 / 差距')+li([
+      'OASIS 有 AI 能量管理，但偏<b>自家生态 / 云锁定</b>。',
+      '缺：跨品牌中立接入、VPP 收益分成、动态电价自动套利、安装商批量纳管、收益结算透明。',
+      '<b>机会(对应扫描 D)</b>：给中国即插即用洪流做独立智能调度 / 聚合层。'
+    ]));
+  // 维度3 AI+Energy
+  h+=sec('🤖 维度三 · AI + Energy',
+    sub('现场信号')+li([
+      '资本押注 AI 交易优化：Entrix €43M(3GW/8.5GWh)、Suena、GridBeyond €52M、<b>Kraken 分拆估值 $8.65B</b>。',
+      '行业从"容量"转"业绩"：<b>bankability</b> 成 2026 主题(TWAICE：50% 缺单一可信数据源、47% 难追责供应商)。',
+      '今日现场：AI EMS 主场(光储协同 + 电网调频 + 户储 AI 管家)、AI 电池诊断(volytica)、AI 可用容量测算。'
+    ])+
+    sub('AI 的四个层次')+li([
+      '① AI 看板/监控（已普及）｜② AI 优化/调度（2.0，拥挤）',
+      '③ <b>AI 自治交易/对冲（agentic，新热点）</b>｜④ <b>AI 可融资账本 / 资产层 KPI（bankability，空白）</b>'
+    ])+
+    sub('▶ EcoFlow 位置')+li([
+      'AI 主要落在<b>消费端</b>(OASIS 用电优化 / 省钱)；缺 ③ 自治交易 与 ④ 可信账本。'
+    ]));
+  // 维度4 EcoFlow 对标 & 打法
+  const rows=[
+    ['储能硬件','德业/比亚迪(系统+渠道)、Tesla/sonnen(生态)','便携+阳台 DTC 强','补 C&I + 系统化交付'],
+    ['接入开放','gridX/kiwigrid 跨品牌平台','有开放 API 但偏自家生态','把 API 做成<b>跨品牌中立接入层</b>(方向②)'],
+    ['VPP/灵活性','1KOMMA5°/sonnen/Next Kraftwerke','基本无 VPP 分成','海量装机→灵活性池+动态电价/VPP分成(A/D)'],
+    ['AI','Suena/Entrix/Kraken(交易)、volytica/TWAICE(账本)','消费端 AI(OASIS)','延伸到自治调度 + 可融资账本(方向③④)'],
+    ['渠道/合规','安装商渠道 + §14a/EEBUS','DTC 为主、合规浅','补安装商工具 + 德国合规楔子(C/F)']
+  ];
+  const table='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">'
+    +'<thead><tr style="text-align:left;border-bottom:2px solid #334155;color:#94a3b8">'
+    +'<th style="padding:6px 5px">维度</th><th style="padding:6px 5px">头部对标</th><th style="padding:6px 5px">EcoFlow 现状</th><th style="padding:6px 5px">差距 / 机会</th></tr></thead><tbody>'
+    +rows.map(r=>'<tr style="border-bottom:1px solid #1e293b">'+r.map((c,i)=>'<td style="padding:6px 5px'+(i===0?';font-weight:700':'')+'">'+c+'</td>').join('')+'</tr>').join('')
+    +'</tbody></table></div>';
+  h+=sec('⭐ 维度四 · EcoFlow 对标 & 打法（核心）', table+
+    sub('四条可执行打法')+li([
+      '<b>短期</b>：开放 API + 做跨品牌接入与安装商纳管工具，把封闭 App 升级为"可被集成的平台"。<span class="muted">(方向②)</span>',
+      '<b>中期</b>：把欧洲海量即插即用装机聚合成 <b>VPP / 灵活性池</b>，接动态电价套利 + VPP 分成（户均上限可达 ~€1000/年）。<span class="muted">(机会 A/D)</span>',
+      '<b>升维</b>：把"接入 + 结算"做成可对外开放的<b>轨道 / 账本(bankability)</b>，不只服务自家硬件。<span class="muted">(3.0 / 方向③④)</span>',
+      '<b>切入楔子</b>：德国 §14a "合规即优化" + 动态电价，借强制刚需低成本获客。<span class="muted">(机会 C/F)</span>'
+    ]));
+  // 现场信号速记 + 来源
+  h+=sec('📡 今日现场信号速记（6/24）', li([
+    '钠电商业化、长时储能补贴框架、构网型逆变器(黑启动)、储能安全/液冷消防。',
+    '<b>EU 储能供应链法案 + 进口碳关税</b> → 中国厂商需关注本土电芯产能/合规。',
+    'bankability(可融资账本)被反复提及，是 3.0 结算轨道的需求信号。'
+  ]));
+  h+='<div class="tip" style="font-size:11.5px;line-height:1.7"><b>来源 / 可信度</b>：综合上传的现场资料 + 官方定调 + 公开报道与融资数据交叉（详见仓库《Intersolar-2026-机会点扫描.md》来源清单）。⚠️ 部分现场议程/数字为 AI 整理草稿，正式商用前请回溯一手原文；展位/获奖以官方为准。</div>';
+  $('#insightbody').innerHTML=h;
 }
 
 async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);const s=bState(id);
