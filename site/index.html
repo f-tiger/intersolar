@@ -771,6 +771,9 @@ function mergeCustomDefs(defs){ if(!Array.isArray(defs))return false; STATE.cust
   defs.forEach(d=>{ if(!d||!d.id||knownBoothId(d.id))return; if(!STATE.custom.find(x=>x.id===d.id)){ STATE.custom.push(d); chg=true; } });
   if(chg) save(); return chg; }
 async function cloudPushCustom(){ if(!(CLOUD&&SB))return; try{
+  // 先读云端现有注册表并合并，避免两人同时新增时相互覆盖（最终写入并集）
+  try{ const {data}=await SB.from('booth_state').select('data').eq('event',EVENT).eq('booth_id','__custom__').maybeSingle();
+       if(data&&data.data&&Array.isArray(data.data.defs)) mergeCustomDefs(data.data.defs); }catch(e){}
   const {error}=await SB.from('booth_state').upsert({event:EVENT,booth_id:'__custom__',data:{defs:STATE.custom||[]},updated_by:ME,updated_at:new Date().toISOString()},{onConflict:'event,booth_id'});
   if(error) throw error;
 }catch(err){ console.warn('自定义展位同步失败',err); } }
