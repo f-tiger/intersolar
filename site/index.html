@@ -189,7 +189,6 @@
     <button data-v="conf">会议</button>
     <button data-v="insight">洞察</button>
     <button data-v="summary">总结</button>
-    <button data-v="dash">验证看板</button>
     <button data-v="data">数据/归档</button>
   </nav>
 </header>
@@ -232,11 +231,6 @@
   <!-- DETAIL VIEW -->
   <section id="view-detail" class="hidden"></section>
 
-  <!-- DASHBOARD VIEW -->
-  <section id="view-dash" class="hidden">
-    <div class="tip">把每个展位调研后给相关假设打上 <b>支持 / 中立 / 反驳</b>，这里会实时汇总。达到 PRD 的"判定标准"即可决定立项。</div>
-    <div id="dashbody"></div>
-  </section>
 
   <!-- DATA VIEW -->
   <section id="view-data" class="hidden">
@@ -280,7 +274,6 @@
         <li>手机打开本页 → "添加到主屏幕"可离线使用（首次需联网加载一次）。</li>
         <li>每个展位：拍照 / 上传图片、逐条勾选并回答调研问题、记笔记、给假设打标。</li>
         <li>照片会自动压缩（长边≤1600px）以节省空间。</li>
-        <li>"验证看板"汇总 A/B 两条线的假设证据，辅助判断 MVP 是否立项。</li>
         <li>本工具本身也是一个可被验证的"现场数据采集"MVP — 用顺手与否就是反馈。</li>
       </ul>
     </div>
@@ -715,7 +708,7 @@ function cardHtml(b,pc){ const st=statusOf(b.id);const s=bState(b.id);const a=an
 /* ---------- 云协作（Supabase 实时；未配置=纯本地） ---------- */
 let CLOUD=false, SB=null, EVENT='', ME=localStorage.getItem('scout_me')||'', OWNER=localStorage.getItem('scout_owner')==='1';
 function applyRole(){ const restricted=CLOUD&&!OWNER;
-  document.querySelectorAll('#nav button[data-v="dash"],#nav button[data-v="data"]').forEach(b=>{b.style.display=restricted?'none':'';}); }
+  document.querySelectorAll('#nav button[data-v="data"]').forEach(b=>{b.style.display=restricted?'none':'';}); }
 let PHOTOS=[]; // 云模式照片缓存 {id,boothId,by,cap,ts,path,url}
 const _pushT={};
 function getCfg(){ try{
@@ -755,7 +748,7 @@ function subscribeRT(){
       const r=p.new; if(!r||!r.booth_id||p.eventType==='DELETE') return;
       if(r.booth_id==='__custom__'){ if(mergeCustomDefs(r.data&&r.data.defs)){ if(CUR==='list')renderList(); else if(CUR==='conf')renderConf(); } return; }
       STATE.booths[r.booth_id]=r.data; save();
-      if(CUR==='list')renderList(); else if(CUR==='dash')renderDash();
+      if(CUR==='list')renderList();
       else if(CUR==='detail'&&CURBOOTH===r.booth_id&&r.updated_by&&r.updated_by!==ME) toast((r.updated_by||'他人')+' 更新了本展位');
     })
     .on('postgres_changes',{event:'*',schema:'public',table:'photos',filter:'event=eq.'+EVENT},p=>{
@@ -842,12 +835,12 @@ window.toggleRef=toggleRef; window.toggleCat=toggleCat; window.selCat=selCat;
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
 let LIST_SCROLL=0;
-function go(v){ if((v==='dash'||v==='data')&&CLOUD&&!OWNER) v='list';
+function go(v){ if(v==='data'&&CLOUD&&!OWNER) v='list';
   if(CUR==='list' && v!=='list') LIST_SCROLL=window.scrollY||window.pageYOffset||0;
-  CUR=v;['list','conf','insight','summary','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
+  CUR=v;['list','conf','insight','summary','detail','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   if(v==='list'){ renderList().then(()=>window.scrollTo(0,LIST_SCROLL)); return; }
-  if(v==='conf')renderConf(); if(v==='insight')renderInsight(); if(v==='summary')renderSummary(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
+  if(v==='conf')renderConf(); if(v==='insight')renderInsight(); if(v==='summary')renderSummary(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
 function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
@@ -1302,7 +1295,7 @@ async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);
 
    ${b.hyp.length?`<div class="sec">
      <h3>🎯 假设证据（关键）</h3>
-     <p class="muted" style="margin:-4px 0 4px;font-size:11.5px">基于本展位见闻，给相关假设打标，会汇总到验证看板</p>
+     <p class="muted" style="margin:-4px 0 4px;font-size:11.5px">基于本展位见闻给相关假设打标（用于自动结论）</p>
      ${b.hyp.map(h=>`<div class="hypbox">
         <div class="hid">${h}</div><div class="ht">${esc(HYP[h].title)}</div>
         <div class="seg" data-h="${h}">
@@ -1422,48 +1415,6 @@ function concludeBooth(b,s){
 }
 function updateConcl(){const box=$('#conclbox');if(!box||!CURBOOTH)return;const b=allBooths().find(x=>x.id===CURBOOTH);const cc=concludeBooth(b,bState(CURBOOTH));
   box.innerHTML='<span class="lean '+cc.cls+'">'+cc.lean+'</span>'+(cc.sel.length?'<div class="muted" style="margin-top:7px;line-height:1.6">关键信号：'+esc(cc.sel.join(' / '))+'</div>':'<div class="muted" style="margin-top:7px">选完选项，这里会给出该公司的倾向</div>');}
-
-/* ============================ 验证看板 ============================ */
-function renderDash(){
-  const tally={};Object.keys(HYP).forEach(h=>tally[h]={support:0,neutral:0,refute:0,booths:[]});
-  allBooths().forEach(b=>{const s=bState(b.id);Object.entries(s.hyp||{}).forEach(([h,v])=>{
-    if(v&&tally[h]){tally[h][v]++;tally[h].booths.push(b.name);}});});
-  const lines={A:'A 线 · 户储 retrofit 层',B:'B 线 · 工商储 value-stacking SaaS',C:'C 线 · 软件未来方向（3.0）'};
-  const lineColor={A:'#4338ca',B:'#0369a1',C:'#0f766e'};
-  let html='';
-  ['A','B','C'].forEach(L=>{
-    html+=`<h2 style="font-size:15px;margin:6px 0 10px;color:${lineColor[L]}">${lines[L]}</h2>`;
-    Object.entries(HYP).filter(([h,o])=>o.line===L).forEach(([h,o])=>{
-      const t=tally[h];const tot=t.support+t.neutral+t.refute;
-      const verdict = tot===0?'尚无证据，去现场调研对应展位':
-        (t.support>=3&&t.support>t.refute)?'✅ 证据偏向成立（支持≥3 且多于反驳）':
-        (t.refute>t.support)?'❌ 证据偏向反驳，需重新评估':'🟡 证据不足/分歧，继续收集';
-      html+=`<div class="hcard"><div class="lbl">${h}</div><div class="desc">${esc(o.title)}</div>
-        <div class="bars">${tot?`
-          ${t.support?`<div class="bs" style="flex:${t.support}">${t.support}</div>`:''}
-          ${t.neutral?`<div class="bn" style="flex:${t.neutral}">${t.neutral}</div>`:''}
-          ${t.refute?`<div class="br" style="flex:${t.refute}">${t.refute}</div>`:''}`:'<div class="empty">暂无证据</div>'}</div>
-        <div class="verdict">${verdict}${t.booths.length?' · '+esc(t.booths.join('、')):''}</div></div>`;
-    });
-  });
-  html+=`<div class="hcard"><div class="lbl">判定标准（来自 PRD）</div>
-    <div class="muted" style="margin-top:6px;line-height:1.8">
-    <b>A 立项</b>：3+ 在位者确认"只服务自家生态"(A-H1 支持≥3) 且 2+ 渠道方要中立层(A-H2)。<br>
-    <b>B 立项</b>：现有产品普遍"绑硬件/偏大资产/结算薄弱"(B-H1) 且 2+ 集成商/ESaaS 愿白标付费(B-H2/H3)。<br>
-    <b>C(3.0)立项</b>：2+ 在位者愿"被集成做底座"(C-H1) ＋ 结算无人达 bankable 标准(C-H2 支持) ＋ 接入/账本尚无人锁定(C-H3)＝有轨道卡位窗。</div></div>`;
-  // 各家洞察（自动结论）
-  const cards=allBooths().filter(b=>b.line!=='G').map(b=>({b,cc:concludeBooth(b,bState(b.id))})).filter(x=>x.cc.lean!=='未调研');
-  html+=`<h2 style="font-size:15px;margin:16px 0 10px">🧭 各家洞察（自动结论 · 随作答更新）</h2>`;
-  if(!cards.length){ html+='<p class="muted">还没有可结论的展位——去现场点选问题后，这里自动按各家作答生成不同结论。</p>'; }
-  cards.forEach(({b,cc})=>{
-    html+=`<div class="hcard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
-      <b style="font-size:13.5px">${esc(b.name)}</b><span class="lean ${cc.cls}">${cc.lean}</span></div>
-      ${cc.sel.length?'<div class="muted" style="margin-top:6px;line-height:1.6">'+esc(cc.sel.join(' / '))+'</div>':''}
-      ${(cc.sup.length||cc.ref.length)?'<div style="margin-top:5px;font-size:11px">'+(cc.sup.length?'<span style="color:#15803d">支持 '+esc(cc.sup.join('、'))+'</span>':'')+(cc.ref.length?' <span style="color:#b91c1c">反驳 '+esc(cc.ref.join('、'))+'</span>':'')+'</div>':''}
-    </div>`;
-  });
-  $('#dashbody').innerHTML=html;
-}
 
 /* ============================ 导出 / 归档 ============================ */
 function blobToDataURL(b){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b);});}
@@ -1608,7 +1559,7 @@ window.openBooth=openBooth;window.go=go;window.markDone=markDone;
 
 /* 切换"主持人模式"：连点标题 5 下 / 长按 0.6s / 网址带 #admin（显示·隐藏 验证看板·数据归档） */
 function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'1':'0'); applyRole();
-  toast(OWNER?'已开启主持人模式（显示看板/数据）':'已关闭主持人模式'); if(!OWNER&&(CUR==='dash'||CUR==='data'))go('list'); }
+  toast(OWNER?'已开启主持人模式（显示数据/归档）':'已关闭主持人模式'); if(!OWNER&&CUR==='data')go('list'); }
 (function(){const el=document.querySelector('header .hbar'); if(!el)return; let t=null,n=0,t0=0;
   el.addEventListener('click',()=>{ const now=Date.now(); if(now-t0>1500)n=0; t0=now; if(++n>=5){n=0; toggleOwner();} });
   const start=()=>{ t=setTimeout(toggleOwner,600); };
@@ -1625,7 +1576,7 @@ function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'
   renderList(); refreshCloudUI(); applyRole();
   const tv=urlView(); if(tv) go(tv); // 分享链接直达（支持 ?view= 或 #view=）
 })();
-function urlView(){ const m=(location.search+location.hash).match(/view=(insight|summary|conf|dash|data|list)/); return m?m[1]:''; }
+function urlView(){ const m=(location.search+location.hash).match(/view=(insight|summary|conf|data|list)/); return m?m[1]:''; }
 window.addEventListener('hashchange',()=>{ const tv=urlView(); if(tv) go(tv); });
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
