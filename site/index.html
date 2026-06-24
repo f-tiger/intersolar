@@ -903,7 +903,7 @@ $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
 /* ============================ 会议 / 论坛排期 ============================ */
 const CONF=[
-  {day:'✅ 6/23 周一 · DAY 1 全论坛（官方 App·准）', items:[
+  {day:'✅ 6/23 周二 · DAY 1 全论坛（官方 App·准）', items:[
     {id:'d1_ees_pitch1',time:'10:30–11:00', name:'ees Forum｜Industry Pitches', loc:'C2.230 ees Forum', key:'(EN)'},
     {id:'d1_is_fleet',time:'10:15–11:45', name:'⭐ Intersolar Forum｜工商业 PV+储能+车队管理 智慧组合', loc:'A3.150 Intersolar Forum', key:'PV-Plus-Storage with Fleet Management(EN)——C&I 光储'},
     {id:'d1_su_aiforecast',time:'10:30–12:00', name:'⭐ Start-up Stage｜AI 预测与用能成本优化', loc:'C4.480 Start-up Stage', key:'AI Forecasting & Energy Cost Optimization(EN)'},
@@ -1026,8 +1026,13 @@ const CONF_BOOTHS=[];
 (function(){ const ids=new Set(SEED.map(b=>b.id));
   CONF.forEach(g=>g.items.forEach(it=>{ if(it.id && !ids.has(it.id) && !CONF_BOOTHS.find(x=>x.id===it.id))
     CONF_BOOTHS.push({id:it.id,name:it.name,line:'G',pri:0,hall:it.loc||'',focus:it.key||'',hyp:[],q:QFORUM}); })); })();
-let CONFVENUE='all', CONFAI=false;
+let CONFVENUE='all', CONFAI=false, CONFDAY='d3';
 const VENUE_ORDER=['ees Forum','Intersolar Forum','Innovation Hub','smarter E Forum','EM-Power','Power2Drive','Hydrogen','ICM','展台/其他'];
+const DAY_ORDER=['d3','d2','d1','d0','other'];
+const DAY_LABEL={d3:'6/25 周四·明天',d2:'6/24 周三·今天',d1:'6/23 周二',d0:'6/22 前夜',other:'跨天/通用'};
+function confDayKey(g){ const d=g.day||'';
+  if(/6\/22[–-]23|6\/23[–-]25/.test(d)) return 'other';
+  if(/6\/25/.test(d))return 'd3'; if(/6\/24/.test(d))return 'd2'; if(/6\/23/.test(d))return 'd1'; if(/6\/22/.test(d))return 'd0'; return 'other'; }
 function confVenue(it){ const s=(it.loc||'')+' '+(it.name||'');
   if(/ees Forum/i.test(s))return 'ees Forum';
   if(/Innovation Hub/i.test(s))return 'Innovation Hub';
@@ -1041,7 +1046,8 @@ function confVenue(it){ const s=(it.loc||'')+' '+(it.name||'');
 function confIsAI(it){ return /AI/i.test((it.name||'')+' '+(it.key||'')); }
 function selConfVenue(v){ CONFVENUE=v; renderConf(); window.scrollTo(0,0); }
 function toggleConfAI(){ CONFAI=!CONFAI; renderConf(); }
-window.selConfVenue=selConfVenue; window.toggleConfAI=toggleConfAI;
+function selConfDay(d){ CONFDAY=d; renderConf(); window.scrollTo(0,0); }
+window.selConfVenue=selConfVenue; window.toggleConfAI=toggleConfAI; window.selConfDay=selConfDay;
 async function renderConf(){
   const allP=await allPhotos(); const pc={}; allP.forEach(p=>{pc[p.boothId]=(pc[p.boothId]||0)+1;});
   const venues=[]; CONF.forEach(g=>g.items.forEach(it=>{const v=confVenue(it); if(!venues.includes(v))venues.push(v);}));
@@ -1050,12 +1056,21 @@ async function renderConf(){
   const aiTotal=CONF.reduce((n,g)=>n+g.items.filter(confIsAI).length,0);
   const pass=it=>(CONFVENUE==='all'||confVenue(it)===CONFVENUE)&&(!CONFAI||confIsAI(it));
   let h='<div class="tip">📅 排期 + 一句话重点。<b>带 ✅ 的 ees Forum(Day2/3) 为现场实拍官方议程（准）</b>；其余"展台/其他论坛"为辅助整理，到场请用官方 App 再核对房间。⚠️ 注：6/24 下午 ees 主舞台是「储能项目融资/可融资性(bankability)」专题(Tolling/merchant风险/Entrix)，此前 AI 草稿里的"AI EMS 主场"等为误，已更正。每场都可点进去<b>拍照 + 记笔记</b>。</div>';
+  // 按天子筛选（默认明天=Day3）
+  const daysPresent=[]; CONF.forEach(g=>{const k=confDayKey(g); if(!daysPresent.includes(k))daysPresent.push(k);});
+  daysPresent.sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+  if(CONFDAY!=='all' && !daysPresent.includes(CONFDAY)) CONFDAY='all';
+  h+='<div class="cattabs">';
+  daysPresent.forEach(k=>{ h+='<button class="'+(CONFDAY===k?'on':'')+'" onclick="selConfDay(\''+k+'\')">'+esc(DAY_LABEL[k]||k)+'</button>'; });
+  h+='<button class="'+(CONFDAY==='all'?'on':'')+'" onclick="selConfDay(\'all\')">全部天</button></div>';
   h+='<div class="cattabs"><button class="'+(CONFVENUE==='all'?'on':'')+'" onclick="selConfVenue(\'all\')">全部场馆</button>';
   venues.forEach(v=>{ h+='<button class="'+(CONFVENUE===v?'on':'')+'" onclick="selConfVenue(\''+v+'\')">'+esc(v)+'</button>'; });
   h+='</div>';
   h+='<div class="filters" style="margin:0 0 10px"><button class="'+(CONFAI?'on':'')+'" onclick="toggleConfAI()">🤖 只看 AI 场 ('+aiTotal+')</button></div>';
   let body='';
-  CONF.forEach(g=>{ const items=g.items.filter(pass); if(!items.length)return;
+  const groups=CONF.map((g,i)=>({g,i,dk:confDayKey(g)})).filter(x=>CONFDAY==='all'||x.dk===CONFDAY)
+    .sort((a,b)=> (DAY_ORDER.indexOf(a.dk)-DAY_ORDER.indexOf(b.dk)) || (a.i-b.i) );
+  groups.forEach(({g})=>{ const items=g.items.filter(pass); if(!items.length)return;
     body+='<h2 style="font-size:14px;margin:16px 0 8px;color:var(--mut)">'+esc(g.day)+'</h2>';
     items.forEach(it=>{ const id=it.id; const a=id?ansCount(bState(id)):0; const np=id?(pc[id]||0):0;
       body+='<div class="card"'+(id?' onclick="openBooth(\''+esc(id)+'\')"':'')+'>'
