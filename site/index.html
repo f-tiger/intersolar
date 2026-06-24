@@ -1069,7 +1069,7 @@ function renderInsight(){
     sub('现场信号')+li([
       '资本押注 AI 交易优化：Entrix €43M(3GW/8.5GWh)、Suena、GridBeyond €52M、<b>Kraken 分拆估值 $8.65B</b>。',
       '行业从"容量"转"业绩"：<b>bankability</b> 成 2026 主题(TWAICE：50% 缺单一可信数据源、47% 难追责供应商)。',
-      '今日现场：AI EMS 主场(光储协同 + 电网调频 + 户储 AI 管家)、AI 电池诊断(volytica)、AI 可用容量测算。'
+      '今日现场实证：6/24 ees Forum 下午整场是<b>储能融资/可融资性</b>(Tolling、merchant 风险、Making BESS Bankable·Entrix)；AI 电池诊断(volytica)、AI 可用容量测算在 Innovation Hub。'
     ])+
     sub('AI 的四个层次')+li([
       '① AI 看板/监控（已普及）｜② AI 优化/调度（2.0，拥挤）',
@@ -1120,8 +1120,24 @@ function renderInsight(){
     'bankability(可融资账本)被反复提及，是 3.0 结算轨道的需求信号。'
   ]));
   h+='<div class="tip" style="font-size:11.5px;line-height:1.7"><b>来源 / 可信度</b>：综合上传的现场资料 + 官方定调 + 公开报道与融资数据交叉（详见仓库《Intersolar-2026-机会点扫描.md》来源清单）。⚠️ 部分现场议程/数字为 AI 整理草稿，正式商用前请回溯一手原文；展位/获奖以官方为准。</div>';
+  h+='<div class="sec"><h3>📤 分享给同事</h3><p class="muted" style="margin:0 0 8px">扫码或转发链接，同事点开<b>直达这份「洞察」总结</b>（无需登录、手机可读）。</p><button class="btn green" id="ins-share" style="width:100%">📱 生成分享二维码</button><div id="ins-qrbox"></div></div>';
   $('#insightbody').innerHTML=h;
+  const sb=$('#ins-share'); if(sb) sb.addEventListener('click',insightShareQR);
 }
+function shareInsightLink(){ const base=location.origin+location.pathname; const c=getCfg();
+  if(c){ const l=shareLink(); return l+(l.indexOf('#')>=0?'&':'#')+'view=insight'; }
+  return base+'#view=insight'; }
+async function insightShareQR(){ const box=$('#ins-qrbox'); if(!box)return; const link=shareInsightLink();
+  box.innerHTML='<p class="muted" style="text-align:center;margin-top:8px">生成中…</p>';
+  try{ const m=await import('https://esm.sh/qrcode@1'); const QR=m.default||m;
+    const url=await QR.toDataURL(link,{width:280,margin:1,color:{dark:'#0b1120',light:'#ffffff'}});
+    box.innerHTML='<img alt="QR" src="'+url+'" style="width:210px;height:210px;background:#fff;padding:8px;border-radius:12px;display:block;margin:10px auto 4px">'
+      +'<p class="muted" style="text-align:center;font-size:11px">同事扫码直达「洞察」总结</p>'
+      +'<button class="btn sec2" id="ins-copy" style="width:100%;margin-top:4px">复制分享链接</button>'
+      +'<p class="muted" style="text-align:center;word-break:break-all;font-size:9px;opacity:.6">'+esc(link)+'</p>';
+    const cp=$('#ins-copy'); if(cp) cp.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(link);toast('链接已复制');}catch(e){prompt('复制此链接发给同事：',link);}});
+  }catch(e){ console.warn(e); box.innerHTML='<p class="muted" style="text-align:center">二维码生成失败(需联网)。可手动复制：<br>'+esc(link)+'</p>'; } }
+window.insightShareQR=insightShareQR;
 
 async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);const s=bState(id);
   go('detail');const v=$('#view-detail');
@@ -1485,6 +1501,7 @@ function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
   if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
   renderList(); refreshCloudUI(); applyRole();
+  if(/view=insight/.test(location.hash)) go('insight'); // 分享链接直达「洞察」
 })();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
