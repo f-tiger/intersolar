@@ -1014,7 +1014,18 @@ function renderInsight(){
       '缺：跨品牌中立接入、VPP 收益分成、动态电价自动套利、安装商批量纳管、收益结算透明。',
       '<b>机会(对应扫描 D)</b>：给中国即插即用洪流做独立智能调度 / 聚合层。'
     ]));
-  // 维度3 AI+Energy
+  // 维度3 AI+Energy —— 储能同行 AI 成色对比（含华为/思格/安克）
+  const aiPeers=[
+    ['华为 FusionSolar','智能光储 + 构网型(grid-forming) + 电网调频 + C&I/大储 EMS（"电网级"AI，最硬核）','绑自家硬件、大厂封闭','拼不过其电网级 AI → EcoFlow 错位走开放+聚合，别正面硬刚'],
+    ['思格 Sigenergy','"AI in All" 叙事；SigenStor 五合一(PV+储+EV+EMS)整合','AI 偏营销话术、对他牌开放度存疑','别陷入"AI 口号"内卷；用<b>真实跨品牌 VPP 收益数据</b>说话'],
+    ['安克 Anker SOLIX','Solarbank 消费端 AI、动态电价 TOU 自动化','云锁定、无官方本地 API','与 EcoFlow <b>最同质</b> → 必须靠<b>开放 API + VPP 分成</b>拉开差距'],
+    ['EcoFlow OASIS','消费端用电优化 / 省钱（家庭场景）','偏自家生态','把消费 AI 升级为<b>可被聚合 / 交易的灵活性</b>（向 ③④ 走）']
+  ];
+  const aiPeerTable='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:540px">'
+    +'<thead><tr style="text-align:left;border-bottom:2px solid #334155;color:#94a3b8">'
+    +'<th style="padding:6px 5px">企业</th><th style="padding:6px 5px">AI 主打</th><th style="padding:6px 5px">开放度</th><th style="padding:6px 5px">对 EcoFlow 的启示</th></tr></thead><tbody>'
+    +aiPeers.map(r=>'<tr style="border-bottom:1px solid #1e293b'+(r[0].indexOf('EcoFlow')>=0?';background:rgba(79,70,229,.12)':'')+'">'+r.map((c,i)=>'<td style="padding:6px 5px'+(i===0?';font-weight:700':'')+'">'+c+'</td>').join('')+'</tr>').join('')
+    +'</tbody></table></div>';
   h+=sec('🤖 维度三 · AI + Energy',
     sub('现场信号')+li([
       '资本押注 AI 交易优化：Entrix €43M(3GW/8.5GWh)、Suena、GridBeyond €52M、<b>Kraken 分拆估值 $8.65B</b>。',
@@ -1025,8 +1036,11 @@ function renderInsight(){
       '① AI 看板/监控（已普及）｜② AI 优化/调度（2.0，拥挤）',
       '③ <b>AI 自治交易/对冲（agentic，新热点）</b>｜④ <b>AI 可融资账本 / 资产层 KPI（bankability，空白）</b>'
     ])+
+    sub('储能同行的 AI 成色对比（更贴近 EcoFlow 的对标）')+aiPeerTable+
     sub('▶ EcoFlow 位置')+li([
-      'AI 主要落在<b>消费端</b>(OASIS 用电优化 / 省钱)；缺 ③ 自治交易 与 ④ 可信账本。'
+      'AI 主要落在<b>消费端</b>(OASIS 用电优化 / 省钱)；缺 ③ 自治交易 与 ④ 可信账本。',
+      '在储能同行里：华为做"电网级"AI(构网/调频/C&I)但封闭；思格"AI in All"偏营销；<b>安克与 EcoFlow 最同质</b>(消费端 AI + 云锁定)。',
+      '<b>结论</b>：别和大厂拼电网级 AI、也别陷入"AI 口号"内卷——EcoFlow 的差异化应是<b>开放 API + 跨品牌聚合 + VPP/交易</b>，把消费 AI 升级为可被调用/结算的灵活性。'
     ]));
   // 维度4 EcoFlow 对标 & 打法
   const rows=[
