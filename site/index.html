@@ -1154,9 +1154,7 @@ function exportInsightHTML(){
   toast('已导出洞察 HTML');
 }
 window.exportInsightHTML=exportInsightHTML;
-function shareInsightLink(){ const base=location.origin+location.pathname; const c=getCfg();
-  if(c){ const l=shareLink(); return l+(l.indexOf('#')>=0?'&':'#')+'view=insight'; }
-  return base+'#view=insight'; }
+function shareInsightLink(){ return location.origin+location.pathname+'#view=insight'; } // 洞察是静态内容，无需带云配置，链接保持短
 async function insightShareQR(){ const box=$('#ins-qrbox'); if(!box)return; const link=shareInsightLink();
   box.innerHTML='<p class="muted" style="text-align:center;margin-top:8px">生成中…</p>';
   try{ const m=await import('https://esm.sh/qrcode@1'); const QR=m.default||m;
