@@ -925,18 +925,43 @@ const CONF_BOOTHS=[];
 (function(){ const ids=new Set(SEED.map(b=>b.id));
   CONF.forEach(g=>g.items.forEach(it=>{ if(it.id && !ids.has(it.id) && !CONF_BOOTHS.find(x=>x.id===it.id))
     CONF_BOOTHS.push({id:it.id,name:it.name,line:'G',pri:0,hall:it.loc||'',focus:it.key||'',hyp:[],q:QFORUM}); })); })();
+let CONFVENUE='all', CONFAI=false;
+const VENUE_ORDER=['ees Forum','Intersolar Forum','Innovation Hub','smarter E Forum','EM-Power','ICM','展台/其他'];
+function confVenue(it){ const s=(it.loc||'')+' '+(it.name||'');
+  if(/ees Forum/i.test(s))return 'ees Forum';
+  if(/Innovation Hub/i.test(s))return 'Innovation Hub';
+  if(/Intersolar Forum/i.test(s))return 'Intersolar Forum';
+  if(/smarter E Forum/i.test(s))return 'smarter E Forum';
+  if(/EM-Power/i.test(s))return 'EM-Power';
+  if(/ICM/i.test(s))return 'ICM';
+  return '展台/其他'; }
+function confIsAI(it){ return /AI/i.test((it.name||'')+' '+(it.key||'')); }
+function selConfVenue(v){ CONFVENUE=v; renderConf(); window.scrollTo(0,0); }
+function toggleConfAI(){ CONFAI=!CONFAI; renderConf(); }
+window.selConfVenue=selConfVenue; window.toggleConfAI=toggleConfAI;
 async function renderConf(){
   const allP=await allPhotos(); const pc={}; allP.forEach(p=>{pc[p.boothId]=(pc[p.boothId]||0)+1;});
-  let h='<div class="tip">📅 排期 + 一句话重点如下。⚠️ <b>今日 6/24 这组为 AI 整理的导览草稿，时间/房间可能有出入，务必到场用官方 The smarter E App 再确认</b>。每场都可点进去<b>拍照 + 记笔记</b>。</div>';
-  CONF.forEach(g=>{ h+='<h2 style="font-size:14px;margin:16px 0 8px;color:var(--mut)">'+esc(g.day)+'</h2>';
-    g.items.forEach(it=>{ const id=it.id; const a=id?ansCount(bState(id)):0; const np=id?(pc[id]||0):0;
-      h+='<div class="card"'+(id?' onclick="openBooth(\''+esc(id)+'\')"':'')+'>'
-        +'<div class="top"><div class="nm">'+esc(it.name)+'</div><span class="chip G">'+esc(it.time)+'</span></div>'
+  const venues=[]; CONF.forEach(g=>g.items.forEach(it=>{const v=confVenue(it); if(!venues.includes(v))venues.push(v);}));
+  venues.sort((a,b)=>VENUE_ORDER.indexOf(a)-VENUE_ORDER.indexOf(b));
+  if(CONFVENUE!=='all' && !venues.includes(CONFVENUE)) CONFVENUE='all';
+  const aiTotal=CONF.reduce((n,g)=>n+g.items.filter(confIsAI).length,0);
+  const pass=it=>(CONFVENUE==='all'||confVenue(it)===CONFVENUE)&&(!CONFAI||confIsAI(it));
+  let h='<div class="tip">📅 排期 + 一句话重点。⚠️ <b>今日 6/24 这组为 AI 整理的导览草稿，时间/房间可能有出入，务必到场用官方 The smarter E App 再确认</b>。每场都可点进去<b>拍照 + 记笔记</b>。</div>';
+  h+='<div class="cattabs"><button class="'+(CONFVENUE==='all'?'on':'')+'" onclick="selConfVenue(\'all\')">全部场馆</button>';
+  venues.forEach(v=>{ h+='<button class="'+(CONFVENUE===v?'on':'')+'" onclick="selConfVenue(\''+v+'\')">'+esc(v)+'</button>'; });
+  h+='</div>';
+  h+='<div class="filters" style="margin:0 0 10px"><button class="'+(CONFAI?'on':'')+'" onclick="toggleConfAI()">🤖 只看 AI 场 ('+aiTotal+')</button></div>';
+  let body='';
+  CONF.forEach(g=>{ const items=g.items.filter(pass); if(!items.length)return;
+    body+='<h2 style="font-size:14px;margin:16px 0 8px;color:var(--mut)">'+esc(g.day)+'</h2>';
+    items.forEach(it=>{ const id=it.id; const a=id?ansCount(bState(id)):0; const np=id?(pc[id]||0):0;
+      body+='<div class="card"'+(id?' onclick="openBooth(\''+esc(id)+'\')"':'')+'>'
+        +'<div class="top"><div class="nm">'+esc(it.name)+(confIsAI(it)?' <span class="chip" style="background:#4f46e5;color:#fff">AI</span>':'')+'</div><span class="chip G">'+esc(it.time)+'</span></div>'
         +'<div class="focus">'+esc(it.key)+'</div>'
         +'<div class="meta"><span>📍 '+esc(it.loc)+'</span><span>📷 '+np+'</span><span>📝 '+a+'</span></div>'
       +'</div>'; });
   });
-  $('#confbody').innerHTML=h;
+  $('#confbody').innerHTML=h+(body||'<p class="muted" style="text-align:center;padding:30px">无匹配场次</p>');
 }
 
 async function openBooth(id){CURBOOTH=id;const b=allBooths().find(x=>x.id===id);const s=bState(id);
