@@ -1029,7 +1029,10 @@ const CONF_BOOTHS=[];
 let CONFVENUE='all', CONFAI=false, CONFDAY='d3';
 const VENUE_ORDER=['ees Forum','Intersolar Forum','Innovation Hub','smarter E Forum','EM-Power','Power2Drive','Hydrogen','ICM','展台/其他'];
 const DAY_ORDER=['d3','d2','d1','d0','other'];
-const DAY_LABEL={d3:'6/25 周四·明天',d2:'6/24 周三·今天',d1:'6/23 周二',d0:'6/22 前夜',other:'跨天/通用'};
+const DAY_BASE={d3:'6/25 周四',d2:'6/24 周三',d1:'6/23 周二',d0:'6/22 前夜',other:'跨天/通用'};
+const DAY_DATE={d1:'2026-06-23',d2:'2026-06-24',d3:'2026-06-25'};
+function dayLabel(k){ let s=DAY_BASE[k]||k; const dt=DAY_DATE[k]; if(dt){ const n=new Date(); const t=new Date(n.getFullYear(),n.getMonth(),n.getDate()); const d=new Date(dt+'T00:00:00'); const diff=Math.round((d-t)/86400000);
+  if(diff===0)s+='·今天'; else if(diff===1)s+='·明天'; else if(diff===-1)s+='·昨天'; } return s; }
 function confDayKey(g){ const d=g.day||'';
   if(/6\/22[–-]23|6\/23[–-]25/.test(d)) return 'other';
   if(/6\/25/.test(d))return 'd3'; if(/6\/24/.test(d))return 'd2'; if(/6\/23/.test(d))return 'd1'; if(/6\/22/.test(d))return 'd0'; return 'other'; }
@@ -1061,7 +1064,7 @@ async function renderConf(){
   daysPresent.sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
   if(CONFDAY!=='all' && !daysPresent.includes(CONFDAY)) CONFDAY='all';
   h+='<div class="cattabs">';
-  daysPresent.forEach(k=>{ h+='<button class="'+(CONFDAY===k?'on':'')+'" onclick="selConfDay(\''+k+'\')">'+esc(DAY_LABEL[k]||k)+'</button>'; });
+  daysPresent.forEach(k=>{ h+='<button class="'+(CONFDAY===k?'on':'')+'" onclick="selConfDay(\''+k+'\')">'+esc(dayLabel(k))+'</button>'; });
   h+='<button class="'+(CONFDAY==='all'?'on':'')+'" onclick="selConfDay(\'all\')">全部天</button></div>';
   h+='<div class="cattabs"><button class="'+(CONFVENUE==='all'?'on':'')+'" onclick="selConfVenue(\'all\')">全部场馆</button>';
   venues.forEach(v=>{ h+='<button class="'+(CONFVENUE===v?'on':'')+'" onclick="selConfVenue(\''+v+'\')">'+esc(v)+'</button>'; });
