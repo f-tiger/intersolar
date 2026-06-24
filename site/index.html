@@ -1207,8 +1207,36 @@ function renderSummary(){
       +(r.n?'<div class="focus">'+esc(r.n)+'</div>':'<div class="focus muted">（已标记完成，未记文字）</div>')
       +'<div class="meta"><span>📍 '+esc(r.it.loc||'')+'</span><span>点开补记</span></div></div>').join(''); }
   h+=sec('🗒 我现场记录的结论（'+recorded.length+' 场）', rec, 'sum-recorded');
+  h+='<div class="sec" id="sum-sharesec"><h3>📤 分享 / 导出</h3><p class="muted" style="margin:0 0 8px">把这份会议总结发给同事，或导出离线 HTML。</p><button class="btn green" id="sum-share" style="width:100%">📱 生成分享二维码</button><button class="btn sec2" id="sum-export" style="width:100%;margin-top:8px">💾 导出为独立 HTML</button><div id="sum-qrbox"></div></div>';
   $('#summarybody').innerHTML=h;
+  const sb=$('#sum-share'); if(sb) sb.addEventListener('click',summaryShareQR);
+  const eb=$('#sum-export'); if(eb) eb.addEventListener('click',exportSummaryHTML);
 }
+async function summaryShareQR(){ const box=$('#sum-qrbox'); if(!box)return; const link=location.origin+location.pathname+'#view=summary';
+  box.innerHTML='<p class="muted" style="text-align:center;margin-top:8px">生成中…</p>';
+  try{ const m=await import('https://esm.sh/qrcode@1'); const QR=m.default||m;
+    const url=await QR.toDataURL(link,{width:280,margin:1,color:{dark:'#0b1120',light:'#ffffff'}});
+    box.innerHTML='<img alt="QR" src="'+url+'" style="width:210px;height:210px;background:#fff;padding:8px;border-radius:12px;display:block;margin:10px auto 4px">'
+      +'<p class="muted" style="text-align:center;font-size:11px">同事扫码直达「总结」</p>'
+      +'<button class="btn sec2" id="sum-copy" style="width:100%;margin-top:4px">复制分享链接</button>'
+      +'<p class="muted" style="text-align:center;word-break:break-all;font-size:9px;opacity:.6">'+esc(link)+'</p>';
+    const cp=$('#sum-copy'); if(cp) cp.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(link);toast('链接已复制');}catch(e){prompt('复制此链接：',link);}});
+  }catch(e){ console.warn(e); box.innerHTML='<p class="muted" style="text-align:center">二维码生成失败(需联网)：<br>'+esc(link)+'</p>'; } }
+function exportSummaryHTML(){ const body=$('#summarybody'); if(!body) return; if(!body.innerHTML.trim()) renderSummary();
+  const clone=$('#summarybody').cloneNode(true); const ss=clone.querySelector('#sum-sharesec'); if(ss) ss.remove();
+  const css='body{font-family:-apple-system,system-ui,"PingFang SC",sans-serif;background:#0b1120;color:#e2e8f0;margin:0;padding:16px;line-height:1.6;-webkit-text-size-adjust:100%}'
+    +'.wrap{max-width:860px;margin:0 auto}h1{font-size:18px;margin:2px 0}'
+    +'.sec{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:12px 14px;margin:12px 0}.sec h3{margin:0 0 8px;font-size:15px}'
+    +'.tip{background:rgba(79,70,229,.14);border:1px solid #4f46e5;border-radius:10px;padding:10px 12px;margin:12px 0;font-size:13px}'
+    +'.card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:10px 12px;margin:8px 0}.card .nm{font-weight:700}.card .focus{font-size:12.5px;margin-top:4px}.card .meta{font-size:11px;color:#94a3b8;margin-top:4px}'
+    +'.muted{color:#94a3b8}ul,ol{margin:6px 0;padding-left:18px}li{margin:3px 0}a{color:#93c5fd}.chip{font-size:11px;padding:1px 6px;border-radius:6px}';
+  const doc='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>EcoFlow 会议总结 · Intersolar / The smarter E 2026</title><style>'+css+'</style></head><body><div class="wrap">'
+    +'<h1>📝 EcoFlow 会议总结 · Intersolar / The smarter E 2026</h1>'
+    +'<p class="muted" style="font-size:12px;margin:0 0 6px">导出时间：'+new Date().toLocaleString('zh-CN')+' · 仅供内部参考</p>'
+    +clone.innerHTML+'</div></body></html>';
+  download('EcoFlow-Intersolar2026-会议总结-'+stamp()+'.html', doc, 'text/html;charset=utf-8'); toast('已导出会议总结 HTML'); }
+window.summaryShareQR=summaryShareQR; window.exportSummaryHTML=exportSummaryHTML;
 window.renderSummary=renderSummary;
 function shareInsightLink(){ return location.origin+location.pathname+'#view=insight'; } // 洞察是静态内容，无需带云配置，链接保持短
 async function insightShareQR(){ const box=$('#ins-qrbox'); if(!box)return; const link=shareInsightLink();
@@ -1585,7 +1613,7 @@ function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
   if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
   renderList(); refreshCloudUI(); applyRole();
-  if(/view=insight/.test(location.hash)) go('insight'); // 分享链接直达「洞察」
+  if(/view=insight/.test(location.hash)) go('insight'); else if(/view=summary/.test(location.hash)) go('summary'); // 分享链接直达
 })();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
