@@ -903,6 +903,36 @@ $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
 /* ============================ 会议 / 论坛排期 ============================ */
 const CONF=[
+  {day:'✅ 6/23 周一 · DAY 1 全论坛（官方 App·准）', items:[
+    {id:'d1_ees_pitch1',time:'10:30–11:00', name:'ees Forum｜Industry Pitches', loc:'C2.230 ees Forum', key:'(EN)'},
+    {id:'d1_is_fleet',time:'10:15–11:45', name:'⭐ Intersolar Forum｜工商业 PV+储能+车队管理 智慧组合', loc:'A3.150 Intersolar Forum', key:'PV-Plus-Storage with Fleet Management(EN)——C&I 光储'},
+    {id:'d1_su_aiforecast',time:'10:30–12:00', name:'⭐ Start-up Stage｜AI 预测与用能成本优化', loc:'C4.480 Start-up Stage', key:'AI Forecasting & Energy Cost Optimization(EN)'},
+    {id:'d1_se_tenant',time:'10:30–11:05', name:'⭐ The smarter E Forum｜转型中的租户电力：模式·落地·可扩展', loc:'C5.550 The smarter E Forum', key:'Tenant Electricity(DE)——prosuming/能源社区'},
+    {id:'d1_hub_kickoff',time:'10:30–11:30', name:'ees Innovation Hub｜ees Islands Challenge 2026 启动', loc:'B0.110 ees Innovation Hub', key:'(EN)'},
+    {id:'d1_p2d_welcome',time:'10:30–10:45', name:'Power2Drive Forum｜开场：Power2Drive & 车队转型日', loc:'C6.450 Power2Drive Forum', key:'(DE)'},
+    {id:'d1_hy_europe',time:'10:30–12:00', name:'Hydrogen Dialogue Forum｜面向/来自欧洲的氢能', loc:'B2.550 Hydrogen Dialogue Forum', key:'(EN)'},
+    {id:'d1_se_plan',time:'11:15–11:50', name:'The smarter E Forum｜规划与整合未来能源系统', loc:'C5.550 The smarter E Forum', key:'Planning & Integrating the Future Energy System'},
+    {id:'d1_ees_market',time:'11:30–13:00', name:'⭐ ees Forum｜塑造欧洲储能的未来：市场·政策·竞争', loc:'C2.230 ees Forum', key:'Shaping Europe Energy Storage Future(EN)——市场/政策格局'},
+    {id:'d1_hub_lab2road',time:'11:30–13:00', name:'ees Innovation Hub｜把创新从实验室带上路', loc:'B0.110 ees Innovation Hub', key:'(EN)'},
+    {id:'d1_is_gfm',time:'12:00–13:00', name:'⭐ Intersolar Forum｜构网型逆变器——稳定电网的关键', loc:'A3.150 Intersolar Forum', key:'Grid-Forming Inverters(EN)——构网/电网级'},
+    {id:'d1_se_mindset',time:'12:15–13:15', name:'The smarter E Forum｜能源转型是心态挑战：24/7 可再生可达', loc:'C5.550 The smarter E Forum', key:'(DE)'},
+    {id:'d1_su_battery',time:'13:00–14:30', name:'Start-up Stage｜电池储能与项目设计', loc:'C4.480 Start-up Stage', key:'(EN)'},
+    {id:'d1_se_gridstab',time:'13:30–14:40', name:'⭐ The smarter E Forum｜电网稳定实战：拥塞/灵活性/电能质量管理', loc:'C5.550 The smarter E Forum', key:'Grid Stability/Congestion/Flexibility——灵活性'},
+    {id:'d1_p2d_charge',time:'13:30–14:45', name:'Power2Drive Forum｜Industry Pitches：5 个可落地的充电方案', loc:'C6.450 Power2Drive Forum', key:'(EN)'},
+    {id:'d1_is_p2h',time:'13:30–15:00', name:'Intersolar Forum｜Power-to-Heat：电与热的耦合', loc:'A3.150 Intersolar Forum', key:'(DE)'},
+    {id:'d1_hub_pitch1',time:'14:00–14:30', name:'ees Innovation Hub｜Industry Pitches 1', loc:'B0.110 ees Innovation Hub', key:'(EN)'},
+    {id:'d1_ees_nextgen',time:'14:30–16:00', name:'⭐ ees Forum｜下一代光储：商业机会', loc:'C2.230 ees Forum', key:'Next-Gen Solar+Storage Business Opportunities(EN)'},
+    {id:'d1_hub_aibattery',time:'14:30–15:35', name:'⭐ ees Innovation Hub｜AI 在电池产业的应用', loc:'B0.110 ees Innovation Hub', key:'AI in the Battery Industry(EN)'},
+    {id:'d1_hy_projects',time:'14:15–15:45', name:'Hydrogen Dialogue Forum｜氢能项目落地交付', loc:'B2.550 Hydrogen Dialogue Forum', key:'(EN)'},
+    {id:'d1_se_ppa',time:'15:00–16:00', name:'⭐ The smarter E Forum｜负电价、正前景？PPA 的未来', loc:'C5.550 The smarter E Forum', key:'Negative Prices / PPA(DE)——电价敞口/变现'},
+    {id:'d1_su_grid',time:'15:00–16:00', name:'Start-up Stage｜并网、基础设施与合规', loc:'C4.480 Start-up Stage', key:'(EN)'},
+    {id:'d1_p2d_v2g_use',time:'15:00–16:15', name:'Power2Drive Forum｜双向充电：从用例到经济现实', loc:'C6.450 Power2Drive Forum', key:'(EN)'},
+    {id:'d1_is_bipv',time:'15:30–17:00', name:'Intersolar Forum｜BIPV：从定制规划到量产产品(欧洲)', loc:'A3.150 Intersolar Forum', key:'(EN)'},
+    {id:'d1_ees_future',time:'16:15–17:20', name:'⭐ ees Forum｜革新未来能源系统', loc:'C2.230 ees Forum', key:'Innovating the Future of Energy Systems(EN)'},
+    {id:'d1_p2d_v2g_real',time:'16:15–17:30', name:'⭐ Power2Drive Forum｜双向充电：释放 V2G 潜力', loc:'C6.450 Power2Drive Forum', key:'Realizing the Potential of V2G(EN)'},
+    {id:'d1_se_eeg',time:'16:30–17:30', name:'⭐ The smarter E Forum｜EEG 2027：新灵活性市场的绿灯？', loc:'C5.550 The smarter E Forum', key:'(DE)——灵活性市场政策'},
+    {id:'d1_ees_pitch2',time:'17:20–17:40', name:'ees Forum｜Industry Pitches', loc:'C2.230 ees Forum', key:'(EN)'}
+  ]},
   {day:'✅ 今日 6/24 · ees Forum 主舞台（现场实拍·准）', items:[
     {id:'e2_p_solinteg',time:'10:10', name:'ees Forum｜创新商业能源转型：新一代混合智能', loc:'C2.230 ees Forum', key:'Industry Pitches(EN) · Solinteg(VP 东欧)'},
     {id:'e2_p_hwgfm',time:'10:20', name:'⭐ ees Forum｜华为 GFM(构网型)储能 · 西班牙实地测试', loc:'C2.230 ees Forum', key:'Huawei(全球电网技术总监)(EN)——构网/grid-forming 实证'},
