@@ -886,6 +886,27 @@ $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
 /* ============================ 会议 / 论坛排期 ============================ */
 const CONF=[
+  {day:'⭐ 今日 6/24 周三 · ESS / AI 储能精选（按时间）', items:[
+    {time:'09:30–10:15', name:'ees Forum｜GW级储能电站商业模式 + 并网新规', loc:'C2.230 ees Forum', key:'大型储能商业模式与并网规则更新（EN）'},
+    {time:'09:45', name:'SMA 展台发布｜户用/小型工商储新品全球首发', loc:'B3.210 SMA', key:'AI混合逆变器+工商储一体化、直流耦合方案路演'},
+    {time:'10:00', name:'宁德时代 CATL｜钠电储能系统技术发布', loc:'C2 馆 CATL', key:'钠电热管理/舱级液冷、全模块化钠电 ESS 交付计划'},
+    {time:'10:05–10:50', name:'ICM｜伊比利亚大停电复盘：储能支撑电网稳定', loc:'ICM Room 13A（付费）', key:'AI实时故障识别、构网型储能快速响应；电网稳定的关键作用'},
+    {time:'10:20', name:'ees Innovation Hub｜AI电池健康虚拟诊断（Volytica）', loc:'B0.110 Innovation Hub', key:'实时BMS数据+热失控预警、电芯衰减机理建模——资产层对标'},
+    {time:'10:30–11:15', name:'ees Forum｜钠离子电池商业化落地', loc:'C2.230 ees Forum', key:'宁德/Verkor 等，站电系统、低温场景、成本对比（EN）'},
+    {time:'11:30–12:15', name:'ees Forum｜工商业光储一体化 + 峰谷套利', loc:'C2.230 ees Forum', key:'混合储能、虚拟电厂VPP、负荷优化控制（DE/EN）——B线核心'},
+    {time:'11:30', name:'远景能源 Envision｜4.X MWh 长时构网储能', loc:'C2 馆 Envision', key:'250% 过载电网支撑技术分享'},
+    {time:'12:30–13:15', name:'Intersolar Forum｜构网型逆变器：电网储能核心设备', loc:'A3.150 Intersolar Forum', key:'SMA / 阳光电源；黑启动支撑技术'},
+    {time:'13:00–13:45', name:'ees Forum｜长时储能路线：液流/压缩空气/氢储', loc:'C2.230 ees Forum', key:'4h+ 长时经济性、欧盟长时储能补贴框架（EN）'},
+    {time:'13:10', name:'ees Innovation Hub｜AI驱动实时可用容量测算', loc:'B0.110 Innovation Hub', key:'大型电站动态SoC校正，减少调度罚款——可用能量/bankability'},
+    {time:'13:30–15:00', name:'Intersolar Forum｜第16届欧洲光伏储能产业峰会（PV+ESS）', loc:'A3.150 Intersolar Forum', key:'派能/ATESS/禾望等；含AI光储板块、欧洲25GWh市场'},
+    {time:'14:00–14:45', name:'ees Forum｜Politics Meets Industry：欧盟储能供应链法案', loc:'C2.230 ees Forum', key:'电池法规、本土电芯产能、进口碳关税'},
+    {time:'14:00–15:00', name:'The smarter E Forum｜数字孪生与AI资产运维', loc:'B5 The smarter E Forum', key:'光储全资产远程运维、cybersecurity、AI风控——3.0资产层'},
+    {time:'14:30', name:'ICM｜微网自治 AI 能源控制 / 离网供电', loc:'ICM Room 14C', key:'孤岛模式自主功率平衡、风光储氢多源协同'},
+    {time:'15:00–15:45', name:'ees Forum｜储能安全新标准：热失控 / 液冷消防', loc:'C2.230 ees Forum', key:'电站消防规范、舱级液冷系统实测（EN）'},
+    {time:'15:40', name:'ees Innovation Hub｜电池制造 + 梯次利用AI分选', loc:'B0.110 Innovation Hub', key:'退役电芯AI视觉+电化学快速分级、循环经济'},
+    {time:'16:00–16:45', name:'⭐ ees Forum｜AI EMS 智能能源管理系统（核心AI主场）', loc:'C2.230 ees Forum', key:'光储协同调度、电网调频辅助服务、户储AI管家落地——你的软件3.0轨道首选'},
+    {time:'17:00', name:'Dyness 展台｜AI-Ready Storage 专场', loc:'C2 馆 Dyness', key:'智能电池+分布式储能全局AI调度'}
+  ]},
   {day:'6/22 周一 · 开幕前夜（ICM）', items:[
     {time:'17:00', name:'The smarter E AWARD 颁奖典礼', loc:'ICM 国际会议中心', key:'一晚锁定全行业软件/VPP 风向与获奖名单；重点听 Smart Integrated Energy 类目的获奖理由', boothId:'award'}
   ]},
@@ -899,7 +920,7 @@ const CONF=[
   ]}
 ];
 function renderConf(){
-  let h='<div class="tip">📅 核心排期 + 一句话重点如下。<b>具体每场时间/房间以官方 The smarter E App 议程为准</b>。带"📝记录"的可点进去现场记笔记。</div>';
+  let h='<div class="tip">📅 排期 + 一句话重点如下。⚠️ <b>今日 6/24 这组为 AI 整理的导览草稿，时间/房间可能有出入，务必到场用官方 The smarter E App 再确认</b>。带"📝记录"的可点进去现场记笔记。</div>';
   CONF.forEach(g=>{ h+='<h2 style="font-size:14px;margin:16px 0 8px;color:var(--mut)">'+esc(g.day)+'</h2>';
     g.items.forEach(it=>{ const rec=!!it.boothId; const a=rec?ansCount(bState(it.boothId)):0;
       h+='<div class="card"'+(rec?' onclick="openBooth(\''+it.boothId+'\')"':'')+'>'
