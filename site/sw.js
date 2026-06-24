@@ -1,5 +1,5 @@
 // Intersolar Booth Scout — offline app shell cache
-const CACHE = 'intersolar-scout-v33';
+const CACHE = 'intersolar-scout-v34';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', e => {

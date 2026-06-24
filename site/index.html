@@ -1014,7 +1014,7 @@ function renderInsight(){
   h+=sec('🧭 一页结论（速览）', li([
     '<b>硬件白菜化</b>：户储电池包 ~$70/kWh（−45%）、户储新机连续两年下滑(−6%)、大储首超户储(55%)。差异化只能来自软件/服务。',
     '<b>软件 2.0 已拥挤、α 压缩</b>：FCR 饱和、英国调频收入曾暴跌 73%；"多榨 X% 收益"会越卷越薄。',
-    '<b>真正高地在 3.0</b>：跨品牌接入 + 可融资结算「轨道/账本」(bankability)，目前<b>无人占稳</b>。',
+    '<b>真正高地在 3.0，但 EcoFlow 只能占其中一半</b>：① <b>跨品牌接入 + 聚合 + 灵活性变现</b>（EcoFlow 能做：海量装机 + DTC + 开放 API）；② 可融资结算账本(bankability，面向 utility/金融)——<b>EcoFlow 无金融/监管 DNA，做不了，应对接而非自建</b>。一句话：<b>EcoFlow 的 3.0 = 分布式灵活性聚合层，不是金融结算轨道。</b>',
     '<b>AI 在升级</b>：从"看板/建议"→"自治交易/调度 + 可信账本"（Suena/Entrix/Kraken $8.65B、volytica/TWAICE）。EcoFlow 的 AI(OASIS)仍偏消费端自家生态。',
     '<b>对 EcoFlow 最大杠杆</b>：把海量「即插即用」装机（现为封闭 App）→ 开放成跨品牌灵活性池 + VPP + 安装商工具，向 3.0 轨道卡位，而非再做一个更封闭的家庭 App。'
   ]));
@@ -1054,7 +1054,7 @@ function renderInsight(){
       ['开放本地 API','△ 开发者','✗ 云锁','△','△','✓ 开源'],
       ['收益结算透明 / bankable','✗','✗','✗','✗','✗ ←全行业空白'],
       ['C&I EMS 调度','✗','✗','✓','△','✓']
-    ],1)+'<div class="muted" style="font-size:11px;margin:4px 0 2px">* gridX / 1KOMMA5° 为跨品牌平台 + VPP 软件标杆；✓强项 △部分/存疑 ✗缺失。结算/bankable 一列全行业皆空 = 3.0 卡位窗。</div>'+
+    ],1)+'<div class="muted" style="font-size:11px;margin:4px 0 2px">* gridX / 1KOMMA5° 为跨品牌平台 + VPP 软件标杆；✓强项 △部分/存疑 ✗缺失。结算/bankable 全行业皆空，但属 utility/金融范畴，<b>非 EcoFlow 主战场（对接即可，不自建）</b>。</div>'+
     sub('▶ EcoFlow 位置 / 机会')+li([
       '强在最浅的"消费端 App"层，越往 HEMS→VPP→EMS 走越弱——而<b>价值正沿这条链上移</b>。',
       '缺：跨品牌中立接入、VPP 收益分成、动态电价自动套利、安装商批量纳管、收益结算透明。',
@@ -1098,14 +1098,14 @@ function renderInsight(){
     sub('▶ EcoFlow 位置 + EcoBot 护城河')+li([
       'AI 仍主要落在<b>消费端</b>(OASIS 优化 + EcoBot 问答)；缺 ③ 自治交易 与 ④ 可信账本。',
       '同行里：华为做"电网级"AI 但封闭；思格"AI in All"偏营销；<b>安克与 EcoFlow 最同质</b>(消费端 AI 助手 + 云锁定)。',
-      '<b>EcoBot 要避免沦为"又一个聊天框"</b>，护城河应建立在：① <b>跨品牌接入</b>（不止自家设备）；② 助手能<b>真调度 + VPP 分成变现</b>（不止问答省钱）；③ 接到<b>自治交易 / 可融资账本(3.0)</b>。'
+      '<b>EcoBot 要避免沦为"又一个聊天框"</b>，护城河应建立在：① <b>跨品牌接入</b>（不止自家设备）；② 助手能<b>真调度 + VPP 分成变现</b>（不止问答省钱）；③ 接到<b>跨品牌聚合 / 灵活性市场(3.0)</b>（融资结算类不自建、对接即可）。'
     ]));
   // 维度4 EcoFlow 对标 & 打法
   const rows=[
     ['储能硬件','德业/比亚迪(系统+渠道)、Tesla/sonnen(生态)','便携+阳台 DTC 强','补 C&I + 系统化交付'],
     ['接入开放','gridX/kiwigrid 跨品牌平台','有开放 API 但偏自家生态','把 API 做成<b>跨品牌中立接入层</b>(方向②)'],
     ['VPP/灵活性','1KOMMA5°/sonnen/Next Kraftwerke','基本无 VPP 分成','海量装机→灵活性池+动态电价/VPP分成(A/D)'],
-    ['AI','Suena/Entrix/Kraken(交易)、volytica/TWAICE(账本)','消费端 AI(OASIS)','延伸到自治调度 + 可融资账本(方向③④)'],
+    ['AI','Suena/Entrix/Kraken(交易)、volytica/TWAICE(账本)','消费端 AI(OASIS)','延伸到自治调度 + 跨品牌聚合(方向②)；账本类对接不自建'],
     ['渠道/合规','安装商渠道 + §14a/EEBUS','DTC 为主、合规浅','补安装商工具 + 德国合规楔子(C/F)']
   ];
   const table='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">'
@@ -1117,7 +1117,7 @@ function renderInsight(){
     sub('四条可执行打法')+li([
       '<b>短期</b>：开放 API + 做跨品牌接入与安装商纳管工具，把封闭 App 升级为"可被集成的平台"。<span class="muted">(方向②)</span>',
       '<b>中期</b>：把欧洲海量即插即用装机聚合成 <b>VPP / 灵活性池</b>，接动态电价套利 + VPP 分成（户均上限可达 ~€1000/年）。<span class="muted">(机会 A/D)</span>',
-      '<b>升维</b>：把"接入 + 结算"做成可对外开放的<b>轨道 / 账本(bankability)</b>，不只服务自家硬件。<span class="muted">(3.0 / 方向③④)</span>',
+      '<b>升维</b>：把海量装机做成<b>分布式灵活性聚合层</b>(跨品牌接入 + 调度 + VPP 分成)，成为别人也接入的平台；<b>融资结算(bankability)不自建</b>，对接 volytica/TWAICE/聚合商/金融。<span class="muted">(3.0 / 方向②)</span>',
       '<b>切入楔子</b>：德国 §14a "合规即优化" + 动态电价，借强制刚需低成本获客。<span class="muted">(机会 C/F)</span>'
     ]));
   // 现场信号速记 + 来源
