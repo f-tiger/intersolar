@@ -1028,8 +1028,8 @@ const CONF_BOOTHS=[];
     CONF_BOOTHS.push({id:it.id,name:it.name,line:'G',pri:0,hall:it.loc||'',focus:it.key||'',hyp:[],q:QFORUM}); })); })();
 let CONFVENUE='all', CONFAI=false, CONFDAY='d3';
 const VENUE_ORDER=['ees Forum','Intersolar Forum','Innovation Hub','smarter E Forum','EM-Power','Power2Drive','Hydrogen','ICM','展台/其他'];
-const DAY_ORDER=['d3','d2','d1','d0','other'];
-const DAY_BASE={d3:'6/25 周四',d2:'6/24 周三',d1:'6/23 周二',d0:'6/22 前夜',other:'跨天/通用'};
+const DAY_ORDER=['d3','d2','d1'];
+const DAY_BASE={d3:'DAY3 · 6/25(四)',d2:'DAY2 · 6/24(三)',d1:'DAY1 · 6/23(二)'};
 const DAY_DATE={d1:'2026-06-23',d2:'2026-06-24',d3:'2026-06-25'};
 function dayLabel(k){ let s=DAY_BASE[k]||k; const dt=DAY_DATE[k]; if(dt){ const n=new Date(); const t=new Date(n.getFullYear(),n.getMonth(),n.getDate()); const d=new Date(dt+'T00:00:00'); const diff=Math.round((d-t)/86400000);
   if(diff===0)s+='·今天'; else if(diff===1)s+='·明天'; else if(diff===-1)s+='·昨天'; } return s; }
@@ -1060,7 +1060,7 @@ async function renderConf(){
   const pass=it=>(CONFVENUE==='all'||confVenue(it)===CONFVENUE)&&(!CONFAI||confIsAI(it));
   let h='<div class="tip">📅 排期 + 一句话重点。<b>带 ✅ 的 ees Forum(Day2/3) 为现场实拍官方议程（准）</b>；其余"展台/其他论坛"为辅助整理，到场请用官方 App 再核对房间。⚠️ 注：6/24 下午 ees 主舞台是「储能项目融资/可融资性(bankability)」专题(Tolling/merchant风险/Entrix)，此前 AI 草稿里的"AI EMS 主场"等为误，已更正。每场都可点进去<b>拍照 + 记笔记</b>。</div>';
   // 按天子筛选（默认明天=Day3）
-  const daysPresent=[]; CONF.forEach(g=>{const k=confDayKey(g); if(!daysPresent.includes(k))daysPresent.push(k);});
+  const daysPresent=[]; CONF.forEach(g=>{const k=confDayKey(g); if(DAY_ORDER.includes(k) && !daysPresent.includes(k))daysPresent.push(k);});
   daysPresent.sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
   if(CONFDAY!=='all' && !daysPresent.includes(CONFDAY)) CONFDAY='all';
   h+='<div class="cattabs">';
@@ -1071,7 +1071,7 @@ async function renderConf(){
   h+='</div>';
   h+='<div class="filters" style="margin:0 0 10px"><button class="'+(CONFAI?'on':'')+'" onclick="toggleConfAI()">🤖 只看 AI 场 ('+aiTotal+')</button></div>';
   let body='';
-  const groups=CONF.map((g,i)=>({g,i,dk:confDayKey(g)})).filter(x=>CONFDAY==='all'||x.dk===CONFDAY)
+  const groups=CONF.map((g,i)=>({g,i,dk:confDayKey(g)})).filter(x=>DAY_ORDER.includes(x.dk) && (CONFDAY==='all'||x.dk===CONFDAY))
     .sort((a,b)=> (DAY_ORDER.indexOf(a.dk)-DAY_ORDER.indexOf(b.dk)) || (a.i-b.i) );
   groups.forEach(({g})=>{ const items=g.items.filter(pass); if(!items.length)return;
     body+='<h2 style="font-size:14px;margin:16px 0 8px;color:var(--mut)">'+esc(g.day)+'</h2>';
