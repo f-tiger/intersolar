@@ -188,6 +188,7 @@
     <button data-v="list" class="on">展位</button>
     <button data-v="conf">会议</button>
     <button data-v="insight">洞察</button>
+    <button data-v="summary">总结</button>
     <button data-v="dash">验证看板</button>
     <button data-v="data">数据/归档</button>
   </nav>
@@ -224,6 +225,9 @@
 
   <!-- INSIGHT VIEW -->
   <section id="view-insight" class="hidden"><div id="insightbody"></div></section>
+
+  <!-- SUMMARY VIEW -->
+  <section id="view-summary" class="hidden"><div id="summarybody"></div></section>
 
   <!-- DETAIL VIEW -->
   <section id="view-detail" class="hidden"></section>
@@ -840,10 +844,10 @@ const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 let LIST_SCROLL=0;
 function go(v){ if((v==='dash'||v==='data')&&CLOUD&&!OWNER) v='list';
   if(CUR==='list' && v!=='list') LIST_SCROLL=window.scrollY||window.pageYOffset||0;
-  CUR=v;['list','conf','insight','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
+  CUR=v;['list','conf','insight','summary','detail','dash','data'].forEach(x=>$('#view-'+x).classList.toggle('hidden',x!==v));
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   if(v==='list'){ renderList().then(()=>window.scrollTo(0,LIST_SCROLL)); return; }
-  if(v==='conf')renderConf(); if(v==='insight')renderInsight(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
+  if(v==='conf')renderConf(); if(v==='insight')renderInsight(); if(v==='summary')renderSummary(); if(v==='dash')renderDash(); if(v==='data')refreshCloudUI(); window.scrollTo(0,0);}
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
 
 function isAns(a){return !!(a&&(a.checked||a.text||(a.opts&&a.opts.length)));}
@@ -1154,6 +1158,58 @@ function exportInsightHTML(){
   toast('已导出洞察 HTML');
 }
 window.exportInsightHTML=exportInsightHTML;
+
+/* ============================ 会议总结页（总目录 · 逐场结论） ============================ */
+// 精选会议结论（人工整理）；要把新的一场加进来，往这个数组里加一条即可
+const MEET_SUMMARY=[
+  {id:'spe-outlook', title:'《欧洲电池储能市场展望》发布', src:'SolarPower Europe · 6/24 ees Forum', tag:'市场数据', star:1,
+   points:[
+     '<b>2025 欧洲新增储能 36 GWh</b>(创新高)：2021–23 由气价飙升催动户储增长，23–24 因户储装机下滑而放缓，<b>24–25 大储成为增长主力、分布式回暖</b>。',
+     '<b>结构——大储已占半壁</b>：2025 利用规模(utility)≈53%、户储 34%、C&I 13%（2024 为 49 / 40 / 11）。',
+     '2025 市场：德国(+2%)、英国(+64%)、意大利(−18%)领跑；<b>乌克兰 5×、保加利亚 12×</b> 强势新兴。',
+     '<b>2026 预测：新增 52 GWh(+44%)、首破 50 GWh</b>——大储建设 +70%、C&I 跳增 ~30%、户储 +6%。',
+     '<b>大储份额持续上升：2030 占年度市场 75%</b>（2026≈64%；届时户储/工商各降到 13%）。',
+     '多元化：Top5 国家份额 2026 降到历史低点 54%（德16/英11/保10/意8/乌8/其余46），2030 部分回升（德15/英13/意11/西11/荷7）。',
+     '<b>政策建议</b>：①破除并网/许可壁垒 ②让市场与系统激励真正奖励储能 ③提供清晰稳定、<b>可融资(bankable)</b>的投资条件 ④用定向 EU 工具放量。'
+   ],
+   ecoflow:'户储增速放缓、份额被大储与 C&I 蚕食 → EcoFlow 户用/阳台基本盘增长趋缓，增量在 <b>C&I(+30%)</b> 与 <b>新兴市场(乌/保/西/荷)</b>。"可融资/bankable"再成政策与产业共识 → 印证软件 3.0 的结算/账本方向。打法：①跟上 C&I 与新兴市场；②把"省钱 App"升级为能服务 VPP/灵活性变现的软件层。'
+  }
+];
+function sessNote(id){ const s=bState(id); const parts=[]; if(s.notes)parts.push(s.notes);
+  Object.values(s.answers||{}).forEach(a=>{ if(a){ if(a.opts&&a.opts.length)parts.push(a.opts.join('/')); if(a.text)parts.push(a.text); } });
+  return parts.join(' · '); }
+window.sumJump=function(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); };
+function renderSummary(){
+  const sec=(t,inner,id)=>'<div class="sec"'+(id?' id="'+id+'"':'')+'><h3>'+t+'</h3>'+inner+'</div>';
+  const li=arr=>'<ul style="padding-left:18px;margin:6px 0;line-height:1.75">'+arr.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  // 现场记录的各场结论（来自「会议」里你记的笔记/作答）
+  const recorded=[]; CONF.forEach(g=>g.items.forEach(it=>{ if(!it.id)return; const n=sessNote(it.id); const st=bState(it.id);
+    if(n || st.status==='done') recorded.push({it,n,done:st.status==='done'}); }));
+  let h='<div class="tip" style="line-height:1.7"><b>📝 会议总结 · 总目录</b><br>把每一场的<b>关键结论</b>沉淀到这里。下面「精选结论」为人工整理；「我现场记录的结论」自动汇总你在「会议」里每场记的笔记/作答。</div>';
+  // 总目录
+  let toc='<ol style="padding-left:18px;margin:6px 0;line-height:1.9">';
+  MEET_SUMMARY.forEach(m=>{ toc+='<li><a href="javascript:void(0)" onclick="sumJump(\'sum-'+m.id+'\')" style="color:#93c5fd;text-decoration:none">'+(m.star?'⭐ ':'')+esc(m.title)+'</a> <span class="muted" style="font-size:11px">· '+esc(m.src)+'</span></li>'; });
+  toc+='<li><a href="javascript:void(0)" onclick="sumJump(\'sum-recorded\')" style="color:#93c5fd;text-decoration:none">🗒 我现场记录的结论</a> <span class="muted" style="font-size:11px">· '+recorded.length+' 场</span></li>';
+  toc+='</ol>';
+  h+=sec('📑 总目录', toc);
+  // 精选结论卡片
+  MEET_SUMMARY.forEach(m=>{
+    let inner='<p class="muted" style="margin:0 0 6px">'+(m.tag?'<span class="chip" style="background:#4f46e5;color:#fff;margin-right:6px">'+esc(m.tag)+'</span>':'')+esc(m.src)+'</p>';
+    inner+=li(m.points);
+    if(m.ecoflow) inner+='<div class="tip" style="margin:8px 0 0;background:rgba(16,163,74,.12);border-color:#16a34a;font-size:12.5px"><b>▶ 对 EcoFlow 的启示</b>：'+m.ecoflow+'</div>';
+    h+=sec((m.star?'⭐ ':'')+esc(m.title), inner, 'sum-'+m.id);
+  });
+  // 现场记录
+  let rec='';
+  if(!recorded.length){ rec='<p class="muted">还没有记录。去「会议」点开任意一场，记笔记/作答后，这里会自动汇总它的结论。</p>'; }
+  else { rec=recorded.map(r=>'<div class="card" onclick="openBooth(\''+esc(r.it.id)+'\')" style="cursor:pointer">'
+      +'<div class="top"><div class="nm">'+(r.done?'✓ ':'')+esc(r.it.name)+'</div><span class="chip G">'+esc(r.it.time||'')+'</span></div>'
+      +(r.n?'<div class="focus">'+esc(r.n)+'</div>':'<div class="focus muted">（已标记完成，未记文字）</div>')
+      +'<div class="meta"><span>📍 '+esc(r.it.loc||'')+'</span><span>点开补记</span></div></div>').join(''); }
+  h+=sec('🗒 我现场记录的结论（'+recorded.length+' 场）', rec, 'sum-recorded');
+  $('#summarybody').innerHTML=h;
+}
+window.renderSummary=renderSummary;
 function shareInsightLink(){ return location.origin+location.pathname+'#view=insight'; } // 洞察是静态内容，无需带云配置，链接保持短
 async function insightShareQR(){ const box=$('#ins-qrbox'); if(!box)return; const link=shareInsightLink();
   box.innerHTML='<p class="muted" style="text-align:center;margin-top:8px">生成中…</p>';
