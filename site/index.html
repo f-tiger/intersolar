@@ -890,23 +890,38 @@ $('#search').addEventListener('input',e=>{SEARCH=e.target.value;renderList();});
 
 /* ============================ 会议 / 论坛排期 ============================ */
 const CONF=[
-  {day:'⭐ 今日 6/24 周三 · ESS / AI 储能精选（已按现场勘误）', items:[
-    {id:'c624_ees0930',time:'09:30–10:15', name:'ees Forum｜GW级储能电站商业模式 + 并网新规', loc:'C2.230 ees Forum', key:'大型储能商业模式与并网规则更新（EN）'},
+  {day:'✅ 今日 6/24 · ees Forum 主舞台（现场实拍·准）', items:[
+    {id:'e2_panel',time:'14:30', name:'ees Forum｜德国大型储能：项目·挑战·前景（专家组）', loc:'C2.230 ees Forum', key:'专家组：Hans Urban｜Schoenergie(CTO)｜FENECON｜ECO STOR(CISO)'},
+    {id:'e2_fin0',time:'15:30', name:'ees Forum｜储能项目融资 · 开场引导', loc:'C2.230 ees Forum', key:'Financing of Storage Projects 专题(EN) · Aurora Energy Research'},
+    {id:'e2_tolling',time:'16:00', name:'ees Forum｜Tolling 协议：私募/基建基金在灵活性时代的机会', loc:'C2.230 ees Forum', key:'Aurora Energy Research(EN)——灵活性资产的金融化'},
+    {id:'e2_invest',time:'16:30', name:'ees Forum｜稳健回报 vs 上行空间：你的 BESS 投资策略', loc:'C2.230 ees Forum', key:'The Mobility House(EN)'},
+    {id:'e2_bankable',time:'16:45', name:'⭐ ees Forum｜从 merchant 风险到结构化收益：让 BESS 可融资', loc:'C2.230 ees Forum', key:'Entrix(COO)——bankability 核心，直接印证软件3.0结算轨道(EN)'},
+    {id:'e2_coloc',time:'17:00', name:'ees Forum｜可融资共址(Co-Location)：混合项目的结构与融资', loc:'C2.230 ees Forum', key:'Hybrid 项目融资结构(EN)'},
+    {id:'e2_epc',time:'17:15', name:'ees Forum｜从"可建成"到"可运营"：大型储能全 EPC 服务', loc:'C2.230 ees Forum', key:'Industry Pitches(EN)'},
+    {id:'e2_baywa',time:'17:25', name:'ees Forum｜一个电池三视角：开发者/交易员/运营商', loc:'C2.230 ees Forum', key:'BayWa r.e.(EN)'},
+    {id:'e2_permit',time:'17:35', name:'ees Forum｜早期 BESS：许可规划对技术与供应商选型的影响', loc:'C2.230 ees Forum', key:'P3 Energy(EN)'}
+  ]},
+  {day:'今日 6/24 · 展台发布 + 其他论坛（辅助整理·到场再核对）', items:[
     {id:'c624_sma0945',time:'09:45', name:'SMA 展台发布｜户用/小型工商储新品全球首发', loc:'B3.210 SMA', key:'AI混合逆变器+工商储一体化、直流耦合方案路演'},
     {id:'c624_catl1000',time:'10:00', name:'宁德时代 CATL｜钠电储能系统技术发布', loc:'B1 馆 CATL', key:'钠电热管理/舱级液冷、全模块化钠电 ESS 交付计划'},
     {id:'c624_hub1020',time:'10:20', name:'ees Innovation Hub｜AI电池健康虚拟诊断（Volytica）', loc:'B0.110 Innovation Hub', key:'实时BMS数据+热失控预警、电芯衰减机理建模——资产层对标'},
-    {id:'c624_ees1030',time:'10:30–11:15', name:'ees Forum｜钠离子电池商业化落地', loc:'C2.230 ees Forum', key:'宁德/Verkor 等，站电系统、低温场景、成本对比（EN）'},
-    {id:'c624_ees1130',time:'11:30–12:15', name:'ees Forum｜工商业光储一体化 + 峰谷套利', loc:'C2.230 ees Forum', key:'混合储能、虚拟电厂VPP、负荷优化控制（DE/EN）——B线核心'},
     {id:'c624_envision1130',time:'11:30', name:'远景能源 Envision｜4.X MWh 长时构网储能', loc:'B1 馆 Envision', key:'250% 过载电网支撑技术分享'},
     {id:'c624_intersolar1230',time:'12:30–13:15', name:'Intersolar Forum｜构网型逆变器：电网储能核心设备', loc:'A3.150 Intersolar Forum', key:'SMA / 阳光电源；黑启动支撑技术'},
-    {id:'c624_ees1300',time:'13:00–13:45', name:'ees Forum｜长时储能路线：液流/压缩空气/氢储', loc:'C2.230 ees Forum', key:'4h+ 长时经济性、欧盟长时储能补贴框架（EN）'},
     {id:'c624_hub1310',time:'13:10', name:'ees Innovation Hub｜AI驱动实时可用容量测算', loc:'B0.110 Innovation Hub', key:'大型电站动态SoC校正，减少调度罚款——可用能量/bankability'},
-    {id:'c624_ees1400',time:'14:00–14:45', name:'ees Forum｜Politics Meets Industry：欧盟储能供应链法案', loc:'C2.230 ees Forum', key:'电池法规、本土电芯产能、进口碳关税'},
     {id:'c624_sef1400',time:'14:00–15:00', name:'The smarter E Forum｜数字孪生与AI资产运维', loc:'B5 The smarter E Forum', key:'光储全资产远程运维、cybersecurity、AI风控——3.0资产层'},
-    {id:'c624_ees1500',time:'15:00–15:45', name:'ees Forum｜储能安全新标准：热失控 / 液冷消防', loc:'C2.230 ees Forum', key:'电站消防规范、舱级液冷系统实测（EN）'},
     {id:'c624_hub1540',time:'15:40', name:'ees Innovation Hub｜电池制造 + 梯次利用AI分选', loc:'B0.110 Innovation Hub', key:'退役电芯AI视觉+电化学快速分级、循环经济'},
-    {id:'c624_eesai1600',time:'16:00–16:45', name:'⭐ ees Forum｜AI EMS 智能能源管理系统（核心AI主场）', loc:'C2.230 ees Forum', key:'光储协同调度、电网调频辅助服务、户储AI管家落地——你的软件3.0轨道首选'},
     {id:'c624_dyness1700',time:'17:00', name:'Dyness 展台｜AI-Ready Storage 专场', loc:'C2 馆 Dyness', key:'智能电池+分布式储能全局AI调度'}
+  ]},
+  {day:'✅ 6/25 周四 · ees Forum DAY 3（现场实拍·准）', items:[
+    {id:'e3_ci_play',time:'10:00', name:'ees Forum｜C&I 光储欧洲攻略：解锁最大未开发机会', loc:'C2.230 ees Forum', key:'Industry Pitches(EN)——C&I 储能蓝海'},
+    {id:'e3_ops',time:'10:10', name:'ees Forum｜储能长期价值始于专业化运营', loc:'C2.230 ees Forum', key:'Industry Pitches(EN)——运营落后于装机的痛点'},
+    {id:'e3_sineng',time:'10:20', name:'ees Forum｜大型储能如何成为电网的"主动支撑者"', loc:'C2.230 ees Forum', key:'Sineng 上能电气 · Tony Fu(EN)'},
+    {id:'e3_intro',time:'11:30', name:'ees Forum｜C&I 储能专场 · 开场引导', loc:'C2.230 ees Forum', key:'电网稳定+新商业模式专场(DE) · BSW 德国太阳能协会'},
+    {id:'e3_ki',time:'11:35', name:'ees Forum｜用 AI/KI 智能规划储能：满足电网要求+收益最大', loc:'C2.230 ees Forum', key:'RatioPower(DE)'},
+    {id:'e3_multiuse',time:'11:50', name:'ees Forum｜C&I 储能 Multi-Use 多用途配置', loc:'C2.230 ees Forum', key:'(DE)'},
+    {id:'e3_econ',time:'12:05', name:'ees Forum｜2026 储能还赚钱吗？智能控制+灵活性交易创造新潜力', loc:'C2.230 ees Forum', key:'Greenflash(DE)——B线核心议题'},
+    {id:'e3_grid',time:'12:20', name:'ees Forum｜C&I 储能：电网稳定 + 新商业模式', loc:'C2.230 ees Forum', key:'Projekt Hoch 4(DE)'},
+    {id:'e3_mittel',time:'12:35', name:'ees Forum｜中小企业储能：新用例大幅降本、缩短回收期', loc:'C2.230 ees Forum', key:'(DE)'}
   ]},
   {day:'6/22 周一 · 开幕前夜（ICM）', items:[
     {id:'award',time:'17:00', name:'The smarter E AWARD 颁奖典礼', loc:'ICM 国际会议中心', key:'一晚锁定全行业软件/VPP 风向与获奖名单；重点听 Smart Integrated Energy 类目的获奖理由'}
@@ -947,7 +962,7 @@ async function renderConf(){
   if(CONFVENUE!=='all' && !venues.includes(CONFVENUE)) CONFVENUE='all';
   const aiTotal=CONF.reduce((n,g)=>n+g.items.filter(confIsAI).length,0);
   const pass=it=>(CONFVENUE==='all'||confVenue(it)===CONFVENUE)&&(!CONFAI||confIsAI(it));
-  let h='<div class="tip">📅 排期 + 一句话重点。已按现场勘误：<b>ICM 今日无储能/付费会(均在 6.23)、A3 13:30 产业峰会今日取消、宁德/远景改在 B1 馆</b>。⚠️ 仍为 AI 整理草稿，到场请用官方 App 再核对房间。每场都可点进去<b>拍照 + 记笔记</b>。</div>';
+  let h='<div class="tip">📅 排期 + 一句话重点。<b>带 ✅ 的 ees Forum(Day2/3) 为现场实拍官方议程（准）</b>；其余"展台/其他论坛"为辅助整理，到场请用官方 App 再核对房间。⚠️ 注：6/24 下午 ees 主舞台是「储能项目融资/可融资性(bankability)」专题(Tolling/merchant风险/Entrix)，此前 AI 草稿里的"AI EMS 主场"等为误，已更正。每场都可点进去<b>拍照 + 记笔记</b>。</div>';
   h+='<div class="cattabs"><button class="'+(CONFVENUE==='all'?'on':'')+'" onclick="selConfVenue(\'all\')">全部场馆</button>';
   venues.forEach(v=>{ h+='<button class="'+(CONFVENUE===v?'on':'')+'" onclick="selConfVenue(\''+v+'\')">'+esc(v)+'</button>'; });
   h+='</div>';
