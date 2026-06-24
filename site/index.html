@@ -986,6 +986,7 @@ function renderInsight(){
   const li=arr=>'<ul style="padding-left:18px;margin:6px 0;line-height:1.75">'+arr.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
   const sub=t=>'<div style="font-weight:700;margin:10px 0 2px;color:#cbd5e1">'+t+'</div>';
   const seg3=(c1,rows)=>'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px"><thead><tr style="text-align:left;border-bottom:2px solid #334155;color:#94a3b8"><th style="padding:6px 5px">'+c1+'</th><th style="padding:6px 5px">头部玩家</th><th style="padding:6px 5px">EcoFlow 位置</th></tr></thead><tbody>'+rows.map(r=>'<tr style="border-bottom:1px solid #1e293b">'+r.map((c,i)=>'<td style="padding:6px 5px'+(i===0?';font-weight:700':'')+'">'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+  const matrix=(cols,rows,hl)=>'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(cols.length>3?'580':'520')+'px"><thead><tr style="text-align:left;border-bottom:2px solid #334155;color:#94a3b8">'+cols.map((c,i)=>'<th style="padding:6px 5px'+(i>0&&cols.length>3?';text-align:center':'')+'">'+c+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr style="border-bottom:1px solid #1e293b">'+r.map((c,i)=>'<td style="padding:6px 5px'+(i===0?';font-weight:700':(i>0&&cols.length>3?';text-align:center':''))+((hl!=null&&i===hl)?';background:rgba(79,70,229,.12)':'')+'">'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
   let h='';
   // 顶部 TL;DR
   h+='<div class="tip" style="line-height:1.7"><b>📊 现场洞察 · 2026 Intersolar / The smarter E（站在 EcoFlow 视角）</b><br>基于已上传的现场资料 + 官方定调 + 公开报道/融资数据交叉。<b>结论：硬件在快速商品化，价值确定性迁移到「软件 + 灵活性 + 结算」层——这是 EcoFlow 从"卖设备"转"卖系统/订阅/调度"的窗口。</b></div>';
@@ -994,7 +995,8 @@ function renderInsight(){
     '<b>软件 2.0 已拥挤、α 压缩</b>：FCR 饱和、英国调频收入曾暴跌 73%；"多榨 X% 收益"会越卷越薄。',
     '<b>真正高地在 3.0</b>：跨品牌接入 + 可融资结算「轨道/账本」(bankability)，目前<b>无人占稳</b>。',
     '<b>AI 在升级</b>：从"看板/建议"→"自治交易/调度 + 可信账本"（Suena/Entrix/Kraken $8.65B、volytica/TWAICE）。EcoFlow 的 AI(OASIS)仍偏消费端自家生态。',
-    '<b>对 EcoFlow 最大杠杆</b>：把海量「即插即用」装机（现为封闭 App）→ 开放成跨品牌灵活性池 + VPP + 安装商工具，向 3.0 轨道卡位，而非再做一个更封闭的家庭 App。'
+    '<b>对 EcoFlow 最大杠杆</b>：把海量「即插即用」装机（现为封闭 App）→ 开放成跨品牌灵活性池 + VPP + 安装商工具，向 3.0 轨道卡位，而非再做一个更封闭的家庭 App。',
+    '<b>🟢 现场实证(6/24 ees Forum 下午整场)</b>：Tolling 协议 → merchant 风险 → <b>Making BESS Bankable(Entrix)</b> → 可融资共址——一整场都在讲"可融资性(bankability)"，正面印证 3.0 = 接入+结算"轨道/账本"是真热点、真缺口。'
   ]));
   // 维度1 储能硬件
   h+=sec('🔋 维度一 · 储能硬件',
@@ -1022,6 +1024,17 @@ function renderInsight(){
       ['📈 VPP / 聚合 / 交易','1KOMMA5°、sonnen、Next Kraftwerke、Tibber、Entrix、Kraken','<b>基本无</b> VPP 收益分成 / 动态电价自动套利'],
       ['⚡ C&I EMS 调度','coneva、Furo、Simpl、Sungrow iSolarEMS、华为、FENECON(开源)','<b>无</b>(对应硬件工商储缺位)']
     ])+
+    sub('EcoFlow 软件能力 vs 同行（逐项·更细）')+matrix(
+      ['软件能力','EcoFlow','安克','华为','思格','gridX/1K5*'],[
+      ['自家 App + AI 助手','✓ EcoBot','✓','✓','✓','✓'],
+      ['动态电价自动套利','△','△','△','△','✓ 强'],
+      ['跨品牌设备接入','✗ 自家','✗ 自家','✗ 自家','△ 存疑','✓ 强'],
+      ['VPP / 聚合分成','✗','✗','△ 电站级','✗','✓ 1GW'],
+      ['安装商批量纳管','△ 弱','✗','✓','△','✓'],
+      ['开放本地 API','△ 开发者','✗ 云锁','△','△','✓ 开源'],
+      ['收益结算透明 / bankable','✗','✗','✗','✗','✗ ←全行业空白'],
+      ['C&I EMS 调度','✗','✗','✓','△','✓']
+    ],1)+'<div class="muted" style="font-size:11px;margin:4px 0 2px">* gridX / 1KOMMA5° 为跨品牌平台 + VPP 软件标杆；✓强项 △部分/存疑 ✗缺失。结算/bankable 一列全行业皆空 = 3.0 卡位窗。</div>'+
     sub('▶ EcoFlow 位置 / 机会')+li([
       '强在最浅的"消费端 App"层，越往 HEMS→VPP→EMS 走越弱——而<b>价值正沿这条链上移</b>。',
       '缺：跨品牌中立接入、VPP 收益分成、动态电价自动套利、安装商批量纳管、收益结算透明。',
@@ -1050,10 +1063,18 @@ function renderInsight(){
       '③ <b>AI 自治交易/对冲（agentic，新热点）</b>｜④ <b>AI 可融资账本 / 资产层 KPI（bankability，空白）</b>'
     ])+
     sub('储能同行的 AI 成色对比（更贴近 EcoFlow 的对标）')+aiPeerTable+
-    sub('▶ EcoFlow 位置')+li([
-      'AI 主要落在<b>消费端</b>(OASIS 用电优化 / 省钱)；缺 ③ 自治交易 与 ④ 可信账本。',
-      '在储能同行里：华为做"电网级"AI(构网/调频/C&I)但封闭；思格"AI in All"偏营销；<b>安克与 EcoFlow 最同质</b>(消费端 AI + 云锁定)。',
-      '<b>结论</b>：别和大厂拼电网级 AI、也别陷入"AI 口号"内卷——EcoFlow 的差异化应是<b>开放 API + 跨品牌聚合 + VPP/交易</b>，把消费 AI 升级为可被调用/结算的灵活性。'
+    sub('App AI 助手对比（消费端新战场：EcoBot / 安克 / 华为 / 思格）')+matrix(
+      ['App AI 助手','定位 / 能做什么','局限 / 差异'],[
+      ['EcoFlow EcoBot','对话式 AI 能源助手：自然语言查看/调节用电、省钱与策略建议、设备控制','偏消费端·自家设备；尚未跨品牌、未接 VPP/交易变现'],
+      ['安克 Anker SOLIX','App AI 助手：用电分析、动态电价/智能模式建议','云锁定、自家生态'],
+      ['华为 FusionSolar','App 智能助手 + AI 诊断/运维：告警、发电与运维优化','偏专业/安装商/电站，绑自家硬件'],
+      ['思格 Sigenergy mySigen','"AI in All" 家庭能量助手','偏营销叙事，对他牌开放存疑'],
+      ['对照 Tesla / sonnen','无对话助手，靠后台自动 VPP/调度直接变现','重"自动变现"轻"问答"']
+    ])+'<div class="muted" style="font-size:11px;margin:4px 0 2px">App AI 助手正成为消费端<b>标配</b>(EcoBot/安克/华为/思格都已上)——"有助手"很快不再是差异化。</div>'+
+    sub('▶ EcoFlow 位置 + EcoBot 护城河')+li([
+      'AI 仍主要落在<b>消费端</b>(OASIS 优化 + EcoBot 问答)；缺 ③ 自治交易 与 ④ 可信账本。',
+      '同行里：华为做"电网级"AI 但封闭；思格"AI in All"偏营销；<b>安克与 EcoFlow 最同质</b>(消费端 AI 助手 + 云锁定)。',
+      '<b>EcoBot 要避免沦为"又一个聊天框"</b>，护城河应建立在：① <b>跨品牌接入</b>（不止自家设备）；② 助手能<b>真调度 + VPP 分成变现</b>（不止问答省钱）；③ 接到<b>自治交易 / 可融资账本(3.0)</b>。'
     ]));
   // 维度4 EcoFlow 对标 & 打法
   const rows=[
