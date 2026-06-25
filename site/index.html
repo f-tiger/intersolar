@@ -277,10 +277,6 @@
         <li>本工具本身也是一个可被验证的"现场数据采集"MVP — 用顺手与否就是反馈。</li>
       </ul>
     </div>
-    <div class="sec">
-      <h3>⚠️ 危险操作</h3>
-      <button class="btn ghost" id="wipe" style="border-color:#ef4444;color:#fca5a5">清空所有本地数据</button>
-    </div>
   </section>
 
   <footer>Intersolar Europe 2026 · The smarter E · 离线可用 · 数据仅存本机</footer>
@@ -1591,9 +1587,6 @@ $('#exp-html').addEventListener('click',async()=>{toast('生成归档报告…')
     <p class="sum">导出时间：${new Date().toLocaleString('zh-CN')} · 共 ${photos.length} 张照片</p>${body||'<p>暂无已填写内容</p>'}</body></html>`;
   download('intersolar-归档-'+stamp()+'.html',doc,'text/html');});
 
-$('#wipe').addEventListener('click',async()=>{if(confirm('确定清空所有本地数据（含照片）？此操作不可恢复。')){
-  localStorage.removeItem(LS_KEY);STATE={booths:{},custom:[]};await clearPhotos();toast('已清空');go('list');}});
-
 $('#addbooth').addEventListener('click',()=>{const name=prompt('展位名称：');if(!name)return;
   const line=prompt('归类 A=户储 / B=工商储 / G=通用：','G').toUpperCase();const L=['A','B','G'].includes(line)?line:'G';
   const id='custom_'+Date.now();STATE.custom=STATE.custom||[];
@@ -1671,9 +1664,13 @@ function pad(n){return String(n).padStart(2,'0');}
 let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
 window.openBooth=openBooth;window.go=go;window.markDone=markDone;
 
-/* 切换"主持人模式"：连点标题 5 下 / 长按 0.6s / 网址带 #admin（显示·隐藏 验证看板·数据归档） */
-function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'1':'0'); applyRole();
-  toast(OWNER?'已开启主持人模式（显示数据/归档）':'已关闭主持人模式'); if(!OWNER&&CUR==='data')go('list'); }
+/* 切换"主持人模式"：连点标题 5 下 / 长按 0.6s / 网址带 #admin。开启需输入密码，避免误触 */
+const OWNER_PW='ecoflow2026';
+function toggleOwner(){
+  if(OWNER){ OWNER=false; localStorage.setItem('scout_owner','0'); applyRole(); toast('已关闭主持人模式'); if(CUR==='data')go('list'); return; }
+  const pw=prompt('输入主持人密码：'); if(pw==null) return;
+  if(pw===OWNER_PW){ OWNER=true; localStorage.setItem('scout_owner','1'); applyRole(); toast('已开启主持人模式（显示数据/归档）'); }
+  else toast('密码错误'); }
 (function(){const el=document.querySelector('header .hbar'); if(!el)return; let t=null,n=0,t0=0;
   el.addEventListener('click',()=>{ const now=Date.now(); if(now-t0>1500)n=0; t0=now; if(++n>=5){n=0; toggleOwner();} });
   const start=()=>{ t=setTimeout(toggleOwner,600); };
@@ -1684,7 +1681,7 @@ function toggleOwner(){ OWNER=!OWNER; localStorage.setItem('scout_owner',OWNER?'
 
 /* 启动 */
 (async()=>{
-  if(location.hash.indexOf('admin')>=0){ OWNER=true; localStorage.setItem('scout_owner','1'); }
+  if(/admin/.test(location.hash) && !OWNER){ const pw=prompt('输入主持人密码：'); if(pw===OWNER_PW){ OWNER=true; localStorage.setItem('scout_owner','1'); } }
   try{ await openDB(); }catch(e){ console.warn('IndexedDB 不可用',e); }
   if(getCfg()){ try{ await initCloud(); }catch(e){ console.warn(e); } }
   renderList(); refreshCloudUI(); applyRole();
